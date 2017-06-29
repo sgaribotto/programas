@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Asignación de comisiones 1er cuatrimestre 2017</title>
+		<title>Asignación de comisiones</title>
 		<?php 
 			require_once 'programas.autoloader.php';
 			require_once('./fuentes/meta.html');
@@ -23,7 +23,7 @@
 		?>
 		
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Asignar comisiones 2do cuatriemestre 2017</h2>
+			<h2 class="formularioLateral">Asignar comisiones 2do cuatrimestre 2017</h2>
 			<div id="plantelActual">
 				<table class="plantelActual">
 					<thead class="plantelActual">
