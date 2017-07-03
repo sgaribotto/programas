@@ -116,7 +116,7 @@
 				$.post("./fuentes/AJAX.php?act=agregarMateria", formValues, function(data) {
 					if (data.tipo == "error") {
 						alert('Error desconocido');
-					} else if(data.tipo == "modificacion")
+					} else if(data.tipo == "modificacion") {
 						alert('Se ha realizado la modificación');
 					} else if(data.tipo == "agregado") {
 						alert('Se ha agregado la materia');
