@@ -360,6 +360,10 @@
 				
 			});
 			
+			$('form.filtros').submit(function(event) {
+				event.preventDefault();
+			});
+			
 		});
 	</script>
 	<style>

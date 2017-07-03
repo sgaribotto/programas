@@ -1,7 +1,7 @@
 ﻿<?php
 	//CONEXIÓN A LA BASE DE DATOS
 	
-	$mysqli = new mysqli('localhost', 'homestead', 'secret', 'programas');
+	$mysqli = new mysqli('localhost', 'root', 'gari', 'programas');
 	$mysqli->set_charset("utf8");
 	
 	if ($mysqli->errno) {
