@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Estado Carga de comisiones</title>
+		<title>Oferta Académica</title>
 		<?php 
 			require_once('./fuentes/meta.html');
 			
@@ -21,58 +21,22 @@
 			require("./fuentes/panelNav.php");
 		?>
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Consultar comisiones</h2>
+			<h2 class="formularioLateral">Oferta académica</h2>
 			<div id="mostrarFormulario">Mostrar filtros</div>
-			<div id="descargarXLS">Reporte Excel</div>
+			<a href="#" target="_blank" charset="utf8" id="downloaderOferta" download="oferta.xls" style="display:inline;">
+				<div id="descargarXLS">Descargar Excel</div>
+			</a>
+			
 			<div id="formulario" class="desplegable">
 				<fieldset class="formularioLateral">
 					<form method="post" class="formularioLateral filtros" >
-						<label class="formularioLateral" for="periodo">Periodo:</label>
-						<select class="formularioLateral iconPeriodo filterTrigger" name="periodo" id="periodo"/>
-							<?php
-								require "fuentes/conexion.php";
-								
-								$query = "SELECT DISTINCT CONCAT(anio, ' - ', cuatrimestre) AS periodo 
-											FROM comisiones_abiertas
-											ORDER BY anio, cuatrimestre";
-								$result = $mysqli->query($query);
-								while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
-									echo "<option class='formularioLateral' value='$row[periodo]' selected='selected'>$row[periodo]</option>";
-								}
-								
-								$result->free();
-								$mysqli->close();
-							?>
-								 
-						</select>
-						<br />
-						<label class="formularioLateral" for="cuatrimestre">Cuatrimestre:</label>
-						<select class="formularioLateral iconPeriodo filterTrigger" name="cuatrimestre" id="cuatrimestre"/>
-							<option class="formularioLateral" value="">Seleccionar cuatrimestre</option>
-							<?php
-								require "fuentes/conexion.php";
-								
-								$query = "SELECT DISTINCT IF( cuatrimestre BETWEEN 1 AND 9, cuatrimestre, 'otro') as cuatrimestre 
-											FROM materia";
-								$result = $mysqli->query($query);
-								while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
-									echo "<option class='formularioLateral' value='$row[cuatrimestre]'>$row[cuatrimestre] cuatrimestre</option>";
-								}
-								
-								$result->free();
-								$mysqli->close();
-							?>
-								 
-						</select>
-						<br />
-						<label class="formularioLateral" for="carrera">Carrera:</label>
+						<label class="formularioLateral" for="carrera">carrera:</label>
 						<select class="formularioLateral iconPeriodo filterTrigger" name="carrera" id="carrera"/>
 							<option class="formularioLateral" value="">Seleccionar carrera</option>
 							<?php
 								require "fuentes/conexion.php";
 								
-								$query = "SELECT DISTINCT id, nombre
-											FROM carrera";
+								$query = "SELECT c.nombre, c.id FROM carrera AS c ORDER BY c.nombre";
 								$result = $mysqli->query($query);
 								while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
 									echo "<option class='formularioLateral' value='$row[id]'>$row[nombre]</option>";
@@ -108,14 +72,45 @@
 								 
 						</select>
 						<br />
+						<label class="formularioLateral" for="anio">Periodo:</label>
+						<select class="formularioLateral iconPeriodo filterTrigger" name="periodo" id="periodo"/>
+							
+							<?php
+								require "fuentes/conexion.php";
+								
+								$query = "SELECT DISTINCT CONCAT(anio, ' - ', cuatrimestre) AS periodo
+											FROM turnos_con_conjunto
+											ORDER BY periodo DESC";
+								$result = $mysqli->query($query);
+								while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+									echo "<option class='formularioLateral' value='$row[periodo]'>$row[periodo]</option>";
+								}
+								
+								$result->free();
+								$mysqli->close();
+							?>
+								 
+						</select>
+						<br />
+						<label class="formularioLateral" for="turno">Turno:</label>
+						<select class="formularioLateral iconPeriodo filterTrigger" name="turno" id="turno"/>
+							<option class="formularioLateral" value="">Seleccionar turno</option>
+							<option class="formularioLateral" value="M">Mañana</option>
+							<option class="formularioLateral" value="T">Tarde</option>
+							<option class="formularioLateral" value="N">Noche</option>
+								 
+						</select>
+						<br />
+						
 						<label class="formularioLateral" for="materia">Materia: </label>
 						<input name="materia" class="formularioLateral iconMateria filterTrigger" id="materia" type="text" maxlength="30">
 						<br />
 					</form>
 				</fieldset>
 			</div>
+			
 			<div class="dialog resumenMateria" id="dialogResumenMateria"></div>
-		
+			<!--<a href="#" target="_blank" charset="utf8" id="downloaderOferta" download="oferta.xls" style="display:inline;">Downloader</a>-->
 			<hr>
 			
 		
@@ -154,20 +149,19 @@
 			var actualizarTabla = function() {
 				formValues = $('form.filtros').serialize();
 				//console.log(formValues);
-				$('#tablaAceptarDesignacion').load("fuentes/AJAX.php?act=tablaConsultaComisiones", formValues, function(data) {
-				
+				$('#tablaAceptarDesignacion').load("fuentes/AJAX.php?act=tablaOfertaAcademica", formValues, function(data) {
+					htmlTest = $('#tablaAceptarDesignacion').html();
+					var textToSave = htmlTest;
+					
+					$('#downloaderOferta').attr('href',  'data:attachment/html, ' + encodeURI((textToSave)))
 				});
 			} 
 			actualizarTabla();
 			
-			$('form.filtros').submit(function(event) {
-				event.preventDefault();
-			});
-			
 			$('#tablaAceptarDesignacion').on('click', 'td.masInfo', function(event) {
 				
 				var string = event.target.innerHTML;
-				string = string.substring(1, 6);
+				string = string.substring(0, 6);
 				//console.log(string);
 				cod = parseFloat(string);
 				$('#dialogResumenMateria').empty();
@@ -180,8 +174,46 @@
 			
 			
 			$('#mostrarFormulario').click(function() {
-				$('div #formulario').slideToggle();
+				$('div #formulario').slideToggle(function() {
+					if ($('div#formulario').is(':visible')) {
+						$('#mostrarFormulario').css('backgroundColor', 'black');
+						$('#mostrarFormulario').css('color', gris);
+					} else {
+						$('#mostrarFormulario').css('backgroundColor', gris);
+						$('#mostrarFormulario').css('color', 'black');
+					}
+				});
+				$('div #formularioCopiarOferta').slideUp();
+				
+				var gris = '#f9f9f9';
+				
+				$('#copiarOferta').css('backgroundColor', gris);
+				$('#copiarOferta').css('color', 'black');
 			});
+			
+			$('#downloaderOferta').click(function() {
+				var ref = $(this).attr('href');
+				//console.log(ref);
+			});
+			$('#copiarOferta').click(function() {
+				
+				$('div #formularioCopiarOferta').slideToggle(function() {
+					if ($('div#formularioCopiarOferta').is(':visible')) {
+						$('#copiarOferta').css('backgroundColor', 'black');
+						$('#copiarOferta').css('color', gris);
+					} else {
+						$('#copiarOferta').css('backgroundColor', gris);
+						$('#copiarOferta').css('color', 'black');
+					}
+				});
+				$('div #formulario').slideUp();
+				
+				var gris = '#f9f9f9';
+				
+				$('#mostrarFormulario').css('backgroundColor', gris);
+				$('#mostrarFormulario').css('color', 'black');
+			});
+			
 			$('#mostrarFormulario').click();
 			
 			$('#materia').focus();
@@ -189,7 +221,7 @@
 			$('input.filterTrigger').on('keyup blur change', function() {
 				val = $(this).val();
 				
-				if (val.length > 0 ) {
+				if (val.length > 2 ) {
 					//alert(val);
 					actualizarTabla(); 
 				}
@@ -200,13 +232,51 @@
 				actualizarTabla();
 			});
 			
-			$('#descargarXLS').click(function(event) {
+			/*function download(data, filename, type) {
+				var a = document.createElement("a"),
+					file = new Blob([data], {type: type});
+				if (window.navigator.msSaveOrOpenBlob) // IE10+
+					window.navigator.msSaveOrOpenBlob(file, filename);
+				else { // Others
+					var url = URL.createObjectURL(file);
+					a.href = url;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					setTimeout(function() {
+						document.body.removeChild(a);
+						window.URL.revokeObjectURL(url);  
+					}, 0); 
+				}
+			}*/
+			
+			$('form.copiarOferta').submit(function(event) {
 				event.preventDefault();
-				var periodo = $('#periodo').val();
-				//periodo = htmlentities(periodo);
-				location.assign('asignacioncomisionesexcel.php?periodo=' + periodo);
+				var values = $('form.copiarOferta').serialize();
+				console.log(values);
+				
+				var acepta = confirm('¿Desea copiar la oferta del periodo ' +
+					$('#copiarDe').val() + ' al periodo ' + $('#copiarA').val() + '?');
+				if (acepta) {
+					//console.log(values);
+					$.post('fuentes/AJAX.php?act=copiarOferta', values, function(data) {
+						
+						location.reload();
+					});
+				}
+				
+			});
+			
+			$('form.filtros').submit(function(event) {
+				event.preventDefault();
 			});
 			
 		});
 	</script>
+	<style>
+	td.materia {
+		text.align: center;
+	}
+	</style>
 </html>
+

@@ -168,9 +168,7 @@
 			<ul class="navLateral">
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
-				<!--<li class="navLateral"><a href="responsables.php" class="navLateral">Responsables</a></li>
-				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
-				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
+				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
 			</ul>
 			
 		</ol>
