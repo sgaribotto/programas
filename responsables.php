@@ -132,9 +132,11 @@
 					$('.botonEliminar').click(function() {
 						var id = $(this).data('id');
 						$.post("./fuentes/AJAX.php?act=eliminarResponsable", {"id":id, }, function(data) {
+							
 							actualizarTabla();
 						});
 					});
+					
 				});
 			} 
 			actualizarTabla();
@@ -145,6 +147,7 @@
 				
 				$.post("./fuentes/AJAX.php?act=agregarResponsable", formValues, function(data) {
 					actualizarTabla();
+					alert('Se ha agregado al responsable');
 				});
 				
 			});
