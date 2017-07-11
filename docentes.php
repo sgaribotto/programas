@@ -74,10 +74,12 @@
 				//console.log(formValues);
 				$('#tablaDatos').load("fuentes/AJAX.php?act=tablaDocentes", formValues, function(data) {
 					$('.botonEliminar').click(function() {
-						var id = $(this).data('id');
-						$.post("./fuentes/AJAX.php?act=eliminarDocente", {"id":id, }, function(data) {
-							actualizarTabla();
-						});
+						if (confirm('¿Desea Eliminar el docente? \n Podrá agregarlo nuevamente solo con el DNI')) {
+							var id = $(this).data('id');
+							$.post("./fuentes/AJAX.php?act=eliminarDocente", {"id":id, }, function(data) {
+								actualizarTabla();
+							});
+						}
 					});
 				});
 			} 
@@ -110,13 +112,6 @@
 				});
 			});
 			
-			$('.botonEliminar').click(function() {
-				alert('eliminar');
-				id = $(this).data('id');
-				$.post("./fuentes/AJAX.php?act=eliminarDocente", {"id":id, }, function(data) {
-					actualizarTabla();
-				});
-			});
 			
 			function togglerButtonColor() {
 				

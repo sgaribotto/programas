@@ -116,7 +116,7 @@
 							?>
 						</select>
 						<br />
-						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Guardar y cargar otro</button>
+						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Agregar docente</button>
 						<p class="formularioLateral errorValidar"></p>
 						<br />
 						<button type="button" class="formularioLateral iconContinuar" id="botonContinuar">Continuar</button>

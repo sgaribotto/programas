@@ -167,6 +167,72 @@
 					$mysqli->query($query);
 					$mysqli->close();
 					break;
+				
+				case "agregarPersonal":
+					require "./conexion.php";
+					
+					$query = "SELECT dni FROM personal WHERE dni = '$_POST[dni]' ";
+					$result = $mysqli->query($query);
+					$_POST['apellido'] = $mysqli->real_escape_string($_POST['apellido']);
+					if ($result->num_rows == 1) {
+						$query = "UPDATE personal 
+									SET apellido = '$_POST[apellido]', 
+										nombres = '$_POST[nombre]', 
+										usuario = '$_POST[usuario]',
+										password = MD5('$_POST[usuario]'),
+										activo = 1
+									WHERE dni = '$_POST[dni]'  ";
+						
+					} else {
+						$query = "INSERT INTO personal 
+									SET dni = '$_POST[dni]', 
+										apellido = '$_POST[apellido]', 
+										nombres = '$_POST[nombre]', 
+										usuario = '$_POST[usuario]', 
+										password = MD5('$_POST[usuario]')";
+					}
+					echo $query;
+					$mysqli->query($query);
+					if ($mysqli->errno) {
+						echo "ERROR: " . $mysqli->error;
+					} else {
+						echo "Se ha cargado el nuevo docente";
+					}
+					
+					
+					
+					$mysqli->close();
+					break;
+				
+				case "buscarPersonal":
+					require "./conexion.php";
+					
+					$query = "SELECT apellido, nombres, usuario FROM personal WHERE dni = '$_POST[dni]' ";
+					$result = $mysqli->query($query);
+					if ($result->num_rows == 1) {
+						$row = $result->fetch_row();
+						$datosDocente = ",";
+						foreach ($row as $value) {
+							$datosDocente .= $value . ",";
+						} 
+						echo $datosDocente;
+					} else {
+						echo "nuevo";
+					}
+					
+					
+					$result->free();
+					$mysqli->close();
+					break;
+					
+				case "eliminarPersonal":
+					require "./conexion.php";
+					$id = $_REQUEST['id'];
+					
+					$query = "UPDATE personal SET activo = 0 WHERE id = {$id}";
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
 					
 				case "agregarTurno":
 					require "./conexion.php";
@@ -314,46 +380,6 @@
 				case "eliminarMateria":
 					require "./conexion.php";
 					$query = "UPDATE materia SET activo = 0 WHERE cod = '$_POST[cod]' LIMIT 1";
-					$mysqli->query($query);
-					$mysqli->close();
-					break;
-				
-				case "agregarPersonal":
-					require "./conexion.php";
-					
-					$query = "SELECT dni FROM personal WHERE dni = '$_POST[dni]' ";
-					$password = md5($_POST['usuario']);
-					$result = $mysqli->query($query);
-					
-					if ($result->num_rows == 1) {
-						$query = "UPDATE personal SET apellido = '$_POST[apellido]', nombres = '$_POST[nombre]', usuario = '$_POST[usuario]', password = '$password', activo = 1 WHERE dni = '$_POST[dni]'  ";
-						$result->free();
-					} else {
-						$query = "INSERT INTO personal SET dni = '$_POST[dni]', apellido = '$_POST[apellido]', nombres = '$_POST[nombre]', password = '$password', usuario = '$_POST[usuario]' ";
-					}
-					echo $query;
-					
-					$mysqli->query($query);
-					$mysqli->close();
-					break;
-				
-				case "buscarPersonal":
-					require "./conexion.php";
-					
-					$query = "SELECT apellido, nombres, usuario FROM personal WHERE dni = '$_POST[dni]' ";
-					$result = $mysqli->query($query);
-					if ($result->num_rows == 1) {
-						$row = $result->fetch_array(MYSQLI_ASSOC);
-						$datos = json_encode($row);
-						echo $datos;
-					}
-					$result->free();
-					$mysqli->close();
-					break;
-					
-				case "eliminarPersonal":
-					require "./conexion.php";
-					$query = "UPDATE personal SET activo = 0 WHERE dni = '$_POST[dni]' LIMIT 1";
 					$mysqli->query($query);
 					$mysqli->close();
 					break;
@@ -2026,7 +2052,55 @@
 						echo "<p>No se encontraron docentes</p>";
 					}
 					break;
+				
+				case "tablaPersonal":
+					require 'conexion.php';
 					
+					$where = '';
+					
+					if (isset($_REQUEST['filtro']) AND $_REQUEST['filtro'] != '') {
+						$where = " AND CONCAT(apellido, nombres, dni) LIKE '%{$_REQUEST['filtro']}%' ";
+					}
+					
+					$query = "SELECT id, dni, CONCAT(apellido, ', ', nombres) AS personal, usuario 
+									FROM personal
+									WHERE activo = 1 {$where} 
+									ORDER BY apellido, nombres
+									LIMIT 20";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$docentes = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$docentes[] = $row;
+					}
+					
+					if (sizeof($docentes)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:15%;'>DNI</th>
+								<th class='subtitulo'style='width:55%;'>Nombre</th>
+								<th class='subtitulo' style='width:20%;'>Usuario</th>
+								<th class='subtitulo' style='width:10%;'>Eliminar</th>
+							</tr>";
+						foreach ($docentes AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[dni]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[personal]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[usuario]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarPersonal' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No hay resultados</p>";
+					}
+					break;
+						
 				case "tablaTurnos":
 					require 'conexion.php';
 					
