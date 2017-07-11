@@ -61,8 +61,7 @@
 				<li class="navLateral"><a href="estadocargacomisiones.php" class="navLateral">Estado de la carga de comisiones</a></li>
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
-				<!--<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
-				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
+				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
 			</ul>
 			
 			
@@ -83,10 +82,7 @@
 				<li class="navLateral"><a href="aceptardesignacion.php" class="navLateral">Aceptar Designaciones/Cargos</a></li>
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
-				<!--<li class="navLateral"><a href="materias.php" class="navLateral">Materias</a></li>
-				<li class="navLateral"><a href="responsables.php" class="navLateral">Responsables</a></li>
-				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
-				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
+				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
 			</ul>
 			
 		</ol>
