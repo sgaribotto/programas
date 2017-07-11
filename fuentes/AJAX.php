@@ -1128,9 +1128,17 @@
 					$requisito = $_REQUEST['requisito'];
 					$tipo = $_REQUEST['tipo'];
 					
-					$query = "INSERT INTO correlatividad (materia, requisito, tipo)
+					if ($tipo == "Ambas") {
+						$query = "INSERT INTO correlatividad (materia, requisito, tipo)
+							VALUES ({$materia}, {$requisito}, 'Total'),
+							({$materia}, {$requisito}, 'Cursada');";
+						$mysqli->query($query);
+					} else {
+						
+						$query = "INSERT INTO correlatividad (materia, requisito, tipo)
 							VALUES ({$materia}, {$requisito}, '{$tipo}');";
-					$mysqli->query($query);
+						$mysqli->query($query);
+					}
 					
 					$mensaje['exito'] = 1;
 					if ($mysqli->errno) {

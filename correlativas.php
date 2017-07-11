@@ -38,6 +38,7 @@
 						<select class="formularioLateral" name="tipo">
 							<option class="formularioLateral" value="Total" selected="selected">Total</option>
 							<option class="formularioLateral" value="Cursada">Cursada</option>
+							<option class="formularioLateral" value="Ambas">Total y cursada</option>
 						</select>
 						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Agregar</button>
 						<div id="materiasUnidas" class="materiasUnidas">

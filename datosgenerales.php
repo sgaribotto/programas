@@ -60,15 +60,16 @@
 							<table id="correlatividades" class="formularioLateral correlatividadesTable" style="width:100%;">
 								<tr class="formularioLateral correlatividadesTable" style="border-bottom:1px solid black;">
 									<th class="formularioLateral correlatividadesTable" style="width:170px;border-bottom:1px solid #CCC;">Código</th>
+									<th class="formularioLateral correlatividadesTable" style="border-bottom:1px solid #CCC;">Tipo</th>
 									<th class="formularioLateral correlatividadesTable" style="border-bottom:1px solid #CCC;">Materia</th>
-								</tr>
 								<?php
 									require('./fuentes/conexion.php');
 									
 									
-									$query = "SELECT m.cod, m.nombre FROM correlatividad AS c
+									$query = "SELECT m.cod, m.nombre, c.tipo 
+													FROM correlatividad AS c
 													INNER JOIN materia AS m
-													ON m.cod = c.requisito
+														ON m.cod = c.requisito
 													WHERE c.materia = '{$_SESSION['materia']}' ";
 																	
 									$result = $mysqli->query($query);
@@ -80,6 +81,7 @@
 										while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
 											echo "<tr class='formularioLateral correlatividadesTable'>
 														<td class='formularioLateral correlatividadesTable'>$row[cod]</td>
+														<td class='formularioLateral correlatividadesTable'>$row[tipo]</td>
 														<td class='formularioLateral correlatividadesTable'>$row[nombre]</td>
 														</tr>";
 										}
