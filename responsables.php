@@ -47,7 +47,7 @@
 							<option value="">Seleccione la materia</option>
 							<?php 
 								require "./conexion.php";
-								$query = "SELECT id, cod, nombre FROM materia WHERE activo = 1";
+								$query = "SELECT id, cod, nombre FROM materia WHERE activo = 1 ORDER BY cod + 0";
 								$result = $mysqli->query($query);
 								
 								while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -74,44 +74,8 @@
 				</fieldset>
 			</div>
 		
-			<hr>
-		
-		
+			<hr />
 			
-					<?php
-						/*require "./conexion.php";
-						//PAginación
-						$cantidadResultados = (isset($_GET['cantidadResultados'])) ? $_GET['cantidadResultados'] : 10;
-						$pagina = (isset($_GET['pagina'])) ? (($_GET['pagina'] - 1) * $cantidadResultados) : 0;
-						$hasta = $pagina + $cantidadResultados;
-						
-						$result = $mysqli->query("SELECT COUNT(id) FROM responsable WHERE activo = 1");
-						$totalPaginas = $result->fetch_row();
-						$result->free();
-						
-						$totalPaginas = $totalPaginas[0] / $cantidadResultados;
-						//tabla y resultados
-						$query = "SELECT id, responsable, materia FROM vista_responsable LIMIT $pagina, $cantidadResultados";
-						$result = $mysqli->query($query);
-						echo $mysqli->error;
-						
-						while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-							
-							echo "<tr class='formularioLateral plantelActual'>";
-							
-							foreach ($row as $value) {
-								echo "<td class='formularioLateral plantelActual'>$value</td>";
-							}
-							
-							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' class='formularioLateral botonEliminar' id='eliminarDocente' data-cod='$row[id]'>X</button>";
-							echo "</tr>";
-						}
-						
-						$result->free();
-						$mysqli->close();*/
-
-					?>
-				
 			<div id="tablaDatos"></div>
 			
 		</div>
