@@ -767,11 +767,79 @@ namespace clases {
 					WHERE ac.materia = '$conjunto' AND ac.anio = $anio
 						AND ac.cuatrimestre = $cuatrimestre
 					GROUP BY ac.comision, ac.docente";
+			
+			/*$query = "SELECT ca.materia, 
+						ca.horario, 
+						ca.nombre_comision, 
+						ca.turno, ca.anio, 
+						ca.cuatrimestre,
+						GROUP_CONCAT(DISTINCT CONCAT(d.apellido, ', ', d.nombres) SEPARATOR ' / ') AS docentes
+					FROM comisiones_abiertas AS ca
+					LEFT JOIN asignacion_comisiones AS ac
+						ON ac.materia = ca.materia
+							AND ac.anio = ca.anio
+							AND ac.cuatrimestre = ca.cuatrimestre
+							AND ac.comision = ca.nombre_comision
+					LEFT JOIN docente AS d
+						ON ac.docente = d.id
+					WHERE ca.anio = {$anio}
+						AND ca.cuatrimestre = {$cuatrimestre}
+						AND ca.materia = '{$conjunto}'
+					GROUP BY materia, nombre_comision"*/		
+			
 			$result = $mysqli->query($query);
 			echo $mysqli->error;
 			$asignaciones = array();
 			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 				$asignaciones[$row['turno']][$row['comision']][] = $row;
+			}
+			
+			$result->free();
+			$mysqli->close();
+			
+			return $asignaciones;
+		}
+		
+		/**
+		 * Muestra el resumen de asignaciones de una materia para usar en 
+		 * el resumen de la materia
+		 * @param $anio
+		 * @param $cuatrimestre
+		 * @return array las asignaciones
+		 */
+		 public function MostrarResumenAsignacionComisiones($anio, $cuatrimestre) {
+			 require "./conexion.php";
+			 
+			 $cod = $this->mostrarCod();
+			 $conjunto = $this->mostrarConjunto();
+			 
+		
+			$query = "SELECT ca.materia, 
+						ca.turno,
+						ca.horario, 
+						ca.nombre_comision, 
+						ca.anio, 
+						ca.cuatrimestre,
+						GROUP_CONCAT(DISTINCT CONCAT(d.apellido, ', ', d.nombres) SEPARATOR ' / ') AS docentes
+					FROM comisiones_abiertas AS ca
+					LEFT JOIN asignacion_comisiones AS ac
+						ON ac.materia = ca.materia
+							AND ac.anio = ca.anio
+							AND ac.cuatrimestre = ca.cuatrimestre
+							AND ac.comision = ca.nombre_comision
+					LEFT JOIN docente AS d
+						ON ac.docente = d.id
+					WHERE ca.anio = {$anio}
+						AND ca.cuatrimestre = {$cuatrimestre}
+						AND ca.materia = '{$conjunto}'
+					GROUP BY materia, nombre_comision";
+			
+			$result = $mysqli->query($query);
+			echo $mysqli->error;
+			$asignaciones = array();
+			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+				//$asignaciones[$row['turno']][$row['horario']][] = $row;
+				$asignaciones[$row['horario']][] = $row;
 			}
 			
 			$result->free();

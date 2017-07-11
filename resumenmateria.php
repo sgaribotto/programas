@@ -2,6 +2,9 @@
 	<img src="./images/logo_eeyn.png" class="logo-print print-only" Alt="EEYN - UNSAM"/>
 	
 		<?php
+			
+			//$_REQUEST['materia'] = 1006;
+			
 			header('Content-Type: text/html; charset=utf-8');
 			require_once 'programas.autoloader.php';
 			include './fuentes/constantes.php';
@@ -9,21 +12,19 @@
 			$materia = new clases\Materia($_REQUEST['materia']);
 			$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE, true);
 			$cantidadComisiones = $materia->mostrarCantidadComisiones($ANIO, $CUATRIMESTRE);
-			$comisionesAsignadas = $materia->mostrarAsignacionComisiones($ANIO, $CUATRIMESTRE);
+			$comisionesAsignadas = $materia->mostrarResumenAsignacionComisiones($ANIO, $CUATRIMESTRE);
 			$turnosMateria = $materia->mostrarTurnos();
 			$inscriptosMateria = $materia->mostrarInscriptos($ANIO, $CUATRIMESTRE);
 			$correlativas = $materia->mostrarCorrelativas();
 			$ratios = $materia->mostrarRatioAprobacion($ANIO, $CUATRIMESTRE);
 			$inscriptosPorTurno = $materia->mostrarInscriptosPorTurno($ANIO, $CUATRIMESTRE);
 			$carrera = $materia->datosMateria['cod_carrera'];
+			$carreras = $materia->mostrarCarreras();
+			$codigosConjunto = $materia->mostrarCodigosConjunto();
 			
-			$inscriptosEstimados = $materia->mostrarEstimacionPreliminar($ANIO, $CUATRIMESTRE, $carrera);
+			/*$inscriptosEstimados = $materia->mostrarEstimacionPreliminar($ANIO, $CUATRIMESTRE, $carrera);
 			$segundaEstimacion = $materia->segundaEstimacion($ANIO + 1, $CUATRIMESTRE - 1, $carrera);
 			$estimacionPool = $materia->mostrarEstimacionPool($ANIO + 1, $CUATRIMESTRE, $carrera);
-			
-			$carreras = $materia->mostrarCarreras();
-			
-			$codigosConjunto = $materia->mostrarCodigosConjunto();
 			
 			$inscriptosPorMateria = array();
 			$ratiosAprobacion = array();
@@ -37,77 +38,18 @@
 				foreach ($correlativasConjunto as $codigocorr => $nombre) {
 					$correlativa = new clases\Materia($codigocorr);
 					$inscriptosCorrelativa[$codigocorr] = $correlativa->mostrarInscriptosPorTurnoPorCod($ANIO,$CUATRIMESTRE, $carrera1);
-				}*/
+				}
 				//$inscriptosPorCod[$codigo] = $materiaDelConjunto->mostrarInscriptosPorTurnoPorCod($ANIO, $CUATRIMESTRE, $carrera1);
 				
 				$inscriptosEstimadosPorCod[$codigo] = $materiaDelConjunto->mostrarEstimacionPreliminarPorCod($ANIO, $CUATRIMESTRE, $carrera1);
 				
-			}
+			}*/
 			//print_r($inscriptosCorrelativa);
 			//echo "Correlativas: ";
 			//print_r($correlativas);
 			echo "<br />";
 		?>
 		
-		<?php
-			
-			$textoTurno = '';
-			
-			foreach ($turnos AS $turno => $nombreTurno) {
-				$resaltar = '';
-				
-				if (isset($cantidadComisiones[$turno])) {
-					$cantidadAsignadas = 0;
-					if (isset($comisionesAsignadas[$turno])) {
-						$cantidadAsignadas = count($comisionesAsignadas[$turno]);
-					}
-					if ($cantidadComisiones[$turno] > $cantidadAsignadas) {
-						$resaltar = 'resaltar';
-					}
-					
-					$dias = array();
-					foreach ($turnosMateria as $value) {
-						if (strpos($value['turno'], $turno) !== false) {
-							$dias[] = ucfirst($value['dia']) . " (" . 
-								$horasTurno[$value['turno']] .")";
-							
-						}
-					}
-					$dias = join(" + ", $dias);
-					
-					$strComisiones = "comisión";
-					if ($cantidadComisiones[$turno] > 1) {
-						$strComisiones = "comisiones";
-					}
-					
-					$textoTurno .= "<li class='formularioLateral turnos $resaltar'><b>"
-						. $dias . "</b> : <span class='cantidad' >" 
-						. $cantidadComisiones[$turno] . "</span> {$strComisiones}</li>";
-					$textoTurno .= "<ul class='formularioLateral comisiones'>";
-					
-					if (isset($comisionesAsignadas[$turno])) {
-						
-						foreach ($comisionesAsignadas[$turno] as $comision => $detalles) {
-							$textoTurno .= "<li class='formularioLateral comision'>";
-							if (isset($inscriptosMateria[$comision])) {
-								$textoTurno .= $comision . "(" . $inscriptosMateria[$comision] . " inscriptos): ";
-							} else {
-								$textoTurno .= $comision . ": ";
-							}
-							
-							foreach ($detalles as $detalle) {
-								$textoTurno .= $detalle['apellido'] . ", " . $detalle['nombres'];
-								$textoTurno .= ' / ';
-							}
-							$textoTurno = substr($textoTurno, 0, -3);
-							$textoTurno .= "</li>";
-						}
-					}
-					$textoTurno .= "</ul>";
-				}
-			}
-			
-		?>
 		<?php if(!isset($_GET['print'])) { 
 			session_start();
 			$animationEvent = "true";
@@ -164,99 +106,32 @@
 				Comisiones <?php echo $ANIO . " - " . $CUATRIMESTRE; ?>
 			</h4>
 			<ul class="formularioLateral turnos">
-				<?php echo $textoTurno; ?>
+				<?php
+					foreach ($comisionesAsignadas as $horario => $comisiones) {
+						echo "<li><b>{$horario}</b>: <ul>";
+						
+						foreach ($comisiones as $detalle) {
+							echo "<li>{$detalle['nombre_comision']}: {$detalle['docentes']}</li>";
+						}
+						
+						echo "</ul></li>";
+						
+					}
+						
+				 ?>
 			</ul>
 			
 			<h4 class='formularioLateral listadoComsiones' style="text-decoration:underline;">Equipo Docente</h4>
 			<table class='aceptarDesignacion'><thead class='aceptarDesignacion'>
 						<tr class='plantelActual' style="text-align:left;">
 							<th class='aceptarDesignacion' style='width:50%;'>Docente</th>
-							<!--<th class='aceptarDesignacion' style='width:35%;'>Materia</th>
-							<th class='aceptarDesignacion' style='width:10%;'>Carrera</th>-->
 							
 							<th class='aceptarDesignacion' style='width:25%;'>Cargo</th>
 							<th class='aceptarDesignacion' style='width:10%;'>Comision</th>
-							<!-- <th class='aceptarDesignacion' style='width:25%;'>Estado</th> -->
 						</tr></thead>
 				<tbody class="tablaInfo" style="width:100%;">
 				<?php 
 				
-					/*session_start();
-					
-					
-					if (in_array(2, $_SESSION['permiso'])) { //PERMISOS DEL SECRETARIO
-									 $carreras[] = 2;
-									 $carreras[] = 1;
-									 $carreras[] = 3;
-									 $carreras[] = 4;
-									 $opcionesEstado = array(
-										'Pendiente' => 'disabled',
-										'AprobadoCOORD' => ['AprobadoSA', 'RechazadoSA'],
-										'RechazadoCOORD' => 'disabled',
-										'AprobadoSA' => 'disabled',
-										'RechazadoSA' => 'disabled',
-										'AprobadoADMIN' => 'disabled',
-										'RechazadoADMIN' => ['AprobadoSA', 'RechazadoSA'],
-										'designado' => 'disabled',
-									);
-								} 
-								if (in_array(3, $_SESSION['permiso'])) { //PERMISOS DEL DIRECTOR DE ADMINISTRACIÓN
-									 $carreras[] = 2;
-									 $carreras[] = 1;
-									 $carreras[] = 3;
-									 $carreras[] = 4;
-									 $opcionesEstado = array(
-										'Pendiente' => 'disabled',
-										'AprobadoCOORD' => 'disabled',
-										'RechazadoCOORD' => 'disabled',
-										'AprobadoSA' => ['AprobadoADMIN', 'RechazadoADMIN'],
-										'RechazadoSA' => 'disabled',
-										'AprobadoADMIN' => 'disabled',
-										'RechazadoADMIN' => 'disabled',
-										'designado' => 'disabled',
-									);
-								} 
-								if (in_array(4, $_SESSION['permiso'])) { //Permisos del director de carrera ECONOmiA
-									 $carreras[] = 2;
-									 $carreras[] = 4;
-									 $opcionesEstado = array(
-										'Pendiente' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoCOORD' => 'disabled',
-										'RechazadoCOORD' => 'disabled',
-										'AprobadoSA' => 'disabled',
-										'RechazadoSA' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoADMIN' => 'disabled',
-										'RechazadoADMIN' => 'disabled',
-										'designado' => 'disabled',
-									);
-								} 
-								if (in_array(5, $_SESSION['permiso'])) { //Permisos del director de carrera ADMIN
-									 $carreras[] = 1;
-									 $carreras[] = 4;
-									 $opcionesEstado = array(
-										'Pendiente' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoCOORD' => 'disabled',
-										'RechazadoCOORD' => 'disabled',
-										'AprobadoSA' => 'disabled',
-										'RechazadoSA' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoADMIN' => 'disabled',
-										'RechazadoADMIN' => 'disabled',
-										'designado' => 'disabled',
-									);
-								} 
-								if (in_array(6, $_SESSION['permiso'])) { //Permisos del director de carrera TURISMO
-									 $carreras[] = 3;
-									 $opcionesEstado = array(
-										'Pendiente' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoCOORD' => 'disabled',
-										'RechazadoCOORD' => 'disabled',
-										'AprobadoSA' => 'disabled',
-										'RechazadoSA' => ['AprobadoCOORD', 'RechazadoCOORD'],
-										'AprobadoADMIN' => 'disabled',
-										'RechazadoADMIN' => 'disabled',
-										'designado' => 'disabled',
-									);
-								} */
 					
 					foreach ($equipoDocente as $key) {
 						echo "<tr class='aceptarDesignacion'>
@@ -264,109 +139,13 @@
 								<td class='aceptarDesignacion'>$key[tipoafectacion]</td>
 								<td class='aceptarDesignacion'>$key[comision]</td>";
 								
-								/*$estado = "<select class='aceptarDesignacion' data-id='$key[id]'>
-											<option class='aceptarDesignacion' value='$key[estado]' selected='selected'>$key[estado]</option>";
-									
-									if ($opcionesEstado[$key['estado']] != 'disabled') {
-										
-										foreach ($opcionesEstado[$key['estado']] as $opcion) {
-											$estado .= "<option class='aceptarDesignacion'>$opcion</option>";
-										}
-									}
-								$estado .= "</select>";
 								
-								echo "<td class='aceptarDesignacion'>$estado</td>
-							</tr>";*/
 					} ?>
 				</tbody>
 			</table>
 			
 			<hr />
-			<?php 
-				if (in_array(2, $_SESSION['permiso']) or in_array(4, $_SESSION['permiso'])
-					or in_array(5, $_SESSION['permiso'])  or in_array(6, $_SESSION['permiso']) ) { ?>
-				<h3 class="formularioLateral estimaciones">Proyecciones</h3>
-				<table class="formularioLateral estimaciones tablaInfo">
-					<thead class="formularioLateral estimaciones">
-						<tr class="formularioLateral estimaciones encabezado">
-							<th class="formularioLateral estimaciones">Tipo estimación</th>
-							<th class='formularioLateral estimaciones'>Mañana</th>
-							<th class='formularioLateral estimaciones'>Noche</th>
-							<th class='formularioLateral estimaciones'>Otro</th>
 						
-						</tr>
-					</thead>
-					<tbody>
-						<tr class="formularioLateral estimaciones preliminar">
-							<td class="formularioLateral estimaciones preliminar">Preliminar</td>
-							<?php
-								foreach ($inscriptosEstimados as $turno => $estimativo) {
-									echo "<td class='formularioLateral'>";
-									echo str_replace('=', ':',http_build_query($estimativo,'',' + '));
-									echo " = <b>TOTAL: ";
-									echo array_sum($estimativo);
-									
-									echo "</b></td>";
-								}
-							?>
-						</tr>
-						
-							
-							<?php
-								
-									
-									foreach ($inscriptosEstimadosPorCod as $codigo => $turnos) {
-										echo "<tr class='formularioLateral estimaciones preliminar'>";
-										echo "<td class='formularioLateral estimaciones preliminar'>Preliminar II ({$codigo})</td>";
-										//print_r($turnos);
-										
-										foreach ($turnos AS $turno => $estimativo) {
-											echo "<td class='formularioLateral'>";
-											echo str_replace('=', ':',http_build_query($estimativo,'',' + '));
-											echo " = <b>TOTAL: ";
-											echo array_sum($estimativo);
-											echo "</b></td>";
-										}
-										
-									echo "</tr>";
-									
-								}
-							?>
-						</tr>
-						<!--<tr class="formularioLateral estimaciones segundaEstimacion">
-							<td class="formularioLateral estimaciones segundaEstimacion">Sda. Estimación</td>
-							<?php
-								/*foreach ($segundaEstimacion as $turno => $estimativo) {
-									echo "<td class='formularioLateral'>";
-									echo str_replace('=', ':',http_build_query($estimativo,'',' + '));
-									echo " = <b>TOTAL: ";
-									echo array_sum($estimativo);
-									
-									echo "</b></td>";
-								}*/
-							?>
-						</tr>
-						<tr class="formularioLateral estimaciones estimacionPool">
-							<td class="formularioLateral estimaciones estimacionPool">Estimación pool</td>
-							<?php
-								/*foreach ($estimacionPool as $turno => $estimativo) {
-									echo "<td class='formularioLateral'>";
-									echo str_replace('=', ':',http_build_query($estimativo,'',' + '));
-									echo " = <b>TOTAL: ";
-									echo array_sum($estimativo);
-									
-									echo "</b></td>";
-								}*/
-							?>
-						</tr>-->
-					
-					</tbody>
-				
-				</table>
-				
-			<hr />
-			
-			
 			<h3 class="formularioLateral tablaInfo" style="margin:0;">Cuatrimestres anteriores</h3>
 					
 			<div class="marcoTablaResumenMateria">
@@ -575,7 +354,7 @@
 				<div class="chart" id="chart_div_cuantasCursadas"></div>
 			</div>
 			
-			<?php } ?>
+			
 			
 		</div>
 		
