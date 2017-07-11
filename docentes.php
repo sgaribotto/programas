@@ -99,11 +99,13 @@
 			$('#dni').change(function() {
 				dni = $('#dni').val();
 				$.post("./fuentes/AJAX.php?act=buscarDNI", {"dni":dni, }, function(data) {
+					if (data != "nuevo") {
 						datosDocente = data.split(',');
 						$('#apellido').val(datosDocente[1]);
 						$('#nombre').val(datosDocente[2]);
 						$('#fechanacimiento').val(datosDocente[3]);
 						$('#fechaingreso').val(datosDocente[4]);
+					}
 					
 				});
 			});

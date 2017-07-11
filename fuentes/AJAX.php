@@ -150,6 +150,8 @@
 							$datosDocente .= $value . ",";
 						} 
 						echo $datosDocente;
+					} else {
+						echo "nuevo";
 					}
 					
 					
