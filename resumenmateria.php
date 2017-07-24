@@ -2,25 +2,37 @@
 	<img src="./images/logo_eeyn.png" class="logo-print print-only" Alt="EEYN - UNSAM"/>
 	
 		<?php
-			
+			//print_r($_REQUEST);
 			//$_REQUEST['materia'] = 1006;
 			
 			header('Content-Type: text/html; charset=utf-8');
 			require_once 'programas.autoloader.php';
 			include './fuentes/constantes.php';
 			
+			$anio = $ANIO;
+			$cuatrimestre = $CUATRIMESTRE;
+			
+			
+			if (isset($_REQUEST['periodo'])) {
+				
+				$periodo = explode('-', $_REQUEST['periodo']);
+				$anio = $periodo[0];
+				$cuatrimestre = $periodo[1];
+			}
+			
 			$materia = new clases\Materia($_REQUEST['materia']);
-			$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE, true);
-			$cantidadComisiones = $materia->mostrarCantidadComisiones($ANIO, $CUATRIMESTRE);
-			$comisionesAsignadas = $materia->mostrarResumenAsignacionComisiones($ANIO, $CUATRIMESTRE);
+			$equipoDocente = $materia->mostrarEquipoDocente('*', $anio, $cuatrimestre, true);
+			$cantidadComisiones = $materia->mostrarCantidadComisiones($anio, $cuatrimestre);
+			$comisionesAsignadas = $materia->mostrarResumenAsignacionComisiones($anio, $cuatrimestre);
 			$turnosMateria = $materia->mostrarTurnos();
-			$inscriptosMateria = $materia->mostrarInscriptos($ANIO, $CUATRIMESTRE);
+			$inscriptosMateria = $materia->mostrarInscriptos($anio, $cuatrimestre);
 			$correlativas = $materia->mostrarCorrelativas();
-			$ratios = $materia->mostrarRatioAprobacion($ANIO, $CUATRIMESTRE);
-			$inscriptosPorTurno = $materia->mostrarInscriptosPorTurno($ANIO, $CUATRIMESTRE);
+			$ratios = $materia->mostrarRatioAprobacion($anio, $cuatrimestre);
+			$inscriptosPorTurno = $materia->mostrarInscriptosPorTurno($anio, $cuatrimestre);
 			$carrera = $materia->datosMateria['cod_carrera'];
 			$carreras = $materia->mostrarCarreras();
 			$codigosConjunto = $materia->mostrarCodigosConjunto();
+			$conjunto = $materia->mostrarConjunto();
 			
 			/*$inscriptosEstimados = $materia->mostrarEstimacionPreliminar($ANIO, $CUATRIMESTRE, $carrera);
 			$segundaEstimacion = $materia->segundaEstimacion($ANIO + 1, $CUATRIMESTRE - 1, $carrera);
@@ -72,7 +84,7 @@
 		<div class="">
 			<h2 class="formularioLateral tituloMateria">
 				<?php 
-					print_r($materia->mostrarConjunto());
+					echo "<span class='tituloMateria'>{$conjunto}</span>";
 					print_r($materia->mostrarNombresConjunto());
 				?>
 			</h2>
@@ -103,7 +115,39 @@
  			
  			
  			<h4 class='formularioLateral listadoComsiones'>
-				Comisiones <?php echo $ANIO . " - " . $CUATRIMESTRE; ?>
+				<form method="GET" action="#" id="selectorPeriodo">
+					<label for="periodo">Comisiones </label>
+					<select name="periodo" class="selectorPeriodo"> 
+						<?php 
+							require 'conexion.php';
+							
+							
+							$query = "SELECT DISTINCT CONCAT(anio, '-', cuatrimestre) AS periodo
+										FROM asignacion_comisiones
+										WHERE materia = '{$conjunto}'
+										ORDER BY anio, cuatrimestre;";
+							
+							$result = $mysqli->query($query);
+							if ($mysqli->errno) {
+								echo "</select>ERROR MYSQL: " . $mysqli->error;
+							}
+							
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								$selected = "";
+								$periodoComparacion = $anio . '-' . $cuatrimestre;
+								if ($row['periodo'] == $periodoComparacion) {
+									$selected = "selected";
+									
+								}
+								echo "<option value='{$row['periodo']}' {$selected}>{$row['periodo']}</option>";
+							}
+							
+							$mysqli->close();
+							
+						
+						?>
+					</select>
+				</form>
 			</h4>
 			<ul class="formularioLateral turnos">
 				<?php
@@ -182,9 +226,9 @@
 										SUM(IF(a.resultado = 'Promocion', 1, 0)) AS promociones
 									FROM actas AS a
 									WHERE anio_academico >= 2012 AND materia IN {$materia->mostrarConjunto()}
-										AND (anio_academico < $ANIO 
-											OR (anio_academico = $ANIO 
-												AND periodo_lectivo < $CUATRIMESTRE))
+										AND (anio_academico < {$anio} 
+											OR (anio_academico = {$anio} 
+												AND periodo_lectivo < {$cuatrimestre}))
 									GROUP BY anio_academico, periodo_lectivo
 									ORDER BY anio_academico DESC, periodo_lectivo DESC";
 									
@@ -269,9 +313,9 @@
 										
 										 AND activo = 1 AND estado NOT LIKE 'Rechazado%'
 										 AND a.anio >= 2012
-										 AND (anio < $ANIO 
-											OR (anio = $ANIO 
-												AND cuatrimestre < $CUATRIMESTRE))
+										 AND (anio < {$anio} 
+											OR (anio = {$anio} 
+												AND cuatrimestre < {$cuatrimestre}))
 										GROUP BY periodo
 										ORDER BY a.anio DESC, a.cuatrimestre DESC";
 										
@@ -315,7 +359,7 @@
 							$result->free();
 							
 							//Datos tabla de cuantas cursadas
-							$anioMin = $ANIO - 5;
+							$anioMin = $anio - 5;
 							
 							$query = "SELECT IF(cantidad > 3, '4+', cantidad) AS recursadas, COUNT(*) AS alumnos
 										FROM (
@@ -372,6 +416,25 @@
 			$('#mostrarFormulario').click(function() {
 				$('div #formulario').toggle();
 			});
+			
+			$('select.selectorPeriodo').change(function() {
+				var periodo = $(this).val();
+				
+				var cod = $('span.tituloMateria').text();
+				
+				cod = cod.substr(1, 6);
+				//alert(cod);
+				//console.log(string);
+				cod = parseFloat(cod);
+				
+				//var cod = 1006;
+				
+				$('#dialogResumenMateria').empty();
+				$('#dialogResumenMateria').load('resumenmateria.php', {"materia":cod, "periodo":periodo});
+				//$('#dialogResumenMateria').dialog(dialogOptions).dialog('open');
+			});
+			
+			
 		});
 	</script>
 	<script>
