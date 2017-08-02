@@ -32,7 +32,7 @@
 					AND aa.dia = '$dia'
 					AND (aa.turno = '$turno' OR aa.turno = '$letraTurno'))
 					AND aa.activo = 1 
-			WHERE a.activo = 1 AND ISNULL(aa.materia) AND a.abierta = 1
+			WHERE a.activo = 1 AND ISNULL(aa.materia) #AND a.abierta = 1
 			ORDER BY a.cod+0";
 	
 	$result = $mysqli->query($query);

@@ -12,8 +12,6 @@
 		require 'conexion.php';
 		require 'constantes.php';
 		
-		$ANIO = 2017;
-		$CUATRIMESTRE = 1;
 	
 		switch($_GET['act']) {
 			
@@ -51,7 +49,7 @@
 							GROUP BY conjunto, comision, aula, t.turno
                             HAVING dias LIKE '%$dia%'";
 							
-				if ($anio == 2017 and $cuatrimestre = 1) {
+				if ($anio == 2017 and $cuatrimestre = 2) {
 					$query = "SELECT e.materia AS conjunto, LEFT(e.nombre_materia, 75) AS nombre_materia, e.cantidad,
 								aa.cantidad_alumnos AS cantidad_asignada,
 								aa.comision, t.turno,
@@ -111,7 +109,7 @@
 				$query = "SELECT  
 								a.cod, 
 								a.capacidad,
-								a.abierta,
+								#a.abierta,
 								aa.id AS id_asignacion,
 								aa.materia,
 								aa.cantidad_alumnos as cantidad_asignada,
@@ -173,7 +171,7 @@
 								AND anio_academico = $anio
 								AND periodo_lectivo = $cuatrimestre
 								AND turno = '$letraTurno'";
-				if ($anio == 2017 and $cuatrimestre == 1) {
+				if ($anio == 2017 and $cuatrimestre == 2) {
 					$query = "SELECT cantidad
 									FROM estimacion
 									WHERE materia = '$materia'
@@ -384,9 +382,12 @@
 				break;
 				
 			case "report":
-				$query = "SELECT aa.aula, aa.dia, aa.materia, aa.turno, aa.comision, aa.cantidad_alumnos, m.nombre AS nombre
+				$query = "SELECT aa.aula, aa.dia, 
+							TRIM(TRAILING 'B' FROM aa.materia) AS materia, aa.turno, 
+							IFNULL(aa.comision_real, CONCAT(LEFT(aa.turno,1), 'X')) AS comision, 
+							aa.cantidad_alumnos, m.nombre AS nombre
 							FROM asignacion_aulas AS aa
-							LEFT JOIN materia AS m ON aa.materia = m.conjunto OR aa.materia = CONCAT(m.conjunto, 'B')
+							LEFT JOIN materia AS m ON aa.materia = m.conjunto OR aa.materia LIKE CONCAT(m.conjunto, '_')
 							WHERE aa.anio = {$ANIO}
 							AND aa.cuatrimestre = {$CUATRIMESTRE}
 							AND aa.activo = 1

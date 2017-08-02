@@ -6,8 +6,6 @@
 		<?php 
 			require_once('./fuentes/meta.html');
 			require_once('fuentes/constantes.php');
-			$ANIO = 2017;
-			$CUATRIMESTRE = 1;
 			
 			function __autoload($class) {
 				$classPathAndFileName = "./clases/" . $class . ".class.php";
@@ -36,6 +34,18 @@
 			
 			td.cantidad {
 				background-color:red;
+			}
+			
+			tr.aula {
+				page-break-inside: avoid;
+			}
+			
+			button#btnExport {
+				display:none;
+			}
+			
+			table.tabla-M, table.tabla-N, table.tabla-T {
+				margin: auto;
 			}
 		</style>
 	</head>
@@ -82,7 +92,7 @@
 							
 						});
 						
-						$.each(aulas, function(cod, aula) {
+						$.each(aulas, function(cod, aula) { //Agrega las aulas con sus capacidades
 							$('tbody.reporte').append('<tr class="reporte aula aula-' + aula.cod + '" data-capacidad="' + aula.capacidad + '">\
 															<td class="reporte aula center-text">' + aula.cod + '<br />\n\
 															' + aula.capacidad + 'A</td>\
@@ -94,7 +104,7 @@
 							$('tr.reporte.aula').append('<td class="reporte aula ' + dia + '"></td>');
 						});
 						
-						$.each(data, function(key, val) {
+						$.each(data, function(key, val) { //RECORRE TODOS LOS TURNOS ASIGNADOS
 							
 							
 							turno = val.turno;
@@ -154,16 +164,17 @@
 								$subtabla.append('<tr class="center-text subTabla"><td class="center-text subTabla">' + horario + '\n</td></tr>');
 								$subtabla.append('<tr class="center-text subTabla cantidad" data-cantidad="' + cantidad + '"><td class="center-text subTabla cantidad" data-cantidad="' + cantidad + '">' + cantidad + ' Alumnos\n</td></tr>');
 								$subtabla.append('<tr class="center-text subTabla"><td class="center-text subTabla">' + materia + comision + '\n</td></tr>');
-								
+								$subtabla.append('<tr class="center-text subTabla"><td class="center-text subTabla"><br /></td></tr>');
 								
 								
 								$celda = $('table.tabla-' + letraTurno + ' tr.aula-' + aula + ' td.' + dia);
 								
 								
 								if (!$celda.is(':empty')) {
-									$celda.append('<hr />');
+									$celda.append('<hr class="not-empty" />');
+									
 								} else if (turno.substr(1,1) == 2) {
-									$celda.append('<br /><table><tr><td><br /></td><tr /><tr><td><br /></td><tr /><tr><td><br /></td><tr /><tr><td><br /></td><tr /></table><hr />');
+									$celda.append('<table class="whaaat"><tr><td><br /></td><tr /><tr><td><br /></td><tr /><tr><td><br /></td><tr /><tr><td><br /></td><tr /></table><hr />');
 								}
 									
 								$celda.append($subtabla);
@@ -228,7 +239,7 @@
 								
 								$celda.append($subtabla);
 								
-								$subtabla = $('<table class="subTabla turno-' + turno + '" border="1"></table>');
+								$subtabla = $('<table class="subTabla turno-' + turno + '></table>');
 								$subtabla.append('<tr class="center-text subTabla"><td class="center-text subTabla">' + nombre + '\n</td></tr>');
 								$subtabla.append('<tr class="center-text subTabla"><td class="center-text subTabla">' + horario + ' (' + turno + ') \n</td></tr>');
 								$subtabla.append('<tr class="center-text subTabla cantidad" data-cantidad="' + cantidad + '"><td class="center-text subTabla cantidad" data-cantidad="' + cantidad + '">' + cantidad + ' Alumnos\n</td></tr>');
