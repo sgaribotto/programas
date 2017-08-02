@@ -114,7 +114,7 @@
 								aa.materia,
 								aa.cantidad_alumnos as cantidad_asignada,
 								aa.aula,
-								aa.comision,
+								IFNULL(aa.comision_real, aa.comision) AS comision,
 								t.turno,
 								t.dia,
 								GROUP_CONCAT(DISTINCT m.nombre SEPARATOR '<br />' ) AS nombre
