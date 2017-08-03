@@ -2745,6 +2745,18 @@
 					$periodo = explode(' - ', $_REQUEST['periodoComisionAbierta']);
 					$anio = $periodo[0];
 					$cuatrimestre = $periodo[1];
+					$letra = "";
+					
+					if (strpos($_REQUEST['horarioComisionAbierta'], '(')) {
+						echo $_REQUEST['horarioComisionAbierta'];
+						$letra = explode(' (', $_REQUEST['horarioComisionAbierta']);
+						print_r($letra);
+						$letra = trim($letra[1], ')');
+						echo $letra . " - ";
+						$letra = substr($letra, 1, 1);
+						echo $letra . " - ";
+					}
+					
 					
 					$query = "INSERT INTO comisiones_abiertas 
 								SET turno = '{$_REQUEST['turnoComisionAbierta']}', 
@@ -2752,7 +2764,8 @@
 								horario = '{$_REQUEST['horarioComisionAbierta']}', 
 								materia = '{$_REQUEST['materia']}', 
 								anio = {$anio},
-								cuatrimestre = {$cuatrimestre}";
+								cuatrimestre = {$cuatrimestre},
+								observaciones = '{$letra}'";
 					//echo $query;
 					$mysqli->query($query);
 					if ($mysqli->errno) {
@@ -2792,6 +2805,7 @@
 					
 					$horarios = array();
 					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+											
 						$horarios[$row['materia']][$row['turno']][$row['dia']][] = $horasTurno[$row['horario']];
 					}
 					
@@ -2809,8 +2823,14 @@
 								
 							}
 							$option = trim($option, ', ');
+							$letra = substr($materia, -1, 1);
+							$letraOption = "";
+							if ($letra != ')') {
+								$option .= " (" . $turno . $letra . ")";
+								$letraOption = "data-letra='" . $letra . "'" ;
+							}
 							
-							$imprimir .= "<option value='{$option}'>{$option}</option>";
+							$imprimir .= "<option value='{$option}' $letraOption>{$option}</option>";
 							
 						}
 						
