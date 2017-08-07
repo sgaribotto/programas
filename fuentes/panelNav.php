@@ -2,6 +2,7 @@
 <div class="navLateral">
 			
 	<?php 
+	//print_r($_SESSION);
 	if (in_array(1, $_SESSION['permiso'])) { ?>
 	<div class="navAdmin">
 		<h2 class="navLateral hidder">Navegación Administrador</h2>
@@ -122,14 +123,30 @@
 				<li class="navLateral"><a href="modificarinscriptos.php" class="navLateral">Modificar inscriptos en una materia</a></li>
 				<li class="navLateral"><a href="turnos.php" class="navLateral">Turnos de grado</a></li>
 				<!--<li class="navLateral"><a href="agregarcursos.php" class="navLateral">Agregar curso de extension</a></li>
-				<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>-->
-				<li class="navLateral"><a href="aulificatorreportExcel.php" class="navLateral">Reporte en Excel</a></li>
-				<li class="navLateral"><a href="ofertaacademica.php" class="navLateral">Oferta Académica</a></li>
+				<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>
 				<li class="navLateral"><a href="estimacionpreliminar.php" class="navLateral">Estimación inscriptos</a></li>
+				<li class="navLateral"><a href="aulificatorreportExcel.php" class="navLateral">Reporte en Excel</a></li>-->
+				<li class="navLateral"><a href="ofertaacademica.php" class="navLateral">Oferta Académica</a></li>
 				
 			</ul>
 			
 		</ol>
+		
+		<ol class="navLateral" >
+			<li class="navLateral">Imprimir</li>
+			
+			<ul class="navLateral">
+				<li class="navLateral"><a href="imprimirCarteles.php" class="navLateral">Carteles</a></li>
+				<li class="navLateral"><a href="imprimirCaratulas.php" class="navLateral">Carátulas</a></li>
+				<!--<li class="navLateral"><a href="agregarcursos.php" class="navLateral">Agregar curso de extension</a></li>
+				<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>
+				<li class="navLateral"><a href="estimacionpreliminar.php" class="navLateral">Estimación inscriptos</a></li>
+				<li class="navLateral"><a href="aulificatorreportExcel.php" class="navLateral">Reporte en Excel</a></li>-->
+				
+			</ul>
+			
+		</ol>
+		
 	</div>
 <?php } ?>
 
