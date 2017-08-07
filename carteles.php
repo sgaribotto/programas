@@ -188,15 +188,15 @@
 			
 			
 			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-				$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['primero'] = $row['primero'];
-				$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['ultimo'] = $row['ultimo'];
-				$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['horario'] = $row['horario'];
-				$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['aula'] = $row['aula'];
-				$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['nombre_materia'] = $row['nombre_materia'];
-				if (!isset($carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'])) {
-					$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'] = 1;
+				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['primero'] = $row['primero'];
+				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['ultimo'] = $row['ultimo'];
+				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['horario'] = $row['horario'];
+				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['aula'] = $row['aula'];
+				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['nombre_materia'] = $row['nombre_materia'];
+				if (!isset($carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'])) {
+					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'] = 1;
 				} else {
-					$carteles[$row['dia']][$row['turno']][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad']++;
+					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad']++;
 				}
 					
 			}
@@ -207,7 +207,7 @@
 						foreach ($carreras as $carrera => $materias) {
 							echo "<img src='images/logo.jpg' />";
 							echo "<h1>AULAS PLAN " . $nombres_planes["{$plan}"] . "</h1>";
-							echo "<h2>DIA " . mb_strtoupper($dia, 'UTF8') . " - TURNO " . mb_strtoupper($diasTurnos[$turno], 'UTF8') . "</h2>";
+							echo "<h2>DIA " . mb_strtoupper($dia, 'UTF8') . " - TURNO " . mb_strtoupper($turno, 'UTF8') . "</h2>";
 							echo "<h3>{$carrera}</h3>";
 							
 							echo "<table class='turnos-comisiones'>";
@@ -226,7 +226,7 @@
 										echo "<td>{$comision}</td>";
 										echo "<td style='text-align:left;'>{$detalle['nombre_materia']}";
 										if ($comisiones['cantidad'] > 1) {
-											echo "<br /><span style='font-weight:normal'>(Desde </span>{$detalle['primero']} <span style='font-weight:normal'>hasta</span> {$detalle['ultimo']})</td>";
+											echo "  <span style='font-weight:normal'>(Desde </span>{$detalle['primero']} <span style='font-weight:normal'>hasta</span> {$detalle['ultimo']})</td>";
 										}
 										echo "<td>{$horasTurno[$detalle['horario']]}</td>";
 										echo "<td>{$detalle['aula']}</td>";
