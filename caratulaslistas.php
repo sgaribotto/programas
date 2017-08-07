@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
+		<title>Carátulas</title>
 		<style>
 			
 			
@@ -35,6 +36,16 @@
 			include 'fuentes/constantes.php';
 			require 'conexion.php';
 			
+			$periodo = $_REQUEST['periodo'];
+			$materia = $_REQUEST['materia'];
+			
+			if ($materia != 'Todas') {
+				$materia = " AND ca.materia = '{$materia}' ";
+			} else {
+				$materia = "";
+			}
+			
+			
 			$query = "SELECT ca.materia, 
 					m.nombres, 
 					ca.turno, 
@@ -55,12 +66,13 @@
 						AND ac.materia = ca.materia AND ac.comision = ca.nombre_comision
 				LEFT JOIN docente AS d
 					ON d.id = ac.docente
-				WHERE ca.anio = 2017 AND ca.cuatrimestre = 2
+				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}' {$materia}
 				GROUP BY ca.materia, ca.nombre_comision
 				HAVING NOT ISNULL(aula) AND NOT ISNULL(docentes)
 				ORDER BY materia";
 			
 			$result = $mysqli->query($query);
+			echo $mysqli->error;
 			$caratulas = array();
 			
 			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -106,7 +118,7 @@
 			
 			foreach ($caratulas as $detalles) {
 				//print_r($detalles);
-				printf($texto, $detalles['materia'] . ' ' . strtoupper($detalles['nombres']), $detalles['nombre_comision'], $detalles['aula'], $detalles['docentes'], $detalles['horario']);
+				printf($texto, $detalles['materia'] . ' ' . mb_strtoupper($detalles['nombres'], 'utf8'), $detalles['nombre_comision'], $detalles['aula'], $detalles['docentes'], $detalles['horario']);
 			}
 		?>
 			
