@@ -48,6 +48,10 @@
 					width: 97%;
 				}
 				
+				tr {
+					page-break-inside: avoid;
+				}
+				
 				td, th {
 					border: 1px solid black;
 					text-align: center;
@@ -56,11 +60,11 @@
 				
 				th {
 					background-color:gray;
-					font-size:1.4em;
+					font-size:1.6em;
 				}
 				
 				td {
-					font-size: 1.2em;
+					font-size: 1.4em;
 				}
 				
 				@media print {
@@ -79,11 +83,16 @@
 			include 'fuentes/constantes.php';
 			require 'conexion.php';
 			
-			$anio = $ANIO;
-			$cuatrimestre = $CUATRIMESTRE;
+			$periodo = $_REQUEST['periodo'];
 			
-			$anio = 2016;
-			$cuatrimestre = 2;
+			$dia = $_REQUEST['dia'];
+			
+			if ($dia != 'Todas') {
+				$dia = " AND t.dia = '{$dia}' ";
+			} else {
+				$dia = " ";
+			}
+			
 			
 			
 			$nombres_planes = array(
@@ -98,7 +107,7 @@
 				'M' => 'Mañana', 
 				'T' => 'Tarde', 
 				'N' => 'Noche',
-				'S' => 'Sábado',
+				'S' => 'Mañana',
 				'Otro' => 'Otro'
 			);
 			
@@ -149,28 +158,32 @@
 							ON i.materia = m.cod
 						LEFT JOIN comisiones_abiertas AS ca
 							ON m.conjunto = ca.materia
-								AND ca.nombre_comision = REPLACE(i.nombre_comision, i.nombre_comision + 0, '')
-								AND ca.anio = (i.anio_academico + 1) AND ca.cuatrimestre = i.periodo_lectivo
+								AND ca.nombre_comision = REPLACE(
+										REPLACE(REPLACE(i.nombre_comision, i.nombre_comision + 0, ''), 'MTS', 'S')
+                                    , 'MT', 'M')
+								AND ca.anio = i.anio_academico AND ca.cuatrimestre = i.periodo_lectivo
 						LEFT JOIN turnos_con_conjunto AS t
 							ON  t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
 								AND LEFT(t.turno, 1) = ca.turno
 								AND t.anio = ca.anio AND t.cuatrimestre = ca.cuatrimestre
 
-						WHERE i.anio_academico = 2016
-							AND i.periodo_lectivo = 2
-							AND i.estado != 'p'
+						WHERE CONCAT(i.anio_academico, ' - ', periodo_lectivo + 0) = '{$periodo}'
+							AND i.estado != 'P' {$dia}
 						GROUP BY i.nombre_comision, t.dia
 						#ORDER BY  turno, t.dia, m.plan, carrera, materia_, i.nombre_comision
 					) AS b
 					LEFT JOIN asignacion_aulas AS aa
-						ON aa.anio = (b.anio_academico + 1) AND aa.cuatrimestre = b.periodo_lectivo
-							AND aa.comision_real = b.comision_real
+						ON aa.anio = b.anio_academico AND aa.cuatrimestre = b.periodo_lectivo
+							AND aa.comision_real = REPLACE(
+										REPLACE(b.comision_real, 'MTS', 'S')
+                                    , 'MT', 'M')
 							AND aa.materia = b.conjunto
-					WHERE b.turno IN ('M', 'N', 'T') AND b.horario != ''
+					#WHERE b.turno IN ('M', 'N', 'T') AND b.horario != ''
 					ORDER BY FIELD(b.dia, 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'), b.turno, materia, b.horario, b.nombre_comision";
 			
+			//echo $query;
 			$result = $mysqli->query($query);
-			//echo $mysqli->error;
+			echo $mysqli->error;
 			$carteles = array();
 			
 			
@@ -194,7 +207,7 @@
 						foreach ($carreras as $carrera => $materias) {
 							echo "<img src='images/logo.jpg' />";
 							echo "<h1>AULAS PLAN " . $nombres_planes["{$plan}"] . "</h1>";
-							echo "<h2>DIA " . strtoupper($dia) . " - TURNO " . mb_strtoupper($diasTurnos[$turno], 'UTF8') . "</h2>";
+							echo "<h2>DIA " . mb_strtoupper($dia, 'UTF8') . " - TURNO " . mb_strtoupper($diasTurnos[$turno], 'UTF8') . "</h2>";
 							echo "<h3>{$carrera}</h3>";
 							
 							echo "<table class='turnos-comisiones'>";
@@ -213,7 +226,7 @@
 										echo "<td>{$comision}</td>";
 										echo "<td style='text-align:left;'>{$detalle['nombre_materia']}";
 										if ($comisiones['cantidad'] > 1) {
-											echo "<br /><span style='text-weight:normal'>(Desde </span>{$detalle['primero']} <span style='text-weight:normal'>hasta</span> {$detalle['ultimo']})</td>";
+											echo "<br /><span style='font-weight:normal'>(Desde </span>{$detalle['primero']} <span style='font-weight:normal'>hasta</span> {$detalle['ultimo']})</td>";
 										}
 										echo "<td>{$horasTurno[$detalle['horario']]}</td>";
 										echo "<td>{$detalle['aula']}</td>";
