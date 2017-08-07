@@ -100,5 +100,9 @@
 			
 	echo "</table>";
 	
+	echo "<script>
+		location.assign('aulificator2015.php')
+	</script>";
+	
 	$mysqli->close();
 ?>

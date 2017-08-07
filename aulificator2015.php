@@ -7,8 +7,8 @@
 			require_once('./fuentes/meta.html');
 			require_once('fuentes/constantes.php');
 			
-			$ANIO = 2017;
-			$CUATRIMESTRE = 1;
+			//$ANIO = 2017;
+			//$CUATRIMESTRE = 1;
 			
 			function __autoload($class) {
 				$classPathAndFileName = "./clases/" . $class . ".class.php";
@@ -75,7 +75,10 @@
 						
 						<button type="submit" class="formularioLateral autoAsignar">Autoasignar</button>
 						
-						<button type="button" class="formularioLateral reiniciar" id="reiniciarAsignaciones">Reiniciar</button>-
+						<button type="button" class="formularioLateral reiniciar" id="reiniciarAsignaciones">Reiniciar</button>
+						
+						<button type="button" class="formularioLateral recodificar" id="recodificarComisiones">Recodificar</button>
+						
 					</form>
 				</fieldset>
 		</div>
@@ -400,6 +403,19 @@
 					//alert('reiniciado');
 					actualizarGrillaAulas();
 				}, 'html');
+			});
+			
+			$('#recodificarComisiones').click(function(event) {
+				alert('recodificando');
+				event.preventDefault();
+				var anio = $('#anio').val();
+				var cuatrimestre = $('#cuatrimestre').val();
+				var act = 'recodificarComisiones';
+				$.get('fuentes/aulificatorAJAX.php', {'act': act, 'anio': anio, 'cuatrimestre': cuatrimestre}, function(data) {
+					alert('actualizo?');
+					actualizarGrillaAulas();
+					
+				});
 			});
 					
 			
