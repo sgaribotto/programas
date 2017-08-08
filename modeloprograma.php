@@ -27,7 +27,6 @@
 			$correlativas = $materia->mostrarCorrelativas();
 			$unidadesTematicas = $materia->mostrarUnidadesTematicas("*", $ANIO, $CUATRIMESTRE, true);
 			$bibliografia = $materia->mostrarBibliografia($ANIO, $CUATRIMESTRE, true);
-
 			$programa = new clases\Programa($_SESSION['materiaTemporal'], $_SESSION['id']);
 			$camposPrograma = $programa->mostrarCampo($ANIO, $CUATRIMESTRE);
 			
@@ -273,10 +272,9 @@
 						if (empty($bibliografia)) {
 							echo "<li class='contenido bibliografia>No hay bibliografía cargada.</li>";
 						} else {
-						
 							foreach ($bibliografia as $key => $value ) {
-								echo "<li class='contenido bibliografia>
-										$value[titulo] - $value[autor] - $value[editorial] ($value[paginas] páginas)
+								echo "<li class='contenido bibliografia'>
+									{$value['titulo']} - {$value['autor']} - {$value['editorial']} ({$value['paginas']} páginas)
 									</li>";
 							}
 						}
