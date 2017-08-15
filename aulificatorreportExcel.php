@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-
 <html>
-	<meta http-equiv="Content-type" content="application/vnd.ms-excel;" />
+	<head>
+	</head>
+	<body>
 	<?php
+		//header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+		//header( "Content-disposition: attachment; filename=aulas.xls" );
 		
-		require 'aulificatorreport.php';
+		header("Content-Type:   application/excel; charset=utf-8");
+		header( "Content-disposition: attachment; filename=aulas.xls" );
+		
+		require 'aulificatorreport4.php';
 		
 	?>
+	</body>
 <html>
