@@ -2,14 +2,14 @@
 
 <html>
 	<?php
+	
+		$periodo = $_REQUEST['periodo'];
+		
 		header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
-		header( "Content-disposition: attachment; filename=total_inscriptos.xls" );
+		header( "Content-disposition: attachment; filename=total_inscriptos{$periodo}.xls" );
 		require './fuentes/conexion.php';
 		require './fuentes/constantes.php';
 		
-		//$periodo = $_REQUEST['periodo'];
-		
-		$periodo = '2017 - 2';
 		
 		$query = "SELECT b.materia, b.nombre, b.comision_agrupada,
 					GROUP_CONCAT(cantidad ORDER by b.cod SEPARATOR ' + ') AS detalle,
