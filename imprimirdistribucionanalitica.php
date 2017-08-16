@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Imprimir Reportes Inscriptos</title>
+		<title>Distribución analítica</title>
 		<?php 
 			require_once('./fuentes/meta.html');
 			
@@ -28,16 +28,16 @@
 			<div id="mostrarFormulario">Mostrar Formulario</div>
 			<div id="formulario">
 				<fieldset class="formularioLateral">
-					<form method="post" class="formularioLateral" action="totalinscriptosexcel.php" id="formularioCarga" target="_blank">
+					<form method="post" class="formularioLateral" action="sumaasignadosenaulas.php" id="formularioCarga" target="_blank">
 						
 						<label class="formularioLateral" for="periodo">Periodo: </label>
 						<select name="periodo" class="formularioLateral">
 							<?php
 								require 'fuentes/conexion.php';
 								
-								$query = "SELECT DISTINCT CONCAT(anio_academico, ' - ', periodo_lectivo + 0) AS periodo
-											FROM inscriptos
-											ORDER BY anio_academico DESC, periodo_lectivo DESC
+								$query = "SELECT DISTINCT CONCAT(anio, ' - ', cuatrimestre + 0) AS periodo
+											FROM asignacion_aulas
+											ORDER BY anio DESC, cuatrimestre DESC
 											LIMIT 10";
 								$result = $mysqli->query($query);
 								
