@@ -115,7 +115,67 @@
 					
 					$mysqli->close();
 					break;
-			
+					
+				case "inscriptos":
+					require 'conexion.php';
+					
+					//print_r($_FILES);
+					//print_r($_REQUEST);
+					//BORRAR TODO LO DEL AÑO EN CUESTION
+					$query = "DELETE FROM inscriptos
+						WHERE CONCAT(anio_academico, ' - ', periodo_lectivo + 0) = '{$_REQUEST['importarA']}'";
+					
+					//echo $query;
+					$mysqli->query($query);
+					
+					//echo $mysqli->error;
+					echo "<p>" . $mysqli->affected_rows . " registros preexistentes borrados.</p>";
+					
+					
+					$file = $_FILES['importar']['tmp_name'];
+					
+					$lines = file($file, FILE_IGNORE_NEW_LINES);
+					$count_lines = count($lines);
+					
+					
+					$paraAgregar = array();
+					$errores = array();
+					for ($i = 1; $i < $count_lines; $i++) {
+						$lines[$i] = preg_split("/\t/", $lines[$i]);
+						array_map(array($mysqli, 'real_escape_string'), $lines[$i]);
+						$valores = '("' . implode( '", "', $lines[$i]) . '")';
+						//echo $valores;
+						$query = "INSERT INTO inscriptos VALUES {$valores}";
+						$mysqli->query($query);
+						//echo $valores;
+						if ($mysqli->errno) {
+							$errores[] = array(
+											'error' => $mysqli->error,
+											'query' => $query,
+											);
+						}
+						
+					}
+					
+					$intentos = $count_lines - 1;
+					$cantidad_errores = count($errores);
+					$agregados = $intentos - $cantidad_errores;
+					
+					echo "<p>Se intentaron agregar {$intentos} registros.</p>";
+					echo "<p>Se agregaron {$agregados} registros con éxito</p>";
+					echo "<p>Se encontraron {$cantidad_errores} errores.</p>";
+					echo "<br /><a href='../importarinscriptos.php'>Volver</a>";
+					
+					if ($cantidad_errores > 0) {
+						echo "<h2>Errores</h2>";
+						print_r($errores);
+					}
+					
+					//echo "<p>" . $mysqli->affected_rows . "INSERTADAS</p>";
+					
+					$mysqli->close();
+					break;
+					
 					
 				default:
 					echo "No se realizó la búsqueda";
