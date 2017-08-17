@@ -435,7 +435,7 @@
 				$anio = $_REQUEST['anio'];
 				$cuatrimestre = $_REQUEST['cuatrimestre'];
 				$distribuciones = array();
-				
+				//print_r($_REQUEST);
 				$query = "SELECT CONCAT(materia, IFNULL(observaciones, '')) AS materia, 
 							turno, 
 							nombre_comision

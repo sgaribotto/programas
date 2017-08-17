@@ -77,7 +77,7 @@
 						
 						<button type="button" class="formularioLateral reiniciar" id="reiniciarAsignaciones">Reiniciar</button>
 						
-						<button type="button" class="formularioLateral recodificar" id="recodificarComisiones">Recodificar</button>
+						<button type="button" class="formularioLateral recodificar" id="recodificarComisiones">Recodificar comisiones</button>
 						
 					</form>
 				</fieldset>
@@ -406,16 +406,18 @@
 			});
 			
 			$('#recodificarComisiones').click(function(event) {
-				alert('recodificando');
+				//alert('recodificando');
 				event.preventDefault();
 				var anio = $('#anio').val();
 				var cuatrimestre = $('#cuatrimestre').val();
 				var act = 'recodificarComisiones';
+				
 				$.get('fuentes/aulificatorAJAX.php', {'act': act, 'anio': anio, 'cuatrimestre': cuatrimestre}, function(data) {
-					alert('actualizo?');
+					//console.log(data);
+					//alert('actualizo?');
 					actualizarGrillaAulas();
 					
-				});
+				}, 'html');
 			});
 					
 			
