@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 	<head>
 		
@@ -302,8 +302,9 @@
 				console.log($('table.tabla-M').html());
 				
 				$("#btnExport").click(function (e) {
-					window.open('data:text/txt, <table>' + $('table.tabla-M').html() + '</table>' + '<table>' + $('table.tabla-N').html() + '</table>' + '<table>' + $('table.tabla-T').html() + '</table>', 'Download');
-					e.preventDefault();
+					//window.open('data:text/txt, <table>' + $('table.tabla-M').html() + '</table>' + '<table>' + $('table.tabla-N').html() + '</table>' + '<table>' + $('table.tabla-T').html() + '</table>', 'Download');
+					//e.preventDefault();
+					location.assign('aulificatorreportExcel.php');
 				});
 				
 			});

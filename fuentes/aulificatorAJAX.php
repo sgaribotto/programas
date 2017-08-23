@@ -109,7 +109,7 @@
 				$query = "SELECT  
 								a.cod, 
 								a.capacidad,
-								#a.abierta,
+								a.abierta,
 								aa.id AS id_asignacion,
 								aa.materia,
 								aa.cantidad_alumnos as cantidad_asignada,
