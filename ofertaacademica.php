@@ -5,6 +5,7 @@
 		<title>Oferta Académica</title>
 		<?php 
 			require_once('./fuentes/meta.html');
+			require 'fuentes/constantes.php';
 			
 			function __autoload($class) {
 				$classPathAndFileName = "./clases/" . $class . ".class.php";
@@ -136,27 +137,23 @@
 						<select class="formularioLateral iconPeriodo" name="copiarA" id="copiarA"/>
 									
 							<?php
-								require "fuentes/conexion.php";
+								$anio = $ANIO;
+								$cuatrimestre = $CUATRIMESTRE;
 								
-								$query = "SELECT MAX(anio) AS anio_max, MIN(anio) AS anio_min
-											FROM turnos_con_conjunto
-											ORDER BY anio DESC";
-								$result = $mysqli->query($query);
-								while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-									$anioMin = $row['anio_min'];
-									$anioMax = $row['anio_max'];
-									
-								}
-								for ($anio = $anioMax + 1; $anio >= $anioMin; $anio--) {
-									
-									for ($cuatrimestre = 1; $cuatrimestre <= 2; $cuatrimestre++) {
+								$periodo = $anio . ' - ' . $cuatrimestre;
+								echo "<option class='formularioLateral' value='{$periodo}'>{$periodo}</option>";
+								for ($i = 1; $i<=2; $i++) {
+									if ($cuatrimestre == 1) {
+										$cuatrimestre++;
+										$periodo = $anio . ' - ' . $cuatrimestre;
+										echo "<option class='formularioLateral' value='{$periodo}'>{$periodo}</option>";
+									} else {
+										$anio++;
+										$cuatrimestre--;
 										$periodo = $anio . ' - ' . $cuatrimestre;
 										echo "<option class='formularioLateral' value='{$periodo}'>{$periodo}</option>";
 									}
 								}
-								
-								$result->free();
-								$mysqli->close();
 							?>
 								 
 						</select>
@@ -353,8 +350,9 @@
 				if (acepta) {
 					//console.log(values);
 					$.post('fuentes/AJAX.php?act=copiarOferta', values, function(data) {
-						
-						location.reload();
+						alert("Se ha copiado la oferta académica y la apertura de comisiones");
+						actualizarTabla();
+						//location.reload();
 					});
 				}
 				

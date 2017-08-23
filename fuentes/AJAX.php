@@ -2411,13 +2411,13 @@
 					
 					$query = "INSERT INTO comisiones_abiertas
 						(materia, horario, nombre_comision, turno, dependencia, observaciones, anio, cuatrimestre, nombre_horario)
-						SELECT materia, horario, nombre_comision, turno, observaciones,
+						SELECT materia, horario, nombre_comision, turno, dependencia, observaciones,
 							{$anio}, {$cuatrimestre}, nombre_horario
 						FROM comisiones_abiertas
 						WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$copiarDe}';";
 					$mysqli->query($query);
 					
-						
+					echo $query;
 					if ($mysqli->error) {
 						echo $mysqli->error;
 					}
