@@ -2403,6 +2403,21 @@
 						FROM turnos_con_conjunto
 						WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$copiarDe}';";
 					$mysqli->query($query);
+					
+					$query = "DELETE FROM comisiones_abiertas
+						WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$copiarAOriginal}';";
+					
+					$mysqli->query($query);
+					
+					$query = "INSERT INTO comisiones_abiertas
+						(materia, horario, nombre_comision, turno, dependencia, observaciones, anio, cuatrimestre, nombre_horario)
+						SELECT materia, horario, nombre_comision, turno, observaciones,
+							{$anio}, {$cuatrimestre}, nombre_horario
+						FROM comisiones_abiertas
+						WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$copiarDe}';";
+					$mysqli->query($query);
+					
+						
 					if ($mysqli->error) {
 						echo $mysqli->error;
 					}
