@@ -24,7 +24,7 @@
 			$PERIODO = $ANIO . ' - ' . $CUATRIMESTRE;
 		?>
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Carteles</h2>
+			<h2 class="formularioLateral">Reporte Inscripciones</h2>
 			<div id="mostrarFormulario">Mostrar Formulario</div>
 			<div id="formulario">
 				<fieldset class="formularioLateral">
@@ -52,16 +52,23 @@
 							?>
 						</select>
 						<br />
+						<label for="reporte" class="formularioLateral">Reporte: </label>
+						<select name="reporte" class="formularioLateral">
+							<option value="suma">Suma de inscriptos</option>
+							<option value="comisiones_abiertas">Cantidad de comisiones abiertas</option>
+						</select>
+						<br />
 						
 						
-						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Reporte en Excel</button>
+						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Detalle suma de inscripciones</button>
 					</form>
 				</fieldset>
 			</div>
 			
 		
 			<hr>
-		
+			
+			
 		
 			
 		
