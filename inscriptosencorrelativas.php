@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Imprimir Reportes Inscriptos</title>
+		<title>Inscriptos en correlativas</title>
 		<?php 
 			require_once('./fuentes/meta.html');
 			
@@ -24,11 +24,11 @@
 			$PERIODO = $ANIO . ' - ' . $CUATRIMESTRE;
 		?>
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Reporte Inscripciones</h2>
+			<h2 class="formularioLateral">Inscripciones en las correlativas</h2>
 			<div id="mostrarFormulario">Mostrar Formulario</div>
 			<div id="formulario">
 				<fieldset class="formularioLateral">
-					<form method="post" class="formularioLateral" action="totalinscriptosexcel.php" id="formularioCarga" target="_blank">
+					<form method="post" class="formularioLateral" action="#" id="formularioCarga" >
 						
 						<label class="formularioLateral" for="periodo">Periodo: </label>
 						<select name="periodo" class="formularioLateral">
@@ -49,18 +49,30 @@
 									}
 									echo "<option value='{$row['periodo']}' $selected>{$row['periodo']}</option>";
 								}
+								
+								$mysqli->close();
 							?>
 						</select>
 						<br />
 						<label for="reporte" class="formularioLateral">Reporte: </label>
-						<select name="reporte" class="formularioLateral">
-							<option value="suma">Suma de inscriptos</option>
-							<option value="comisiones_abiertas">Cantidad de comisiones abiertas</option>
+						<select name="conjunto" class="formularioLateral">
+							<?php
+								require 'fuentes/conexion.php';
+								
+								$query = "SELECT DISTINCT conjunto, nombres
+											FROM vista_materias_por_conjunto
+											ORDER BY conjunto";
+								$result = $mysqli->query($query);
+								
+								while ($row = $result->fetch_array(MYSQL_ASSOC)) {
+									echo "<option value='{$row['conjunto']}' $selected>{$row['conjunto']} {$row['nombres']}</option>";
+								}
+							?>
 						</select>
 						<br />
 						
 						
-						<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Reporte en Excel</button>
+						<button type="submit" class="formularioLateral" id="guardarCargarOtro">Mostrar resultado</button>
 					</form>
 				</fieldset>
 			</div>
@@ -68,7 +80,7 @@
 		
 			<hr>
 			
-			
+			<div class="tabla"></div>
 		
 			
 		
@@ -81,6 +93,15 @@
 			
 			$('#mostrarFormulario').click(function() {
 				$('div #formulario').toggle();
+			});
+			
+			$('#formularioCarga').submit(function(event) {
+				event.preventDefault();
+				var values = $('#formularioCarga').serialize();
+				values += '&act=inscriptosEnCorrelativas';
+				$('div.tabla').load("./fuentes/AJAX.php?" + values, function(data) {
+					
+				});
 			});
 			
 			$("select").combobox();

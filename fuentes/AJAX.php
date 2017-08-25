@@ -5,7 +5,7 @@
 	session_start();
 	require_once '../programas.autoloader.php';
 	require './constantes.php';
-
+	//print_r($_REQUEST);
 	
 	if (isset($_GET['act'])) {
 		
@@ -2855,6 +2855,59 @@
 					
 					echo $imprimir;			
 				
+					break;
+					
+					case "inscriptosEnCorrelativas":
+					require 'conexion.php';
+					//print_r($_REQUEST);
+					$conjunto = $_REQUEST['conjunto'];
+					$periodo = $_REQUEST['periodo'];
+					
+					$query = "SELECT COUNT(DISTINCT i.nro_documento) AS inscriptos, 
+								m.conjunto,
+								GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.cod SEPARATOR '/') AS nombres,
+								REPLACE(nombre_comision, nombre_comision + 0, '') AS comision_agrupada
+							FROM inscriptos AS i
+							LEFT JOIN materia AS m
+								ON m.cod = i.materia
+							WHERE CONCAT(i.anio_academico,' - ', i.periodo_lectivo + 0) = '{$periodo}'
+								AND materia IN (
+									SELECT requisito FROM correlatividad WHERE materia IN {$conjunto}
+								)
+							GROUP BY m.conjunto, comision_agrupada
+							ORDER BY m.conjunto, comision_agrupada";
+								
+					//echo $query;
+					$result = $mysqli->query($query);
+					
+					echo $mysqli->error;
+					$comisiones = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$comisiones[] = $row;
+					}
+					
+					if (sizeof($comisiones)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:20%;'>Códigos</th>
+								<th class='subtitulo'style='width:60%;'>Nombre</th>
+								<th class='subtitulo' style='width:10%;'>Comision</th>
+								<th class='subtitulo' style='width:10%;'>Inscriptos</th>
+							</tr>";
+						foreach ($comisiones AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo'>$valores[conjunto]</td>
+									<td class='info masInfo'>$valores[nombres]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[comision_agrupada]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[inscriptos]</td>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>Sin resultados</p>";
+					}
+					
 					break;
 					
 				default:
