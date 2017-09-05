@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html>
 	<?php
@@ -9,13 +9,11 @@
 		
 		$periodo = $_REQUEST['periodo'];
 		
-		$query = "SELECT DISTINCT ca.materia,
+		$query = "SELECT ca.materia,
 					ca.nombres,
 					ca.nombre_comision,
 					ca.horario,
-					CONCAT(d.apellido, ', ', d.nombres) AS docentes,
-					
-					a.tipoafectacion AS Cargo,
+					GROUP_CONCAT(DISTINCT CONCAT(d.apellido, ', ', d.nombres) SEPARATOR ' / ') AS docentes,
 					ca.responsable
 				FROM programas.vista_comisiones_abiertas_con_responsables AS ca
 				LEFT JOIN asignacion_comisiones AS ac
@@ -25,16 +23,8 @@
 					AND ca.nombre_comision = ac.comision OR ca.nombre_comision = CONCAT(ac.comision, 'A')
 				LEFT JOIN docente AS d
 					ON ac.docente = d.id
-				LEFT JOIN (SELECT a.docente, m.conjunto, a.anio, a.cuatrimestre, a.tipoafectacion
-					FROM afectacion AS a
-					LEFT JOIN materia AS m
-						ON a.materia = m.cod
-					WHERE a.activo = 1
-					GROUP BY m.conjunto, a.docente, a.anio, a.cuatrimestre, a.tipoafectacion) AS a
-					ON a.anio = ca.anio AND a.cuatrimestre = ca.cuatrimestre
-						AND a.conjunto = ca.materia AND ac.docente = a.docente
 				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
-				GROUP BY ca.materia, ca.nombre_comision, docentes";
+				GROUP BY ca.materia, ca.nombre_comision";
 				
 		$result = $mysqli->query($query);
 		
@@ -60,19 +50,18 @@
 				<th>Comision</th>
 				<th>Horario</th>
 				<th>Docentes</th>
-				<th>Cargo</th>
 				<th>Responsable</th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
 				foreach ($datosTabla as $key => $value) {
-					echo "<tr style='vertical-align: middle; border: 1px solid black;'>";
+					echo "<tr>";
 					foreach ($value as $k => $v) {
-						if ($k == 'materia' and !strpos($v, ', ')) {
+						if ($k = 'materia' and !strpos($v, ', ')) {
 							$v = "'" . $v;
 						}
-						echo "<td>" . $v . "</td>";
+						echo "<td>" . mb_convert_encoding($v, 'utf16', 'utf8') . "</td>";
 					}
 					echo "</tr>";
 				}	
