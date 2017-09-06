@@ -13,10 +13,13 @@
 					ca.nombres,
 					ca.nombre_comision,
 					ca.horario,
+					IFNULL(au.aula, '') AS aula,
+					IFNULL(au.cantidad_alumnos, '') AS cantidad_alumnos,
 					CONCAT(d.apellido, ', ', d.nombres) AS docentes,
 					
 					a.tipoafectacion AS Cargo,
 					ca.responsable
+					
 				FROM programas.vista_comisiones_abiertas_con_responsables AS ca
 				LEFT JOIN asignacion_comisiones AS ac
 					ON ca.materia = ac.materia  
@@ -33,6 +36,9 @@
 					GROUP BY m.conjunto, a.docente, a.anio, a.cuatrimestre, a.tipoafectacion) AS a
 					ON a.anio = ca.anio AND a.cuatrimestre = ca.cuatrimestre
 						AND a.conjunto = ca.materia AND ac.docente = a.docente
+				LEFT JOIN asignacion_aulas AS au
+					ON au.materia LIKE CONCAT(ca.materia, '%') AND au.comision_real = ca.nombre_comision
+						AND au.anio = ca.anio AND au.cuatrimestre = ca.cuatrimestre
 				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
 				GROUP BY ca.materia, ca.nombre_comision, docentes";
 				
@@ -59,6 +65,8 @@
 				<th>Nombre Materia</th>
 				<th>Comision</th>
 				<th>Horario</th>
+				<th>Aula</th>
+				<th>Inscriptos</th>
 				<th>Docentes</th>
 				<th>Cargo</th>
 				<th>Responsable</th>
