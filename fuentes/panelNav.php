@@ -33,18 +33,19 @@
 				<li class="navLateral"><a href="evaluacion.php" class="navLateral">Evaluación y criterios de aprobación</a></li>
 				<li class="navLateral"><a href="bibliografia.php" class="navLateral">Bibliografía</a></li>-->
 			</ul>
-			<!--
-			<li class="navLateral">Plan de clases</li>
+			
+			<li class="navLateral">Configuración</li>
 			
 			<ul class="navLateral">
-				<li class="navLateral"><a href="cronograma.php" class="navLateral">Plan de clases</a></li>
+				
+				
+				<li class="navLateral"><a href="verconstantes.php" class="navLateral">Constantes</a></li>
+				
+				<!--<li class="navLateral"><a href="unidadestematicas.php" class="navLateral">Unidades temáticas</a></li>
+				<li class="navLateral"><a href="evaluacion.php" class="navLateral">Evaluación y criterios de aprobación</a></li>
+				<li class="navLateral"><a href="bibliografia.php" class="navLateral">Bibliografía</a></li>-->
 			</ul>
 			
-			<li class="navLateral">Vista previa</li>
-			
-			<ul class="navLateral">
-				<li class="navLateral"><a href="programacompleto.php" class="navLateral">Vista previa</a> <img src="./images/icons/info.png" alt="Info" title="Haciendo click aquí, verá toda la información cargada para la materia" height="12px" style="cursor:help;margin-left:10px;"></li>
-			</ul>-->
 			
 		</ol>
 	</div>
@@ -57,9 +58,9 @@
 			
 			<ul class="navLateral">
 				<li class="navLateral"><a href="aceptardesignacion.php" class="navLateral">Aceptar Designaciones/Cargos</a></li>
-				<li class="navLateral"><a href="listadomaterias.php" class="navLateral">Cargos por materia</a></li>
-				<li class="navLateral"><a href="infoafectaciones.php" class="navLateral">Información de Designaciones/Cargos</a></li>
-				<li class="navLateral"><a href="estadocargacomisiones.php" class="navLateral">Estado de la carga de comisiones</a></li>
+				<li class="navLateral"><a href="#listadomaterias.php" class="navLateral disabled">Cargos por materia</a></li>
+				<li class="navLateral"><a href="#infoafectaciones.php" class="navLateral disabled">Información de Designaciones/Cargos</a></li>
+				<li class="navLateral"><a href="#estadocargacomisiones.php" class="navLateral disabled">Estado de la carga de comisiones</a></li>
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
 				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
@@ -315,3 +316,8 @@
 		
 	});
 </script>
+<style>
+	a.disabled {
+		color: gray;
+	}
+</style>
