@@ -310,6 +310,7 @@
 			});
 		</script>
 		<button id="btnExport">Excel</button>
+		
 		<div class="reporte">
 			
 		</div> 

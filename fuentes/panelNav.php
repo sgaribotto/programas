@@ -64,6 +64,7 @@
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
 				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
+				<li class="navLateral"><a href="aulificatorreportcondocentes.php" class="navLateral">Reporte de aulas con docentes</a></li>
 			</ul>
 			
 			
