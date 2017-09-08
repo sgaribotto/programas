@@ -138,6 +138,34 @@
 					$mysqli->close();
 					break;
 				
+				case "agregarConstante":
+					require "./conexion.php";
+					
+					$query = "SELECT nombre FROM constantes WHERE nombre = '$_POST[nombre]' ";
+					$result = $mysqli->query($query);
+					$_POST['valor'] = $mysqli->real_escape_string($_POST['valor']);
+					if ($result->num_rows == 1) {
+						$query = "UPDATE constantes 
+									SET valor = '$_POST[valor]', nombre = '$_POST[nombre]'
+									WHERE nombre = '$_POST[nombre]'  ";
+						$result->free();
+					} else {
+						$query = "INSERT INTO constantes 
+									SET valor = '$_POST[valor]', nombre = '$_POST[nombre]'";
+					}
+					//echo $query;
+					
+					if ($mysqli->errno) {
+						echo "ERROR: " . $mysqli->error;
+					} else {
+						echo "Se ha cargado una nueva constante";
+					}
+					
+					
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+				
 				case "buscarDNI":
 					require "./conexion.php";
 					
@@ -168,6 +196,15 @@
 					$mysqli->close();
 					break;
 				
+				case "eliminarConstante":
+					require "./conexion.php";
+					$id = $_REQUEST['id'];
+					
+					$query = "DELETE FROM constantes WHERE id = {$id}";
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+					
 				case "agregarPersonal":
 					require "./conexion.php";
 					
@@ -2050,6 +2087,54 @@
 						echo "</table>";
 					} else {
 						echo "<p>No se encontraron docentes</p>";
+					}
+					break;
+					
+				case "tablaConstantes":
+					require 'conexion.php';
+					
+					$where = '';
+					
+					if (isset($_REQUEST['filtro']) AND $_REQUEST['filtro'] != '') {
+						$where = " AND nombre LIKE '%{$_REQUEST['filtro']}%' ";
+					}
+					
+					$query = "SELECT id, nombre, valor 
+									FROM constantes 
+									WHERE 1 = 1 {$where} 
+									ORDER BY nombre
+									LIMIT 20";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$constantes = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$constantes[] = $row;
+					}
+					
+					if (sizeof($constantes)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:10%;'>Id</th>
+								<th class='subtitulo'style='width:40%;'>Nombre</th>
+								<th class='subtitulo' style='width:40%;'>Valor</th>
+								<th class='subtitulo' style='width:10%;'>Eliminar</th>
+							</tr>";
+						foreach ($constantes AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[id]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[nombre]</td>";
+							echo "<td class='materia' data-id='$valores[id]'>$valores[valor]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarConstante' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No hay resultados.</p>";
 					}
 					break;
 				

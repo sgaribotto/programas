@@ -1,7 +1,18 @@
 <?php
 //CONSTANTES PHP
-	$ANIO = 2017;
-	$CUATRIMESTRE = 2;
+	require 'conexion.php';
+	
+	$query = "SELECT nombre, valor
+				FROM constantes;";
+	$result = $mysqli->query($query);
+	
+	$constantes = array();
+	while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+		$constantes[$row['nombre']] = $row['valor'];
+	}
+
+	$ANIO = $constantes['anio'];
+	$CUATRIMESTRE = $constantes['cuatrimestre'];
 	
 	$turnos = array(
 		'M' => 'Mañana', 
