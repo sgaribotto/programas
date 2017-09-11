@@ -303,16 +303,20 @@
 <script>
 	$(document).ready( function() {
 		
-		$('h2.navLateral').siblings().addClass('hidden');
+		$('h2.navLateral').siblings('ol').addClass('hidden');
 		$('h2.navLateral').click(function() {
 			$clicked = $(this);
-			$('h2.navLateral').siblings().addClass('hidden');
-			$clicked.siblings().slideToggle('fast').removeClass('hidden');
+			$clicked.siblings('ol:not(.open)').addClass('opening');
+			$('h2.navLateral').siblings('ol.open:not(opening)').slideUp('fast').removeClass('open');
+			
+			$clicked.siblings('ol.opening').slideDown('fast').addClass('open').removeClass('opening');
+			
+			
 		});
 		
 		
 		if ( $('h2.navLateral').length == 1 ) {
-			$('h2.navLateral').click();
+			//$('h2.navLateral').click();
 		};
 		
 	});
@@ -321,4 +325,5 @@
 	a.disabled {
 		color: gray;
 	}
+	
 </style>
