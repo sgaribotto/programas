@@ -5,7 +5,7 @@
 	</head>
 	<body>
 	<?php
-	
+		//print_r($_REQUEST);
 		$periodo = $_REQUEST['periodo'];
 		$reporte = $_REQUEST['reporte'];
 		
@@ -95,7 +95,7 @@
 						FROM programas.inscriptos AS i
 						LEFT JOIN materia AS m
 							ON m.cod = i.materia
-						RIGHT JOIN comisiones_abiertas AS ca
+						LEFT JOIN comisiones_abiertas AS ca
 							ON ca.materia = m.conjunto
 								AND ca.anio = i.anio_academico
 								AND ca.cuatrimestre = i.periodo_lectivo
@@ -107,6 +107,7 @@
 						GROUP BY m.conjunto, comision_agrupada
 						#HAVING isNULL(com_abiertas)
 						ORDER BY materia;";
+					//echo $query;
 					$result = $mysqli->query($query);
 					//echo $query;
 					$datosTabla = array();
@@ -143,7 +144,199 @@
 				<?php
 					break;
 					
+				case "cantidad_comisiones_abiertas":
 					
+					$query = "SELECT t.materia,
+								m.nombres,
+								COUNT(DISTINCT ca.nombre_comision) AS cantidad_comisiones,
+								LEFT(t.turno, 1) AS turno
+							FROM turnos_con_conjunto AS t
+							LEFT JOIN comisiones_abiertas AS ca
+									ON t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
+								AND t.anio = ca.anio
+								AND t.cuatrimestre = ca.cuatrimestre
+								AND LEFT(t.turno, 1) = ca.turno
+							LEFT JOIN vista_materias_por_conjunto AS m
+								ON m.conjunto = ca.materia
+							WHERE CONCAT(t.anio, ' - ', t.cuatrimestre) = '2017 - 2'
+							GROUP BY t.materia, turno
+							ORDER BY t.materia, turno";
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[$row['materia']][$row['turno']]['cantidad'] = $row['cantidad_comisiones'];
+						$datosTabla[$row['materia']]['nombres'] = $row['nombres'];
+					}
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th>M</th>
+								<th>N</th>
+								<th>T</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $materia => $detalle) {
+									echo "<tr>";
+										
+										//print_r($detalle);
+										if (!isset($detalle['N'])) {
+											$detalle['N'] = 0;
+										}
+										if (!isset($detalle['M'])) {
+											$detalle['M'] = 0;
+										}
+										if (!isset($detalle['T'])) {
+											$detalle['T'] = 0;
+										}
+										
+										
+										
+										echo "<td>" . $materia . "</td>";
+										echo "<td>" . $detalle['nombres'] . "</td>";
+										echo "<td>" . $detalle['N']['cantidad'] . "</td>";
+										echo "<td>" . $detalle['M']['cantidad'] . "</td>";
+										echo "<td>" . $detalle['T']['cantidad'] . "</td>";
+									
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
+				case "abiertasVSoferta":
+					
+					$query = "SELECT t.materia, 
+								m.nombres,
+								LEFT(t.turno, 1) AS turno,
+								GROUP_CONCAT(DISTINCT CONCAT(t.dia, ' ', t.turno) 
+												ORDER BY FIELD(t.dia, 'lunes', 'martes', 
+													'miércoles', 'jueves', 'viernes', 
+													'sábado'), t.turno) AS horario,
+								COUNT(DISTINCT ca.nombre_comision) AS cantidad_comisiones,
+								GROUP_CONCAT(DISTINCT ca.nombre_comision ORDER BY nombre_comision) AS comisiones,
+								GROUP_CONCAT(DISTINCT ca.horario SEPARATOR '/') AS horarios_abiertos
+							FROM comisiones_abiertas AS ca
+							LEFT JOIN turnos_con_conjunto AS t
+								ON CONCAT(ca.materia, IFNULL(ca.observaciones, '')) = t.materia
+									AND ca.anio = t.anio AND ca.cuatrimestre = t.cuatrimestre
+									AND ca.turno = LEFT(t.turno, 1)
+							LEFT JOIN vista_materias_por_conjunto AS m
+								ON t.materia LIKE CONCAT(m.conjunto, '%')
+							WHERE CONCAT(t.anio, ' - ', t.cuatrimestre) = '{$periodo}'
+							GROUP BY t.materia, LEFT(t.turno, 1)
+							ORDER BY ca.materia, turno, comisiones
+							#HAVING horarios_abiertos LIKE '%/%'
+							#HAVING ISNULL(comisiones)";
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[] = $row;
+					}
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Cod</th>
+								<th>Materia</th>
+								<th>turno</th>
+								<th>horario</th>
+								<th>Cantidad Comisiones</th>
+								<th>Comisiones</th>
+								<th>Horarios Abiertos</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								
+								foreach ($datosTabla as $k => $detalles) {
+									echo "<tr>";
+										$rojo = "";
+										$horario = "";
+									foreach($detalles as $col => $detalle) {
+										if ($col == 'horario') {
+											$detalle = strtr($detalle, $horasTurno);
+											$horario = $detalle;
+										} 
+										if ($col == 'horarios_abiertos' and $detalle != $horario) {
+											$rojo = "style='background-color: yellow;'";
+										}
+											
+										
+										echo "<td $rojo>" . $detalle . "</td>";
+									}
+									
+									echo "</tr>";
+								}	
+								
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
+					
+				case "ofertaVSabiertas":
+					
+					$query = "";
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[$row['materia']][$row['turno']]['cantidad'] = $row['cantidad_comisiones'];
+						$datosTabla[$row['materia']]['nombres'] = $row['nombres'];
+					}
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th>M</th>
+								<th>N</th>
+								<th>T</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $materia => $detalle) {
+									echo "<tr>";
+										
+										//print_r($detalle);
+										if (!isset($detalle['N'])) {
+											$detalle['N'] = 0;
+										}
+										if (!isset($detalle['M'])) {
+											$detalle['M'] = 0;
+										}
+										if (!isset($detalle['T'])) {
+											$detalle['T'] = 0;
+										}
+										
+										
+										
+										echo "<td>" . $materia . "</td>";
+										echo "<td>" . $detalle['nombres'] . "</td>";
+										echo "<td>" . $detalle['N']['cantidad'] . "</td>";
+										echo "<td>" . $detalle['M']['cantidad'] . "</td>";
+										echo "<td>" . $detalle['T']['cantidad'] . "</td>";
+									
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;	
 			}
 			
 			?>
