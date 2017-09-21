@@ -23,7 +23,7 @@
 			$materia = new clases\Materia($_SESSION['materiaTemporal']);
 			$codMateria = $materia->mostrarCod();
 			$datosMateria = $materia->mostrarDatos();
-			$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE);
+			$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE, true);
 			$correlativas = $materia->mostrarCorrelativas();
 			$unidadesTematicas = $materia->mostrarUnidadesTematicas("*", $ANIO, $CUATRIMESTRE, true);
 			$bibliografia = $materia->mostrarBibliografia($ANIO, $CUATRIMESTRE, true);
