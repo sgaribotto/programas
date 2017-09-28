@@ -1821,6 +1821,164 @@
 					echo "</table>";
 					break;
 					
+				case "tablaAnalisisOferta":
+					require 'conexion.php';
+					
+					$dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+					
+					
+					$carrera = $_REQUEST['carrera'];
+					switch ($carrera) {
+						case "1":
+							$carrera = "(1, 7, 4)";
+							$nombre_carrera = "Lic. Administración y Gestión Empresarial";
+							break;
+						case "2":
+							$carrera = "(2, 7, 4)";
+							$nombre_carrera = "Lic. Economía";
+							break;
+						case "3":
+							$carrera = "(3, 7)";
+							$nombre_carrera = "Lic. Turismo";
+							break;
+						default: 
+							$carrera = "(" . $carrera . ")";
+							$nombre_carrera = "Selección personalizada de carreras";
+							break;
+					}
+					
+					//echo $carrera;
+							
+					$filtro['m.nombre'] = $_REQUEST['materia'];
+					$filtro['m.carrera'] = $carrera;
+					$filtro['m.plan'] = $_REQUEST['plan'];
+					$filtro['LEFT(t.turno, 1)'] = $_REQUEST['turno'];
+					$filtro['m.cuatrimestre'] = $_REQUEST['cuatrimestre'];
+					
+					$periodo = $_REQUEST['periodo'];
+					
+					$turno = $_REQUEST['turno'];
+					switch ($turno) {
+						case 'N':
+							$turno = 'noche';
+							break;
+						case 'M':
+							$turno = 'mañana';
+							break;
+						case 'T':
+							$turno = 'tarde';
+							break;
+						default:
+							$turnos = 'todos los turnos';
+							break;
+					}
+					
+					$plan = $_REQUEST['plan'];
+					
+					$tipos = array();
+					$carreras = '()';
+					
+					$where = "WHERE 1 = 1 ";
+					foreach ($filtro as $key => $value) {
+						if ($value != "" and $value != '()') {
+							if ($key == 'm.nombre') {
+								$where .= "AND CONCAT(m.nombre, m.cod) LIKE '%$value%' ";
+							} else if ($key == 'm.carrera') {
+								$where .= " AND m.carrera IN {$value} " ;
+								
+							} else {
+								$where .= "AND $key = '$value' ";
+							}
+						}
+					}
+					
+					$query = "SELECT m.cod, IFNULL(t.materia, m.conjunto) AS materia, 
+								m.nombre, e.turno AS turno, t.dia, t.turno AS horario, e.cantidad,
+								CONCAT(e.turno, REPLACE(e.materia, m.conjunto, '')) AS alternativa_turno,
+								COUNT(DISTINCT aa.nombre_comision) AS comisiones, m.cuatrimestre, m.plan, c.cod AS carrera,
+								c.nombre AS nombre_carrera
+								
+							FROM materia AS m
+							LEFT JOIN estimacion AS e
+								ON e.materia LIKE CONCAT(m.conjunto, '%')
+									AND CONCAT(e.anio , ' - ', e.cuatrimestre) = '{$periodo}'
+							LEFT JOIN comisiones_abiertas AS aa
+								ON aa.materia = m.conjunto
+									AND aa.turno = e.turno
+									AND aa.anio = e.anio AND aa.cuatrimestre = e.cuatrimestre
+							LEFT JOIN carrera AS c
+								ON m.carrera = c.id
+							LEFT JOIN turnos_con_conjunto AS t
+								ON t.materia LIKE CONCAT(m.conjunto, '%')
+									AND e.turno = LEFT(t.turno, 1)
+									AND t.anio = e.anio AND t.cuatrimestre = e.cuatrimestre
+							{$where}
+							GROUP BY m.carrera, m.plan,  m.cod, t.dia, alternativa_turno, e.turno, t.turno
+							ORDER BY t.turno";
+					$result = $mysqli->query($query);
+					
+					
+					echo $query;
+					if ($mysqli->errno) {
+						echo $mysqli->error;
+						echo "<br>";
+						echo $query;
+					}
+					
+					$materias = array();
+					$cantidades = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						//print_r($row);
+						if (!isset($materias[$row['plan']][$row['alternativa_turno']][$row['horario']][$row['dia']])) {
+							$materias[$row['plan']][$row['alternativa_turno']][$row['horario']][$row['dia']] = $row['cod'];
+						} else {
+							$materias[$row['plan']][$row['alternativa_turno']][$row['horario']][$row['dia']] .= ' + ' . $row['cod'];
+						}
+						$cantidades[$row['alternativa_turno']]['inscriptos'] = $row['cantidad'];
+						$cantidades[$row['alternativa_turno']]['comisiones'] = $row['comisiones'];
+						
+					}
+					
+					print_r($materias);
+					
+					
+					echo "<h2 class='tituloTabla Requerimientos'>Análisis del turno {$turno}</h2>";
+					
+					foreach ($materias as $plan => $alternativas) {
+						foreach ($alternativas as $alternativa => $horarios) {
+							echo "<h3 class='tituloTabla carrera'>{$alternativa} - Plan: {$plan}</h3>";
+							echo "<table class='materias' border='1'>";
+
+							echo "<tr class='subtitulo'>
+									<th style='text-align:center;font-size:1em;color:white; background-color:black;' width='10%'>Horario</th>";
+							foreach ($dias as $dia) {
+								echo "<th style='text-align:center;font-size:1em;color:white; background-color:black;' width='8%' >{$dia}</th>";
+							}
+									
+							echo "</tr>";
+							
+							foreach ($horarios as $horario => $dias_cargados) {
+								echo "<tr class='salto' style='height:.5em'>
+										<td class='materia' style='text-align:center;font-size:.8em;'>{$horario}</td>";
+								foreach ($dias as $dia) {
+									if (isset($dias_cargados[$dia])) {
+										echo "<td class='materia' style='text-align:center;font-size:.8em;'>{$dias_cargados[$dia]}</td>";
+									} else {
+										echo "<td></td>";
+									}
+								}
+										
+								echo "</tr>";
+							}
+								
+					
+						echo "</table>";
+						}
+					}
+					
+					break;
+					
 				case "tablaInscriptosParaAsignar":
 					require 'conexion.php';
 					
