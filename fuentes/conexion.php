@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	//CONEXIÓN A LA BASE DE DATOS
 	
 	$mysqli = new mysqli('localhost', 'root', 'gari', 'programas');
