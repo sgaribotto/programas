@@ -1,5 +1,5 @@
 <?php
-	echo header('Content-Type: application/json; charset=utf-8');
+	//header('Content-Type: application/json; charset=utf-8');
 //Consultas vía AJAX
 	//Autoload de la clase.
 	session_start();
@@ -49,7 +49,7 @@
 							GROUP BY conjunto, comision, aula, t.turno
                             HAVING dias LIKE '%$dia%'";
 							
-				if ($anio == 2017 and $cuatrimestre = 2) {
+				if ($anio >= 2014) {
 					$query = "SELECT e.materia AS conjunto, LEFT(e.nombre_materia, 75) AS nombre_materia, e.cantidad,
 								aa.cantidad_alumnos AS cantidad_asignada,
 								aa.comision, t.turno,
@@ -134,7 +134,7 @@
 				//echo $query;
 				$result = $mysqli->query($query);
 				if ($mysqli->errno) {
-					print_r($mysqli->error);
+					//print_r($mysqli->error);
 				}
 				//echo $query;
 				$asignaciones = array();
@@ -178,7 +178,7 @@
 									AND turno = '$letraTurno'";
 				}
 				$result = $mysqli->query($query);
-				echo $mysqli->error;
+				//echo $mysqli->error;
 				$inscriptos = $result->fetch_array(MYSQLI_ASSOC);
 				echo $inscriptos['cantidad'];
 				$result->free();

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
 		
@@ -290,6 +290,7 @@
 				
 				$.get('fuentes/aulificatorAJAX.php', formValues, function(data, success) {
 					$('#aulas').empty();
+					console.log(data);
 					$.each(data, function(key, val) {
 						$containerAula = $("<div class='aula'></div>");
 						$containerAula.data(val)

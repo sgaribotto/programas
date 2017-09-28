@@ -1,8 +1,8 @@
 ﻿<?php
 	require 'fuentes/conexion.php';
 	
-	$anio = 2017;
-	$cuatrimestre = 2;
+	$anio = 2016;
+	$cuatrimestre = 1;
 	$distribuciones = array();
 	
 	$query = "SELECT CONCAT(materia, IFNULL(observaciones, '')) AS materia, 
