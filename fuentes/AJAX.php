@@ -5,7 +5,7 @@
 	session_start();
 	require_once '../programas.autoloader.php';
 	require './constantes.php';
-	//print_r($_REQUEST);
+	//print_r($_SESSION);
 	
 	if (isset($_GET['act'])) {
 		
@@ -1249,6 +1249,8 @@
 					$materia = new clases\Materia($_SESSION['materia']);
 					$conjunto = $materia->datosMateria['conjunto'];
 					$id = $_REQUEST['comision'];
+					$usuario = $_SESSION['usuario'];
+					
 					$query = "SELECT turno, horario, nombre_comision, dependencia
 						FROM comisiones_abiertas 
 						WHERE id = {$id};";
@@ -1276,9 +1278,9 @@
 					$result->free();
 					
 					if (!$cantidad) {
-						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, anio, cuatrimestre)
+						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
 									VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
-												'{$datos['dependencia']}', {$ANIO}, {$CUATRIMESTRE})";
+												'{$datos['dependencia']}','{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
 						$mysqli->query($query);
 						$mensajes['exito'] = 'true';
 					} else {
@@ -1286,9 +1288,9 @@
 						/*$mensajes['error'] = "Solo puede agregar un docente por comisión en esta etapa";*/
 						
 						//DUPLICAR HABILITADO
-						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, anio, cuatrimestre)
+						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
 									VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
-												'{$datos['dependencia']}', {$ANIO}, {$CUATRIMESTRE})";
+												'{$datos['dependencia']}', '{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
 						$mysqli->query($query);
 						$mensajes['exito'] = 'true';
 						
@@ -1320,7 +1322,8 @@
 					//$cuatrimestre = 2;
 					
 					$query = "SELECT IFNULL(a.id, 'empty') AS id, c.nombre_comision, c.horario, 
-									CONCAT(d.apellido, ', ', d.nombres) AS docente
+									CONCAT(d.apellido, ', ', d.nombres) AS docente,
+									aula_virtual
 								FROM comisiones_abiertas AS c
 								LEFT JOIN asignacion_comisiones AS a
 									ON a.anio = c.anio AND a.cuatrimestre = c.cuatrimestre
@@ -1342,14 +1345,24 @@
 						if ($empty) {
 							$resaltar = "resaltar";
 						}
+						
+						$checked = '';
+						if ($row['aula_virtual'] == 1) {
+							$checked = 'checked';
+						}
+						
 						echo "<tr class='formularioLateral correlatividadesTable'>
 								
 								
 								<td class='formularioLateral correlatividadesTable'>$row[nombre_comision]</td>
 								<td class='formularioLateral correlatividadesTable'>$row[horario]</td>
 								<td class='formularioLateral correlatividadesTable {$resaltar}'>$row[docente]</td>";
+								
 						if (!$empty) {
-							echo "<td class='formularioLateral correlatividadesTable'>
+							echo "<td class='formularioLateral correlatividadesTable' data-id='{$row['id']}'>
+									<input type='checkbox' class='formularioLateral aulaVirtual' value='1' {$checked} data-id='$row[id]'/>
+								</td>
+								<td class='formularioLateral correlatividadesTable'>
 									<button type='button' class='botonEliminar' data-id='$row[id]' >X</button>
 								</td>";
 						} else {
@@ -1358,6 +1371,20 @@
 						echo "</tr>";
 						
 					}
+					break;
+					
+				case "asignarAulaVirtual":
+					$id = $_REQUEST['id'];
+					$check = $_REQUEST['check'];
+					$usuario = $_SESSION['usuario'];
+					
+					$query = "UPDATE asignacion_comisiones
+								SET aula_virtual = {$check},
+								usuario_ultima_modificacion = '{$usuario}'
+								WHERE id = {$id}";
+					$mysqli->query($query);
+					echo $mysqli->error;
+					
 					break;
 					
 				case "tablaEquipoDocente":

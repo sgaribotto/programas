@@ -31,13 +31,13 @@
 						
 						<!--<th class="plantelActual" style="width:20%;">Dependencia</th>-->
 						<!--<th class="plantelActual" style="width:10%;">Materia</th>-->
-						<th class="plantelActual" style="width:10%;">Comisión</th>
+						<th class="plantelActual" style="width:8%;">Comisión</th>
 						<th class="plantelActual" style="width:40%;">Horario</th>
-						<th class="plantelActual" style="width:40%;">Docente</th>
-						<!--<th class="plantelActual" style="width:15%;">Cargo</th>-->
+						<th class="plantelActual" style="width:36%;">Docente</th>
+						<th class="plantelActual" style="width:8%;">+Campus</th>
 						<!--<th class="plantelActual" style="width:20%;">Carácter</th>-->
 						<!--<th class="plantelActual" style="width:25%;">Fecha de Ingreso</th>-->
-						<th class="plantelActual" style="width:10%;">Eliminar</th>
+						<th class="plantelActual" style="width:8%;">Eliminar</th>
 					</tr>
 					</thead>
 					<tbody class="plantelActual" id="comisionesAsignadas"></tbody>
@@ -155,17 +155,35 @@
 			
 			$("select").combobox();
 			
+			
+			
 			var actualizarTabla = function() {
 				//formValues = $('form.filtros').serialize();
 				//console.log(formValues);
 				$('tbody#comisionesAsignadas').load("fuentes/AJAX.php?act=tablaAsignacionComisiones", function(data) {
 					
 					$('.botonEliminar').click(function() {
-						id = $(this).data('id');
-						$.post("./fuentes/AJAX.php?act=eliminarComisionAsignada", {"id":id, }, function(data1) {
+						
+						var id = $(this).data('id');
+						
+						$.post("./fuentes/AJAX.php?act=eliminarComisionAsignada", {"id":id, }, function(data) {
 							actualizarTabla();
+							
 						});
-				});
+					});
+					$('.aulaVirtual').click(function() {
+						var id = $(this).data('id');
+						var check = 0;
+						if (this.checked) {
+							check = 1;
+						}
+						$.post("./fuentes/AJAX.php?act=asignarAulaVirtual", {"id": id, "check": check}, function(data) {
+							console.log(id);
+							
+							
+						});
+					});
+				
 				
 				});
 			} 
