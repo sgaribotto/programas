@@ -1374,17 +1374,21 @@
 					break;
 					
 				case "asignarAulaVirtual":
+					require 'conexion.php';
 					$id = $_REQUEST['id'];
 					$check = $_REQUEST['check'];
 					$usuario = $_SESSION['usuario'];
+					//$usuario = 'test';
 					
 					$query = "UPDATE asignacion_comisiones
 								SET aula_virtual = {$check},
 								usuario_ultima_modificacion = '{$usuario}'
 								WHERE id = {$id}";
-					$mysqli->query($query);
-					echo $mysqli->error;
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					echo 'ok';
 					
+					$mysqli->close();
 					break;
 					
 				case "tablaEquipoDocente":

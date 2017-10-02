@@ -166,19 +166,19 @@
 						
 						var id = $(this).data('id');
 						
-						$.post("./fuentes/AJAX.php?act=eliminarComisionAsignada", {"id":id, }, function(data) {
+						$.post("./fuentes/AJAX.php?act=eliminarComisionAsignada", {"id":id, }, function(data2) {
 							actualizarTabla();
 							
 						});
 					});
-					$('.aulaVirtual').click(function() {
+					$('.aulaVirtual').change(function() {
 						var id = $(this).data('id');
 						var check = 0;
 						if (this.checked) {
 							check = 1;
 						}
-						$.post("./fuentes/AJAX.php?act=asignarAulaVirtual", {"id": id, "check": check}, function(data) {
-							console.log(id);
+						$.get("./fuentes/AJAX.php?act=asignarAulaVirtual", {"id": id, "check": check, }, function(data1) {
+							//console.log(id);
 							
 							
 						});
