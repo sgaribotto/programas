@@ -1241,62 +1241,70 @@
 					break;
 					
 				case "agregarAsignacionComision":
-					require "./conexion.php";
+					
 					
 					//$ANIO = 2017;
 					//$CUATRIMESTRE = 1;
 					
-					$materia = new clases\Materia($_SESSION['materia']);
-					$conjunto = $materia->datosMateria['conjunto'];
-					$id = $_REQUEST['comision'];
-					$usuario = $_SESSION['usuario'];
-					
-					$query = "SELECT turno, horario, nombre_comision, dependencia
-						FROM comisiones_abiertas 
-						WHERE id = {$id};";
-					
-					$result = $mysqli->query($query);
-					$datos = $result->fetch_array(MYSQLI_ASSOC);
-					
-					
-					
-					$result->free();
-					
-					
-					
-					//Prevención de duplicados
-					$query = "SELECT COUNT(*) AS cantidad FROM asignacion_comisiones
-								WHERE turno = '{$datos['turno']}'
-									AND materia = '{$conjunto}'
-									AND comision = '{$datos['nombre_comision']}'
-									AND dependencia = '{$datos['dependencia']}'
-									AND anio = {$ANIO}
-									AND cuatrimestre = {$CUATRIMESTRE};";
-					$result = $mysqli->query($query);
-					//echo '{error:MYSQL-> ' . $mysqli->error . '}'; 
-					$cantidad = $result->fetch_array(MYSQL_ASSOC)['cantidad'];
-					$result->free();
-					
-					if (!$cantidad) {
-						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
-									VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
-												'{$datos['dependencia']}','{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
-						$mysqli->query($query);
-						$mensajes['exito'] = 'true';
+					if ($ASIGNAR_COMISIONES) {
+						require "./conexion.php";
+						$materia = new clases\Materia($_SESSION['materia']);
+						$conjunto = $materia->datosMateria['conjunto'];
+						$id = $_REQUEST['comision'];
+						$usuario = $_SESSION['usuario'];
+						
+						$query = "SELECT turno, horario, nombre_comision, dependencia
+							FROM comisiones_abiertas 
+							WHERE id = {$id};";
+						
+						$result = $mysqli->query($query);
+						$datos = $result->fetch_array(MYSQLI_ASSOC);
+						
+						
+						
+						$result->free();
+						
+						
+						
+						//Prevención de duplicados
+						$query = "SELECT COUNT(*) AS cantidad FROM asignacion_comisiones
+									WHERE turno = '{$datos['turno']}'
+										AND materia = '{$conjunto}'
+										AND comision = '{$datos['nombre_comision']}'
+										AND dependencia = '{$datos['dependencia']}'
+										AND anio = {$ANIO}
+										AND cuatrimestre = {$CUATRIMESTRE};";
+						$result = $mysqli->query($query);
+						//echo '{error:MYSQL-> ' . $mysqli->error . '}'; 
+						$cantidad = $result->fetch_array(MYSQL_ASSOC)['cantidad'];
+						$result->free();
+						
+						if (!$cantidad) {
+							$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
+										VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
+													'{$datos['dependencia']}','{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
+							$mysqli->query($query);
+							$mensajes['exito'] = 'true';
+						} else {
+							//NO DUPLICAR
+							/*$mensajes['error'] = "Solo puede agregar un docente por comisión en esta etapa";*/
+							
+							//DUPLICAR HABILITADO
+							$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
+										VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
+													'{$datos['dependencia']}', '{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
+							$mysqli->query($query);
+							$mensajes['exito'] = 'true';
+							
+						}
+						echo json_encode($mensajes);			
+						$mysqli->close();
 					} else {
-						//NO DUPLICAR
-						/*$mensajes['error'] = "Solo puede agregar un docente por comisión en esta etapa";*/
+						$mensajes['exito'] = 'false';
+						$mensajes['error'] = 'El periodo de asignación de comisiones está cerrado';
 						
-						//DUPLICAR HABILITADO
-						$query = "INSERT INTO asignacion_comisiones (docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre)
-									VALUES ({$_REQUEST['docente']}, '{$conjunto}', '{$datos['turno']}', '{$datos['nombre_comision']}',
-												'{$datos['dependencia']}', '{$usuario}', {$ANIO}, {$CUATRIMESTRE})";
-						$mysqli->query($query);
-						$mensajes['exito'] = 'true';
-						
+						echo json_encode($mensajes);
 					}
-					echo json_encode($mensajes);			
-					$mysqli->close();
 					break;
 					
 				case "eliminarComisionAsignada":
@@ -1351,6 +1359,13 @@
 							$checked = 'checked';
 						}
 						
+						$disabled = "";
+						$eliminar = "botonEliminar";
+						if (!$ASIGNAR_COMISIONES) {
+							$disabled = "disabled";
+							$eliminar = "periodoCerrado";
+						}
+						
 						echo "<tr class='formularioLateral correlatividadesTable'>
 								
 								
@@ -1360,10 +1375,11 @@
 								
 						if (!$empty) {
 							echo "<td class='formularioLateral correlatividadesTable' data-id='{$row['id']}'>
-									<input type='checkbox' class='formularioLateral aulaVirtual' value='1' {$checked} data-id='$row[id]'/>
-								</td>
-								<td class='formularioLateral correlatividadesTable'>
-									<button type='button' class='botonEliminar' data-id='$row[id]' >X</button>
+									<input type='checkbox' class='formularioLateral aulaVirtual' value='1' {$checked} {$disabled} data-id='$row[id]'/>
+								</td>";
+							
+							echo "<td class='formularioLateral correlatividadesTable'>
+									<button type='button' class='{$eliminar}' data-id='$row[id]' >X</button>
 								</td>";
 						} else {
 							echo "<td></td>";

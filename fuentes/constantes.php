@@ -13,6 +13,7 @@
 
 	$ANIO = $constantes['anio'];
 	$CUATRIMESTRE = $constantes['cuatrimestre'];
+	$ASIGNAR_COMISIONES = $constantes['asignar_comisiones'];
 	
 	$turnos = array(
 		'M' => 'Mañana', 
