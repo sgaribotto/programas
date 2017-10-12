@@ -1675,6 +1675,8 @@
 								$where .= "AND CONCAT(m.nombre, m.cod) LIKE '%$value%' ";
 							} else if ($key == 'm.carrera') {
 								$where .= " AND m.carrera IN {$value} " ;
+							} else if ($key == 'LEFT(t.turno, 1)' and ($value == 'N' or $value =='M')) {
+								$where .= " AND ({$key} = '{$value}' OR {$key} = 'S') ";
 							} else {
 								$where .= "AND $key = '$value' ";
 							}
@@ -1746,7 +1748,8 @@
 					$result = $mysqli->query($query);
 					
 					
-					//echo $query;
+					//
+					echo $query;
 					if ($mysqli->errno) {
 						echo $mysqli->error;
 						echo "<br>";
