@@ -107,6 +107,7 @@
 						<label class="formularioLateral" for="materia">Materia: </label>
 						<input name="materia" class="formularioLateral iconMateria filterTrigger" id="materia" type="text" maxlength="30">
 						<br />
+						<button type="submit" class="formularioLateral">Actualizar</button>
 					</form>
 				</fieldset>
 			</div>

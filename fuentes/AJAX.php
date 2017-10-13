@@ -1722,9 +1722,13 @@
 								), 
 									'')) AS viernes,
 								MAX(IF(t.dia = 'sabado', 
-									IF(RIGHT(t.materia,1) != ')', 
-									CONCAT(m.cod, 'S', RIGHT(t.materia, 1)), 
-									CONCAT(m.cod, 'S')
+									IF(RIGHT(t.materia,1) != ')',
+										IF (RIGHT(t.materia, 2) != ')S',
+											CONCAT(m.cod, LEFT(t.turno,1), RIGHT(t.materia, 1)),
+											CONCAT(m.cod, 'S')
+										),	
+											
+									CONCAT(m.cod, LEFT(t.turno,1))
 								), 
 									'')) AS sabado,
 								IF(cor.nombre_correlativas LIKE 'Elementos de%', 'CPU completo', cor.nombre_correlativas) AS nombre_correlativas,
@@ -1748,8 +1752,7 @@
 					$result = $mysqli->query($query);
 					
 					
-					//
-					echo $query;
+					//echo $query;
 					if ($mysqli->errno) {
 						echo $mysqli->error;
 						echo "<br>";
@@ -2452,6 +2455,60 @@
 						echo "</table>";
 					} else {
 						echo "<p>No se encontraron materias</p>";
+					}
+					break;
+					
+				case "tablaTurnosMateria":
+					require 'conexion.php';
+					
+					$materia = $_REQUEST['materia'];
+					$periodo = $_REQUEST['periodo'];
+					
+										
+					$query = "SELECT t.id, t.materia, m.nombres, t.dia, t.turno, t.observaciones 
+									FROM turnos_con_conjunto AS t
+									LEFT JOIN vista_materias_por_conjunto AS m
+										ON m.conjunto = t.materia OR t.materia LIKE CONCAT(m.conjunto, '_')
+									WHERE t.materia = '{$materia}' OR t.materia LIKE '{$materia}_'
+										AND CONCAT(t.anio, ' - ', t.cuatrimestre) = '{$periodo}'
+									ORDER BY LEFT(t.turno, 1), t.materia, 
+										FIELD(t.dia, 'lunes', 'martes', 
+											'miércoles', 'jueves', 
+											'viernes', 'sábado')
+									#LIMIT 30";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$turnos = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$turnos[] = $row;
+					}
+					
+					if (sizeof($turnos)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:20%;'>Cod</th>
+								<th class='subtitulo'style='width:50%;'>Nombre</th>
+								<th class='subtitulo' style='width:15%;'>Día</th>
+								<th class='subtitulo' style='width:8%;'>Horario</th>
+								<th class='subtitulo' style='width:7%;'>Eliminar</th>
+							</tr>";
+						foreach ($turnos AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[materia]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[nombres]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[dia]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[turno]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminarTurno' id='eliminarTurno' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron horarios</p>";
 					}
 					break;
 					
