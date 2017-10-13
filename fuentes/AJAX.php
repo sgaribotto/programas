@@ -2469,7 +2469,7 @@
 									FROM turnos_con_conjunto AS t
 									LEFT JOIN vista_materias_por_conjunto AS m
 										ON m.conjunto = t.materia OR t.materia LIKE CONCAT(m.conjunto, '_')
-									WHERE t.materia = '{$materia}' OR t.materia LIKE '{$materia}_'
+									WHERE (t.materia = '{$materia}' OR t.materia LIKE '{$materia}_')
 										AND CONCAT(t.anio, ' - ', t.cuatrimestre) = '{$periodo}'
 									ORDER BY LEFT(t.turno, 1), t.materia, 
 										FIELD(t.dia, 'lunes', 'martes', 

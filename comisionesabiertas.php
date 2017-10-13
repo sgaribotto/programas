@@ -116,7 +116,7 @@
 						</select>
 						<br />
 						<label class="formularioLateral" for="periodo">Periodo:</label>
-						<select class="formularioLateral iconCod filtros actualizarTabla" name="periodo" required="required" id="periodo" >
+						<select class="formularioLateral iconCod filtros actualizarTabla" name="periodo" required="required" id="periodoTurno" >
 							<?php
 								$anio = $ANIO;
 								$cuatrimestre = $CUATRIMESTRE;
@@ -162,6 +162,7 @@
 			var actualizarTablaComisionesAbiertas = function() {
 				var periodo = $('#periodoComisionAbierta').val();
 				var materia = $('#materiaComisionAbierta').text();
+				var periodoTurno = $('#periodoTurno').val();
 				$('#tablaComisionesAbiertas').load("fuentes/AJAX.php?act=tablaComisionesAbiertas", {"periodo": periodo, "materia": materia}, function(data) {
 					$('.botonEliminar').click(function() {
 						if (confirm('Desea Eliminar la comisión?')) {
@@ -174,7 +175,7 @@
 					});
 				});
 				
-				$('#tablaTurnos').load("fuentes/AJAX.php?act=tablaTurnosMateria", {"periodo": periodo, "materia": materia}, function(data) {
+				$('#tablaTurnos').load("fuentes/AJAX.php?act=tablaTurnosMateria", {"periodo": periodoTurno, "materia": materia}, function(data) {
 					$('.botonEliminarTurno').click(function() {
 						if (confirm('Desea Eliminar la comisión?')) {
 							var id = $(this).data('id');
@@ -207,7 +208,7 @@
 			});
 			
 			$('select.actualizarTabla').change(function() {
-				alert('actual');
+				//alert('actual');
 				actualizarTablaComisionesAbiertas();
 			});
 			
@@ -307,9 +308,6 @@
 					
 			};
 			
-			$('#periodoComisionAbierta').change(function() {
-				actualizarTablaComisionesAbiertas();
-			});
 			
 			//$("select").combobox();
 		});

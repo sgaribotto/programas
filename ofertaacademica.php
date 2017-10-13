@@ -260,6 +260,12 @@
 				$('#dialogResumenMateria').load('comisionesabiertas.php', {"materia":cod});
 				
 				$('#dialogResumenMateria').dialog(dialogOptions).dialog('open');
+				
+				$('#dialogResumenMateria').on('dialogclose', function() {
+					actualizarTabla();
+					//alert('close');
+				});
+				
 			});
 			
 			
@@ -361,6 +367,8 @@
 			
 			$('form.filtros').submit(function(event) {
 				event.preventDefault();
+				//alert('ok');
+				actualizarTabla();
 			});
 			
 		});
