@@ -230,7 +230,7 @@
 											OR (anio_academico = {$anio} 
 												AND periodo_lectivo < {$cuatrimestre}))
 									GROUP BY anio_academico, periodo_lectivo
-									ORDER BY anio_academico DESC, periodo_lectivo DESC";
+									ORDER BY anio_academico, periodo_lectivo ";
 									
 							$result = $mysqli->query($query);
 							//echo $mysqli->error;
