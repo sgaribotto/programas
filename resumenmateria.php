@@ -220,10 +220,10 @@
 								
 							$query = "SELECT CONCAT(a.anio_academico, '-', a.periodo_lectivo) AS periodo, 
 										COUNT(*) AS inscriptos,
-										SUM(IF(a.resultado = 'Aprob', 1, 0)) AS aprobados,
-										SUM(IF(a.resultado = 'Reprob', 1, 0)) AS reprobados,
+										SUM(IF(LEFT(a.resultado, 5) = 'Aprob', 1, 0)) AS aprobados,
+										SUM(IF(LEFT(a.resultado, 6) = 'Reprob', 1, 0)) AS reprobados,
 										SUM(IF(a.resultado = 'Ausente', 1, 0)) AS ausentes,
-										SUM(IF(a.resultado = 'Promocion', 1, 0)) AS promociones
+										SUM(IF(LEFT(a.resultado, 6) = 'Promoc', 1, 0)) AS promociones
 									FROM actas AS a
 									WHERE anio_academico >= 2012 AND materia IN {$materia->mostrarConjunto()}
 										AND (anio_academico < {$anio} 
