@@ -46,7 +46,7 @@
 								} else {
 									$cuatrimestre++;
 								}
-								echo "<option class='formularioLateral' value='{$anio} - {$cuatrimestre}' >{$anio} - {$cuatrimestre}</option>";
+								echo "<option class='formularioLateral' value='{$anio} - {$cuatrimestre}'>{$anio} - {$cuatrimestre}</option>";
 							?>
 						</select>
 						<br />
@@ -62,9 +62,6 @@
 						<br />
 						<label class="formularioLateral" for="horarioComisionAbierta">Horario:</label>
 						<select class="formularioLateral iconCod filtros " name="horarioComisionAbierta" required="required" id="horarioComisionAbierta" >
-							<?php
-								
-							?>
 						</select>
 						
 						<br />						

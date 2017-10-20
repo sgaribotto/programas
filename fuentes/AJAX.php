@@ -3112,20 +3112,28 @@
 					$cuatrimestre = $periodo[1];
 					$letra = "";
 					
+					$turno = $_REQUEST['turnoComisionAbierta'];
+					$nombre_comision = $_REQUEST['nombreComisionAbierta'];
+					
+					if (strpos($nombre_comision, 'S')) {
+						$turno = 'S';
+					}
+					
+					
 					if (strpos($_REQUEST['horarioComisionAbierta'], '(')) {
-						echo $_REQUEST['horarioComisionAbierta'];
+						//echo $_REQUEST['horarioComisionAbierta'];
 						$letra = explode(' (', $_REQUEST['horarioComisionAbierta']);
-						print_r($letra);
+						//print_r($letra);
 						$letra = trim($letra[1], ')');
-						echo $letra . " - ";
+						//echo $letra . " - ";
 						$letra = substr($letra, 1, 1);
-						echo $letra . " - ";
+						//echo $letra . " - ";
 					}
 					
 					
 					$query = "INSERT INTO comisiones_abiertas 
-								SET turno = '{$_REQUEST['turnoComisionAbierta']}', 
-								nombre_comision = '{$_REQUEST['nombreComisionAbierta']}', 
+								SET turno = '{$turno}', 
+								nombre_comision = '{$nombre_comision}', 
 								horario = '{$_REQUEST['horarioComisionAbierta']}', 
 								materia = '{$_REQUEST['materia']}', 
 								anio = {$anio},
@@ -3170,7 +3178,9 @@
 					
 					$horarios = array();
 					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-											
+						if($row['dia'] == 'sábado') {
+							$row['horario'] = str_replace($row['turno'], 'S', $row['horario']);
+						} 
 						$horarios[$row['materia']][$row['turno']][$row['dia']][] = $horasTurno[$row['horario']];
 					}
 					
