@@ -1722,13 +1722,13 @@
 								), 
 									'')) AS viernes,
 								MAX(IF(t.dia = 'sabado', 
-									IF(RIGHT(t.materia,1) != ')',
-										IF (RIGHT(t.materia, 2) != ')S',
-											CONCAT(m.cod, LEFT(t.turno,1), RIGHT(t.materia, 1)),
-											CONCAT(m.cod, 'S')
-										),	
+									IF(t.materia LIKE '%)S%',
+										CONCAT(m.cod, REPLACE(t.materia, m.conjunto, '')),
+										IF(RIGHT(t.materia,1) != ')', 
+											CONCAT(m.cod, LEFT(t.turno,1), RIGHT(t.materia, 1)), 
+											CONCAT(m.cod, LEFT(t.turno, 1))
+										)
 											
-									CONCAT(m.cod, LEFT(t.turno,1))
 								), 
 									'')) AS sabado,
 								IF(cor.nombre_correlativas LIKE 'Elementos de%', 'CPU completo', cor.nombre_correlativas) AS nombre_correlativas,
