@@ -23,7 +23,7 @@
 		?>
 		
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Asignar comisiones 2do cuatrimestre 2017</h2>
+			<h2 class="formularioLateral">Asignar comisiones del primer cuatrimestre 2018</h2>
 			<div id="plantelActual">
 				<table class="plantelActual">
 					<thead class="plantelActual">

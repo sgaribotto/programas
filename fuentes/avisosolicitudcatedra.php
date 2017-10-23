@@ -136,14 +136,16 @@
 A efectos de poder realizar las designaciones de docentes para el segundo cuatrimestre 
 del ciclo lectivo 2017​ y con el fin de lograr una adecuada coordinación 
 de cursos y​ alumnos le solicitamos realice la asignación de docentes a través de la 
-aplicación web de Solicitud de Cátedra.  <br />
+aplicación web de Solicitud de Cátedra. En la misma pantalla, deberá indicar qué docentes 
+utilizarán el aula virtual de MásCampus.  <br />
 <br />
 La distribución  de comisiones de la materia que usted tiene a cargo estará disponible ingresando a la 
 dirección: <a href='http://planeseeyn.unsam.edu.ar/programas'>http://planeseeyn.unsam.edu.ar/programas</a> 
 con el usuario y contraseña que se le otorgó el cuatrimestre anterior y accediendo a la opción
-asignar comisiones. El sistema estará habilitado para ello hasta el miércoles 28 de junio de 2017.
+asignar comisiones. El sistema estará habilitado para ello el lunes 23 de octubre hasta el 
+miércoles 8 de noviembre de 2017.
 <br />
-Una vez terminada la inscripción, de acuerdo a la cantidad de inscriptos, haremos los ajustes necesarios. 
+Una vez terminada la inscripción por parte de los alumnos, de acuerdo a la cantidad de inscriptos, haremos los ajustes necesarios. 
 <br />
 
 <br />
@@ -155,7 +157,7 @@ Dirección de Asuntos Académicos.<br />
 Secretaría Académica<br />
 EEYN - UNSAM </p>";
 	
-	$asunto = "Solicitud de cátedra 2do cuatrimestre 2017";
+	$asunto = "Solicitud de cátedra 1er cuatrimestre 2018";
 	
 	// ARMADO DE LA BASE DE DATOS PARA EL ENVÏO DE MAILS
 	
@@ -189,7 +191,7 @@ EEYN - UNSAM </p>";
 	}*/
 	
 	//TEST MAIL A planes.eeyn@unsam.edu.ar
-	/*$mensaje = sprintf($template, 'Santiago Garibotto');
+	$mensaje = sprintf($template, 'Santiago Garibotto');
 	mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Matías López', 'matias.lopez@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Lorena Penna', 'lpenna@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
@@ -197,7 +199,7 @@ EEYN - UNSAM </p>";
 	
 	
 	//ENVIO DE MAILS GUARDADOS EN LA BASE
-	$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
+	/*$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
 			FROM envios_por_mail
 			WHERE NOT ISNULL(mail) AND mail != '' AND enviado < 1
 			LIMIT 40;";
@@ -217,7 +219,7 @@ EEYN - UNSAM </p>";
 	
 	$result->free();
 	$mysqli->close();
-	
+	*/
 	
 	
 	
