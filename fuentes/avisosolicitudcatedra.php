@@ -3,7 +3,7 @@
 	//COmentar para ejecutar
 	//phpinfo();
 	require '../libs/PHPMailer/PHPMailerAutoload.php';
-	
+	require 'constantes.php';
 
 	function mailAvisoMasCampus($docente, $direccion, $asunto, $mensaje) {
 		
@@ -133,11 +133,12 @@
 	$template = "<p 'style=text-align:justify;'>Estimado Responsable de Cátedra <b>%s</b>:
 <br />
 <br />
-A efectos de poder realizar las designaciones de docentes para el segundo cuatrimestre 
-del ciclo lectivo 2017​ y con el fin de lograr una adecuada coordinación 
+A efectos de poder realizar las designaciones de docentes para el primer cuatrimestre 
+del ciclo lectivo 2018​ y con el fin de lograr una adecuada coordinación 
 de cursos y​ alumnos le solicitamos realice la asignación de docentes a través de la 
 aplicación web de Solicitud de Cátedra. En la misma pantalla, deberá indicar qué docentes 
-utilizarán el aula virtual de MásCampus.  <br />
+utilizarán el aula virtual de MásCampus. Ésta será la única vía para solicitar el aula virtual y
+deberá realizarse en el lapso indicado debajo. <br />
 <br />
 La distribución  de comisiones de la materia que usted tiene a cargo estará disponible ingresando a la 
 dirección: <a href='http://planeseeyn.unsam.edu.ar/programas'>http://planeseeyn.unsam.edu.ar/programas</a> 
@@ -149,7 +150,7 @@ Una vez terminada la inscripción por parte de los alumnos, de acuerdo a la cant
 <br />
 
 <br />
-Cualquier duda o consulta sobre la plataforma no dude en comunicarse a Dirección de Asuntos Académicos.
+Cualquier duda o consulta sobre la plataforma no dude en comunicarse a la Dirección de Asuntos Académicos.
 <br />
 <br />
 Saluda Cordialmente.<br />
@@ -181,7 +182,7 @@ EEYN - UNSAM </p>";
 			($docente, '$tipo', '$nombre_docente', '$mail', '$asunto', '$message');";
 		$mysqli->query($insertQuery);
 		echo $mysqli->error;
-		echo "$row[docente] --> $row[mail]";
+		echo "$row[docente] / $nombre_docente --> $row[mail]";
 		
 		echo "<hr />";
 		
@@ -191,18 +192,18 @@ EEYN - UNSAM </p>";
 	}*/
 	
 	//TEST MAIL A planes.eeyn@unsam.edu.ar
-	$mensaje = sprintf($template, 'Santiago Garibotto');
-	mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
+	//$mensaje = sprintf($template, 'Santiago Garibotto');
+	//mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Matías López', 'matias.lopez@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Lorena Penna', 'lpenna@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Marcelo Estayno', 'mestayno@gmail.com', 'TEST' . $asunto, $mensaje);*/
 	
 	
 	//ENVIO DE MAILS GUARDADOS EN LA BASE
-	/*$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
+	$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
 			FROM envios_por_mail
-			WHERE NOT ISNULL(mail) AND mail != '' AND enviado < 1
-			LIMIT 40;";
+			WHERE NOT ISNULL(mail) AND mail != '' AND enviado = 0
+			LIMIT 30;";
 	
 	$result = $mysqli->query($query);
 	echo $mysqli->error;
@@ -219,7 +220,7 @@ EEYN - UNSAM </p>";
 	
 	$result->free();
 	$mysqli->close();
-	*/
+	
 	
 	
 	

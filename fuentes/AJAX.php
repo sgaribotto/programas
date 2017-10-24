@@ -3192,7 +3192,7 @@
 							$option = "";
 							foreach ($dias as $dia => $horas) {
 								foreach ($horas as $hora) {
-									$option .= $dia . " de " . $hora . ", ";
+									$option .= $dia . $hora . ", ";
 									//$imprimir .= "<option value='{$option}'>{$option}</option>";
 								}
 								
