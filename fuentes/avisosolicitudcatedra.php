@@ -117,6 +117,9 @@
 			LIMIT 1000;";*/
 	
 	//CONSULTA CON LOS RESPONSABLES DE MATERIAS CON COMISIONES ABIERTAS
+	
+	$anio = 2018;
+	$cuatrimestre = 1;
 	$query = "SELECT DISTINCT CONCAT(p.apellido, ', ', p.nombres) AS nombre_docente, d.id AS docente, p.id, dd.valor AS mail,
 				GROUP_CONCAT(DISTINCT ca.materia) AS materias
 			FROM responsable AS r
@@ -125,7 +128,7 @@
 			LEFT JOIN datos_docentes AS dd ON dd.docente = d.id AND dd.tipo = 'mail'
 			LEFT JOIN materia AS m ON r.materia = m.cod
 			LEFT JOIN comisiones_abiertas AS ca ON m.conjunto = ca.materia
-			WHERE r.activo = 1 AND ca.anio = {$ANIO} AND ca.cuatrimestre = {$CUATRIMESTRE}
+			WHERE r.activo = 1 AND ca.anio = {$anio} AND ca.cuatrimestre = {$cuatrimestre}
 			GROUP BY d.id
 			HAVING NOT ISNULL(materias);";
 	
@@ -133,8 +136,7 @@
 	$template = "<p 'style=text-align:justify;'>Estimado Responsable de Cátedra <b>%s</b>:
 <br />
 <br />
-A efectos de poder realizar las designaciones de docentes para el primer cuatrimestre 
-del ciclo lectivo 2018​ y con el fin de lograr una adecuada coordinación 
+A efectos de poder realizar las designaciones de docentes para el primer cuatrimestre del ciclo lectivo 2018​ y con el fin de lograr una adecuada coordinación 
 de cursos y​ alumnos le solicitamos realice la asignación de docentes a través de la 
 aplicación web de Solicitud de Cátedra. En la misma pantalla, deberá indicar qué docentes 
 utilizarán el aula virtual de MásCampus. Ésta será la única vía para solicitar el aula virtual y
@@ -158,7 +160,7 @@ Dirección de Asuntos Académicos.<br />
 Secretaría Académica<br />
 EEYN - UNSAM </p>";
 	
-	$asunto = "Solicitud de cátedra 1er cuatrimestre 2018";
+	$asunto = "Solicitud de cátedra 1er cuatrimestre 2018 [Recordatorio]";
 	
 	// ARMADO DE LA BASE DE DATOS PARA EL ENVÏO DE MAILS
 	
