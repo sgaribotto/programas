@@ -316,7 +316,7 @@
 		
 		
 		if ( $('h2.navLateral').length == 1 ) {
-			//$('h2.navLateral').click();
+			$('h2.navLateral').click();
 		};
 		
 	});
