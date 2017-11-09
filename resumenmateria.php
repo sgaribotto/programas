@@ -65,12 +65,14 @@
 		<?php if(!isset($_GET['print'])) { 
 			session_start();
 			$animationEvent = "true";
+			$print = false;
 		?>
 			<a href='resumenmateria.php?print=1&materia=<?php echo $materia->mostrarCod();?>' 
-					class='no-print' target='_new'>Imprimir</a>
+					class='no-print imprimir' target='_new'>Imprimir</a>
 		<?php } else { 
 			require 'fuentes/meta.html';
 			$animationEvent = "false";
+			$print = true;
 			
 			?>
 			<style>
@@ -117,6 +119,10 @@
  			<h4 class='formularioLateral listadoComsiones'>
 				<form method="GET" action="#" id="selectorPeriodo">
 					<label for="periodo">Comisiones </label>
+					<?php if ($print) {
+						echo $_REQUEST['periodo'];
+					} else {
+					?>
 					<select name="periodo" class="selectorPeriodo"> 
 						<?php 
 							require 'conexion.php';
@@ -147,6 +153,7 @@
 						
 						?>
 					</select>
+					<?php } ?>
 				</form>
 			</h4>
 			<ul class="formularioLateral turnos">
@@ -478,6 +485,19 @@
 						$('.errorValidar').text('Debe elegir un docente');
 					}*/
 				}
+			});
+			
+			$('a.imprimir').click(function(event) {
+				event.preventDefault();
+				var periodo = $('select.selectorPeriodo').val();
+				
+				var cod = $('span.tituloMateria').text();
+				cod = cod.replace('(', '');
+				cod = parseFloat(cod);
+				
+				var url = "resumenmateria.php?print=1&materia=" + cod + "&periodo=" + periodo;
+				
+				window.open(url, '_blank');
 			});
 			
 		});
