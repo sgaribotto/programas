@@ -1407,6 +1407,40 @@
 					$mysqli->close();
 					break;
 					
+				case "asignarCargaCVAR":
+					require 'conexion.php';
+					$id = $_REQUEST['id'];
+					$check = $_REQUEST['check'];
+					
+					//$usuario = 'test';
+					
+					$query = "UPDATE docente
+								SET cvar = {$check}
+								WHERE id = {$id}";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					echo 'ok';
+					
+					$mysqli->close();
+					break;
+				
+				case "asignarExceptuadoCVAR":
+					require 'conexion.php';
+					$id = $_REQUEST['id'];
+					$check = $_REQUEST['check'];
+					
+					//$usuario = 'test';
+					
+					$query = "UPDATE docente
+								SET exceptuado_cvar = {$check}
+								WHERE id = {$id}";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					echo 'ok';
+					
+					$mysqli->close();
+					break;
+					
 				case "tablaEquipoDocente":
 				
 					//$ANIO = 2017;
@@ -2293,6 +2327,64 @@
 							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
 									class='formularioLateral botonEliminar' id='eliminarDocente' data-id='$valores[id]'>
 								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron docentes</p>";
+					}
+					break;
+					
+				case "tablaSituacionCVAR":
+					require 'conexion.php';
+					
+					$where = '';
+					
+					if (isset($_REQUEST['docente']) AND $_REQUEST['docente'] != '') {
+						$where = " AND CONCAT(apellido, nombres, dni) LIKE '%{$_REQUEST['docente']}%' ";
+					}
+					
+					$query = "SELECT id, dni, CONCAT(apellido, ', ', nombres) AS docente, exceptuado_cvar, cvar
+									FROM docente 
+									WHERE activo = 1 {$where} 
+									ORDER BY apellido, nombres
+									LIMIT 20";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$docentes = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$docentes[] = $row;
+					}
+					
+					if (sizeof($docentes)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:15%;'>DNI</th>
+								<th class='subtitulo'style='width:55%;'>Docente</th>
+								<th class='subtitulo' style='width:15%;'>CVar Cargado</th>
+								<th class='subtitulo' style='width:15%;'>Exceptuado CVAR</th>
+							</tr>";
+						foreach ($docentes AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[dni]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[docente]</td>";
+							$checked = '';
+							if ($valores['cvar'] == 1) {
+								$checked = 'checked';
+							}
+							echo "<td class='materia' style='text-align:left;'>
+									<input type='checkbox' name='cvar' id='cvar' class='cvar' data-id='{$valores['id']}' $checked>
+							</td>";
+							$checked = '';
+							if ($valores['exceptuado_cvar'] == 1) {
+								$checked = 'checked';
+							}
+							echo "<td class='materia' style='text-align:left;'>
+									<input type='checkbox' name='exceptuado_cvar' id='exceptuado_cvar' class='exceptuado_cvar' data-id='{$valores['id']}' $checked>
+							</td>";
 							echo "</tr>";
 						}
 						echo "</table>";

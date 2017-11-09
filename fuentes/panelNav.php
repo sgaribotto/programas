@@ -65,6 +65,7 @@
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
 				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
 				<li class="navLateral"><a href="aulificatorreportcondocentes.php" class="navLateral">Reporte de aulas con docentes</a></li>
+				<li class="navLateral"><a href="situacionCVAR.php" class="navLateral">Situación Carga CVar</a></li>
 			</ul>
 			
 			
