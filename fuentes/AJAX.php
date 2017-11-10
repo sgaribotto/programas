@@ -2549,6 +2549,84 @@
 						echo "<p>No se encontraron materias</p>";
 					}
 					break;
+				
+				case "tablaComisionesPorDia":
+					require 'conexion.php';
+					require 'constantes.php';
+					
+					$periodo = $_REQUEST['periodo'];
+					
+					$turnosConsiderados = array('M1' => 'M', 
+												'M2' => 'M', 
+												'N1' => 'N', 
+												'N2' => 'N', 
+												'T1' => 'T', 
+												'T2' => 'T', 
+												'S1' => 'S', 
+												'S2' => 'S'
+											);
+					$turnosCompletos = ['M', 'N', 'T', 'S'];
+					
+					
+					$query = "SELECT t.dia, t.turno, 
+								COUNT(DISTINCT CONCAT(t.materia, ca.nombre_comision)) AS cantidad_comisiones
+							FROM turnos_con_conjunto AS t
+							LEFT JOIN comisiones_abiertas AS ca
+								ON t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
+									AND ca.turno = LEFT(t.turno, 1)
+									AND ca.anio = t.anio
+									AND ca.cuatrimestre = t.cuatrimestre
+							WHERE CONCAT(t.anio, ' - ', t.cuatrimestre) = '{$periodo}'
+							GROUP BY t.turno, t.dia#, t.materia
+							ORDER BY ca.turno, t.dia, t.turno, t.materia";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$cantidad_comisiones = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$cantidad_comisiones[$row['turno']][$row['dia']] = $row['cantidad_comisiones'];
+					}
+					
+					
+					if (sizeof($cantidad_comisiones)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:10%;text-align:left;'>Turno</th>
+								<th class='subtitulo'style='width:15%;text-align:center;'>Lunes</th>
+								<th class='subtitulo' style='width:15%;text-align:center;'>Martes</th>
+								<th class='subtitulo' style='width:15%;text-align:center;'>Miércoles</th>
+								<th class='subtitulo' style='width:15%;text-align:center;'>Jueves</th>
+								<th class='subtitulo' style='width:15%;text-align:center;'>Viernes</th>
+								<th class='subtitulo' style='width:15%;text-align:center;'>Sábado</th>
+							</tr>";
+						foreach ($turnosConsiderados as $horario => $turno) {
+							echo "<tr class='info'>
+									<td class='turno' >{$horario}</td>";
+							foreach ($diasSemana as $dia) {
+								$cantidad = 0;
+								if (isset($cantidad_comisiones[$horario][$dia])) {
+									$cantidad += $cantidad_comisiones[$horario][$dia];
+								}
+								if (isset($cantidad_comisiones[$turno][$dia])) {
+									$cantidad += $cantidad_comisiones[$turno][$dia];
+									//$cantidad += 100;
+								}
+								
+								$mark = '';
+								if ($cantidad > 21) {
+									$mark = "background-color: yellow;";
+								}
+								echo "<td class='dia' style='text-align:center;{$mark}' >{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron comisiones abiertas</p>";
+					}
+					break;
 					
 				case "tablaTurnosMateria":
 					require 'conexion.php';
