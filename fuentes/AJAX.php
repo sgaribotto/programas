@@ -2346,7 +2346,7 @@
 					
 					$query = "SELECT id, dni, CONCAT(apellido, ', ', nombres) AS docente, exceptuado_cvar, cvar
 									FROM docente 
-									WHERE activo = 1 {$where} 
+									WHERE 1 = 1 {$where} 
 									ORDER BY apellido, nombres
 									LIMIT 20";
 					//echo $query;
