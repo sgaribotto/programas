@@ -143,8 +143,8 @@
 				<li class="navLateral"><a href="imprimirreportesinscriptos.php" class="navLateral">Total inscriptos</a></li>
 				<li class="navLateral"><a href="imprimirdistribucionanalitica.php" class="navLateral">Distribución analítica</a></li>
 				<li class="navLateral"><a href="inscriptosencorrelativas.php" class="navLateral">Inscriptos en correlativas</a></li>
-				<!--<li class="navLateral"><a href="agregarcursos.php" class="navLateral">Agregar curso de extension</a></li>
-				<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>
+				<li class="navLateral"><a href="cantidadcomisionespordia.php" class="navLateral">Cantidad de comisiones por día</a></li>
+				<!--<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>
 				<li class="navLateral"><a href="estimacionpreliminar.php" class="navLateral">Estimación inscriptos</a></li>
 				<li class="navLateral"><a href="aulificatorreportExcel.php" class="navLateral">Reporte en Excel</a></li>-->
 				
