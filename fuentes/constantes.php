@@ -44,4 +44,6 @@
 		"S1 - S2" => "8:30 a 12:30"
 	);
 	
+	$diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+	
 ?>
