@@ -93,13 +93,16 @@
 				$.post("./fuentes/AJAX.php?act=agregarDocente", formValues, function(data) {
 					alert(data);
 					actualizarTabla();
+					$("#cargarDocenteNuevo")[0].reset();
 				});
 				
 			});
 			
 			
-			$('#dni').change(function() {
+			$('#dni').keyup(function() {
 				dni = $('#dni').val();
+				$('#filtro').val(dni);
+				$('#filtro').keyup();
 				$.post("./fuentes/AJAX.php?act=buscarDNI", {"dni":dni, }, function(data) {
 					if (data != "nuevo") {
 						datosDocente = data.split(',');
@@ -110,6 +113,7 @@
 					}
 					
 				});
+				
 			});
 			
 			
