@@ -25,6 +25,7 @@
 				$dia = $_REQUEST['dia'];
 				$turno = $_REQUEST['turno'];
 				$letraTurno = substr($turno, 0, 1);
+				$numeroTurno = substr($turno, -1);
 				$anio = $_REQUEST['anio'];
 				$cuatrimestre = $_REQUEST['cuatrimestre'];
 				
@@ -39,8 +40,8 @@
                                 GROUP_CONCAT(DISTINCT t.dia SEPARATOR ', ') AS dias
 							FROM inscriptos_con_conjunto AS v 
 							LEFT JOIN turnos AS t ON t.materia = v.materia  
-							LEFT JOIN asignacion_aulas AS aa ON aa.materia = v.conjunto AND aa.anio = $anio AND aa.activo = 1
-								AND aa.cuatrimestre = $cuatrimestre AND (aa.turno = '$turno' OR aa.turno = '$letraTurno') AND aa.dia = '$dia'
+							LEFT JOIN asignacion_aulas AS aa ON aa.materia = v.conjunto AND aa.anio = e.anio AND aa.activo = 1
+								AND aa.cuatrimestre = e.cuatrimestre AND (aa.turno = '$turno' OR aa.turno = '$letraTurno') AND aa.dia = '$dia'
 							WHERE v.anio_academico = $anio 
 								AND v.periodo_lectivo = $cuatrimestre
 								AND v.turno = '$letraTurno'
@@ -50,19 +51,40 @@
                             HAVING dias LIKE '%$dia%'";
 							
 				if ($anio >= 2014) {
-					$query = "SELECT e.materia AS conjunto, LEFT(e.nombre_materia, 75) AS nombre_materia, e.cantidad,
-								aa.cantidad_alumnos AS cantidad_asignada,
-								aa.comision, t.turno,
-                                GROUP_CONCAT(DISTINCT CONCAT(t.dia, t.turno) ORDER BY t.dia SEPARATOR ', ' ) AS dias
-							FROM estimacion AS e
-							LEFT JOIN turnos_con_conjunto AS t ON t.materia = e.materia
-							LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = $anio AND aa.activo = 1
-								AND aa.cuatrimestre = $cuatrimestre AND (aa.turno = '$turno' OR aa.turno = '$letraTurno') AND aa.dia = '$dia'
-							WHERE e.turno = '$letraTurno'
-								AND (t.turno = '$turno' OR t.turno = '$letraTurno')
-								AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre}
-							GROUP BY e.materia, aa.comision, aa.aula, t.turno
-                            HAVING dias LIKE '%$dia%'";
+					if ($dia == 'sábado') {
+						$query = "SELECT e.materia AS conjunto, LEFT(e.nombre_materia, 75) AS nombre_materia, e.cantidad,
+									aa.cantidad_alumnos AS cantidad_asignada,
+									aa.comision, 
+									IF({$numeroTurno} IN (1 , 2),
+										CONCAT('S', {$numeroTurno}),
+										'S'
+									) AS turno,
+									
+									GROUP_CONCAT(DISTINCT CONCAT(t.dia, t.turno) ORDER BY t.dia SEPARATOR ', ' ) AS dias
+								FROM estimacion AS e
+								LEFT JOIN turnos_con_conjunto AS t ON t.materia = e.materia AND t.anio = e.anio AND t.cuatrimestre = e.cuatrimestre
+								LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = e.anio AND aa.activo = 1
+									AND aa.cuatrimestre = e.cuatrimestre AND (RIGHT(aa.turno, 1) = '$numeroTurno' OR aa.turno IN ('S', 'M', 'N', 'T')) AND aa.dia = 'sábado'
+								WHERE (RIGHT(t.turno, 1) = '$numeroTurno' OR t.turno IN ('S', 'M', 'N', 'T'))
+									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre}
+								GROUP BY e.materia, aa.comision, aa.aula, t.turno
+								HAVING dias LIKE '%sábado%'";
+					} else {
+						$query = "SELECT e.materia AS conjunto, LEFT(e.nombre_materia, 75) AS nombre_materia, e.cantidad,
+									aa.cantidad_alumnos AS cantidad_asignada,
+									aa.comision, 
+									t.turno,
+									GROUP_CONCAT(DISTINCT CONCAT(t.dia, t.turno) ORDER BY t.dia SEPARATOR ', ' ) AS dias
+								FROM estimacion AS e
+								LEFT JOIN turnos_con_conjunto AS t ON t.materia = e.materia AND t.anio = e.anio AND t.cuatrimestre = e.cuatrimestre
+								LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = e.anio AND aa.activo = 1
+									AND aa.cuatrimestre = e.cuatrimestre AND (aa.turno = t.turno) AND aa.dia = '$dia'
+								WHERE e.turno = '$letraTurno'
+									AND (t.turno = '$turno' OR t.turno = '$letraTurno')
+									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre}
+								GROUP BY e.materia, aa.comision, aa.aula, t.turno
+								HAVING dias LIKE '%$dia%'";
+					}
 				}
 				//echo $query;
 				$result = $mysqli->query($query);
@@ -103,38 +125,67 @@
 				$dia = $_REQUEST['dia'];
 				$turno = $_REQUEST['turno'];
 				$letraTurno = substr($turno, 0, 1);
+				$numeroTurno = substr($turno, -1);
 				$anio = $_REQUEST['anio'];
 				$cuatrimestre = $_REQUEST['cuatrimestre'];
 				
-				$query = "SELECT  
-								a.cod, 
-								a.capacidad,
-								a.abierta,
-								aa.id AS id_asignacion,
-								aa.materia,
-								aa.cantidad_alumnos as cantidad_asignada,
-								aa.aula,
-								IFNULL(aa.comision_real, aa.comision) AS comision,
-								t.turno,
-								t.dia,
-								GROUP_CONCAT(DISTINCT m.nombre SEPARATOR '<br />' ) AS nombre
-							FROM aulas AS a
-							LEFT JOIN asignacion_aulas AS aa 
-                                ON (a.cod = aa.aula AND aa.anio = $anio 
-									AND aa.cuatrimestre = $cuatrimestre 
-									AND aa.activo = 1 
-									AND aa.dia = '$dia'
-									AND (aa.turno = '$turno' OR aa.turno = '$letraTurno'))
-							LEFT JOIN materia AS m ON m.conjunto = aa.materia OR aa.materia LIKE CONCAT(m.conjunto, '_')
-							LEFT JOIN turnos AS t ON m.cod = t.materia AND t.turno = '$turno' AND t.dia = '$dia'
-							
-							WHERE a.activo = 1
-							GROUP BY aa.materia, aa.aula, a.cod, t.dia
-							ORDER BY a.cod+0";
+				if ($dia != 'sábado') {
+					$query = "SELECT  
+									a.cod, 
+									a.capacidad,
+									a.abierta,
+									aa.id AS id_asignacion,
+									aa.materia,
+									aa.cantidad_alumnos as cantidad_asignada,
+									aa.aula,
+									IFNULL(aa.comision_real, aa.comision) AS comision,
+									t.turno,
+									t.dia,
+									GROUP_CONCAT(DISTINCT m.nombre SEPARATOR '<br />' ) AS nombre
+								FROM aulas AS a
+								LEFT JOIN asignacion_aulas AS aa 
+									ON (a.cod = aa.aula AND aa.anio = $anio 
+										AND aa.cuatrimestre = $cuatrimestre 
+										AND aa.activo = 1 
+										AND aa.dia = '$dia'
+										AND (aa.turno = '$turno' OR aa.turno = '$letraTurno'))
+								LEFT JOIN materia AS m ON m.conjunto = aa.materia OR aa.materia LIKE CONCAT(m.conjunto, '_')
+								LEFT JOIN turnos AS t ON m.cod = t.materia AND t.turno = '$turno' AND t.dia = '$dia'
+								
+								WHERE a.activo = 1
+								GROUP BY aa.materia, aa.aula, a.cod, t.dia
+								ORDER BY a.cod+0";
+				} else {
+					$query = "SELECT  
+									a.cod, 
+									a.capacidad,
+									a.abierta,
+									aa.id AS id_asignacion,
+									aa.materia,
+									aa.cantidad_alumnos as cantidad_asignada,
+									aa.aula,
+									IFNULL(aa.comision_real, aa.comision) AS comision,
+									t.turno,
+									t.dia,
+									GROUP_CONCAT(DISTINCT m.nombre SEPARATOR '<br />' ) AS nombre
+								FROM aulas AS a
+								LEFT JOIN asignacion_aulas AS aa 
+									ON (a.cod = aa.aula AND aa.anio = $anio 
+										AND aa.cuatrimestre = $cuatrimestre 
+										AND aa.activo = 1 
+										AND aa.dia = 'sábado'
+										AND (RIGHT(aa.turno, 1) = '{$numeroTurno}' OR aa.turno IN ('S', 'M', 'T', 'N')))
+								LEFT JOIN materia AS m ON m.conjunto = aa.materia OR aa.materia LIKE CONCAT(m.conjunto, '_')
+								LEFT JOIN turnos AS t ON m.cod = t.materia AND RIGHT(t.turno, 1) = RIGHT(aa.turno, 1) AND t.dia = 'sábado'
+								
+								WHERE a.activo = 1
+								GROUP BY aa.materia, aa.aula, a.cod, t.dia
+								ORDER BY a.cod+0";
+				}
 				//echo $query;
 				$result = $mysqli->query($query);
 				if ($mysqli->errno) {
-					//print_r($mysqli->error);
+					print_r($mysqli->error);
 				}
 				//echo $query;
 				$asignaciones = array();
@@ -216,6 +267,7 @@
 				$result = $mysqli->query($query);
 				$comisionesEncontradas = array();
 				
+				//echo $query;
 				while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 					$comisionesEncontradas[] = $row['comision'];
 				}
@@ -232,11 +284,12 @@
 				
 				//Cálculo de turnos
 				
-				if ($asignarTodosLosDias) {
+				if ($asignarTodosLosDias and $dia != 'sábado') {
 					$query = "SELECT DISTINCT t.dia
 								FROM turnos_con_conjunto AS t
 								WHERE materia = '{$materia}' AND turno = '$turno';";
 					$result = $mysqli->query($query);
+					//echo $query;
 					echo $mysqli->error;
 					$diasParaAsignar = array();
 					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -285,7 +338,7 @@
 					$query = "INSERT INTO asignacion_aulas (aula, materia, cantidad_alumnos, dia, turno, comision, anio, cuatrimestre)
 									VALUES ('$aula', '$materia', $cantidad, '$dia', '$turno', $comision, 
 									$anio, $cuatrimestre)";
-					//echo $query;
+					
 					$mysqli->query($query);
 					$error = $mysqli->error;
 				

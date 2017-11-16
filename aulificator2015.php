@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 	<head>
 		
@@ -54,7 +54,7 @@
 							<!--<option class='formularioLateral' value='N'>N</option>-->
 							<option class='formularioLateral' value='N1'>N1</option>
 							<option class='formularioLateral' value='N2'>N2</option>
-							<option class='formularioLateral' value='S'>S</option>
+							<!--<option class='formularioLateral' value='S'>S</option>-->
 							<option class='formularioLateral' value='S1'>S1</option>
 							<option class='formularioLateral' value='S2'>S2</option>
 						</select>
