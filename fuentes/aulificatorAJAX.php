@@ -66,7 +66,7 @@
 								LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = e.anio AND aa.activo = 1
 									AND aa.cuatrimestre = e.cuatrimestre AND (RIGHT(aa.turno, 1) = '$numeroTurno' OR aa.turno IN ('S', 'M', 'N', 'T')) AND aa.dia = 'sábado'
 								WHERE (RIGHT(t.turno, 1) = '$numeroTurno' OR t.turno IN ('S', 'M', 'N', 'T'))
-									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre}
+									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre} AND t.dia = 'sábado'
 								GROUP BY e.materia, aa.comision, aa.aula, t.turno
 								HAVING dias LIKE '%sábado%'";
 					} else {
