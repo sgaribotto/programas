@@ -218,18 +218,18 @@
 				
 				$query = "SELECT SUM(cantidad) as cantidad
 							FROM vista_inscriptos_por_materia
-							WHERE materia IN " . $materia . "
-								AND anio_academico = $anio
-								AND periodo_lectivo = $cuatrimestre
-								AND turno = '$letraTurno'";
-				if ($anio == 2017 and $cuatrimestre == 2) {
+							WHERE materia IN {$materia}
+								AND anio_academico = {$anio}
+								AND periodo_lectivo = {$cuatrimestre}
+								AND turno = '{$letraTurno}'";
+				if ($anio > 2016) {
 					$query = "SELECT cantidad
 									FROM estimacion
 									WHERE materia = '$materia'
 									AND turno = '$letraTurno'";
 				}
 				$result = $mysqli->query($query);
-				//echo $mysqli->error;
+				echo $mysqli->error;
 				$inscriptos = $result->fetch_array(MYSQLI_ASSOC);
 				echo $inscriptos['cantidad'];
 				$result->free();
