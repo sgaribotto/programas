@@ -1,6 +1,4 @@
-<!DOCTYPE html>
 
-<html>
 	<?php
 	
 		$periodo = $_REQUEST['periodo'];
@@ -89,4 +87,3 @@
 			?>
 		</tbody>
 	</table>
-<html>

@@ -52,14 +52,13 @@
 							?>
 						</select>
 						<br />
-						<!--<label for="reporte" class="formularioLateral">Reporte: </label>
+						<label for="reporte" class="formularioLateral">Reporte: </label>
 						<select name="reporte" class="formularioLateral">
 							<option value="suma">Suma de inscriptos</option>
-							<option value="cantidad_comisiones_abiertas">Cantidad de comisiones abiertas</option>
-							<option value="comisiones_abiertas">Detalle de comisiones abiertas</option>
-							<option value="abiertasVSoferta">Comisiones abiertas vs. Oferta</option>
-							<option value="ofertaVSabierta">Oferta vs. Comisiones abiertas</option>
-						</select>-->
+							<option value="situacion_cuatrimestral">Situación Cuatrimestral</option>
+							<option value="renovacion">Renovación anual</option>
+							
+						</select>
 						<br />
 						
 						
