@@ -27,7 +27,6 @@ namespace clases {
 		 */
 		
 		public function __construct($cod) {
-			
 			//fijo código
 			$this->cod = $cod;
 			$_SESSION['materia'] = $cod;
@@ -42,6 +41,7 @@ namespace clases {
 							ON m.carrera = c.id
 							WHERE m.cod = '{$cod}' ";
 			$result = $mysqli->query($query);
+			//print_r($result);
 			//Fijo las propiedades
 			while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
 				
@@ -489,7 +489,7 @@ namespace clases {
 		 * @return array el equipo docente
 		 */
 		
-		public function mostrarEquipoDocente($cargo = "*", $anio = 2016, $cuatrimestre = 1, $conjunto = false) {
+		public function mostrarEquipoDocente($anio, $cuatrimestre, $conjunto = false, $cargo = "*") {
 			require "./conexion.php";
 			
 			$conjuntoClause = '';
@@ -500,11 +500,11 @@ namespace clases {
 				
 			$whereClause = "WHERE a.activo = 1
 								AND (a.materia = '{$this->cod}' $conjuntoClause) 
-								AND a.anio = $anio AND a.cuatrimestre = $cuatrimestre ";
+								AND a.anio = {$anio} AND a.cuatrimestre = {$cuatrimestre} ";
 			
 			if ($cargo != "*") {
 				if (is_string($cargo) ) {
-					$whereClause .= "AND a.tipoafectacion = '$cargo' ";
+					$whereClause .= "AND a.tipoafectacion = '{$cargo}' ";
 				} elseif (is_array($cargo)) {
 					$whereClause .= "AND a.tipoafectacion IN (0, ";
 					foreach ($cargo as $value) {
@@ -540,6 +540,55 @@ namespace clases {
 											'estado' => $row['estado'],
 											'comision' => $row['comision'],
 										];
+			}
+			
+			$result->free();
+			$mysqli->close();
+			
+			return $equipoDocente;
+		}
+		
+		/**
+		 * Muestra el equipo docente de la materia
+		 * @param int $anio
+		 * @param int $cuatrimestre
+		 * @return array el equipo docente Con las restricciones de cada docente
+		 */
+		
+		public function mostrarEquipoDocenteConRestricciones($anio, $cuatrimestre) {
+			require "./conexion.php";
+			
+			
+			$conjunto = $this->mostrarConjunto();
+			
+			$query = "SELECT CONCAT(d.apellido, ', ', d.nombres) AS nombre_docente,
+							d.id AS id_docente,
+							a.id AS id_afectacion,
+							acc.id id_asignacion,
+							acc.materia,
+							acc.dia,
+							acc.horario,
+							a.materia
+						FROM afectacion AS a
+						LEFT JOIN asignacion_comisiones_calendario AS acc
+							ON acc.docente = a.docente AND acc.anio = a.anio
+								AND acc.cuatrimestre = a.cuatrimestre
+						LEFT JOIN docente AS d
+							ON d.id = a.docente
+						WHERE a.materia IN {$conjunto}
+							AND a.anio = {$anio} AND a.cuatrimestre = {$cuatrimestre}
+							AND a.activo = 1
+						ORDER BY nombre_docente";
+			//echo $query;
+			$result = $mysqli->query($query);
+			if ($mysqli->errno) {
+				echo $mysqli->error;
+			}
+			$equipoDocente = array();
+			while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+					
+					$equipoDocente[$row['id_docente']][$row['horario']][$row['dia']][] = $row;
+					$equipoDocente[$row['id_docente']]['nombre_docente'] = $row['nombre_docente'];
 			}
 			
 			$result->free();
@@ -876,9 +925,11 @@ namespace clases {
 		 
 		 /**
 		  * Muestra los turnos asignados a la materia
+		  * @param (int) anio
+		  * @param (int) cuatrimestre
 		  * @return (array) Turnos
 		  */
-		 public function mostrarTurnos() {
+		 public function mostrarTurnos($anio, $cuatrimestre) {
 			 require 'conexion.php';
 			 
 			 $cod = $this->mostrarCod();
@@ -887,18 +938,137 @@ namespace clases {
 			 $query = "SELECT DISTINCT dia, turno
 					FROM turnos_con_conjunto
 					WHERE materia = '{$conjunto}' OR materia LIKE '{$conjunto}%'
+						AND anio = {$anio} and cuatrimestre = {$cuatrimestre}
 					ORDER BY FIELD(dia, 'lunes', 'martes', 'miercoles', 
 						'jueves', 'viernes', 'sabado'), turno;";
 			 $result = $mysqli->query($query);
 			 
 			 $turnos = array();
 			 while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-				 $turnos[] = $row;
+				 $turnos[$row['dia']][$row['turno']] = $row;
 			 }
 			 
 			 $result->free();
 			 $mysqli->close();
 			 return $turnos;
+		 }
+		 
+		 /**
+		  * Muestra los docentes asignados a la materia por comision
+		  * @param (int) anio
+		  * @param (int) cuatrimestre
+		  * @param (str) Turno default *
+		  * @return (array) Turnos
+		  */
+		 public function mostrarDocentesAsignadosPorComision($anio, $cuatrimestre, $turno = '*') {
+			 require 'conexion.php';
+			 
+			 $cod = $this->mostrarCod();
+			 $conjunto = $this->mostrarConjunto();
+			 
+			 $whereTurno = "";
+			 if ($turno != '*') {
+				 $whereTurno = " AND turno = '{$turno}'";
+			 }
+			 
+			 $query = "SELECT acc.id, acc.docente, 
+						LEFT(CONCAT(d.apellido, ', ', d.nombres), 20) AS nombre_docente, 
+						acc.materia, acc.dia, acc.horario,
+						acc.comision, acc.anio, acc.cuatrimestre, acc.aula_virtual
+					FROM asignacion_comisiones_calendario AS acc
+					LEFT JOIN docente AS d
+						ON d.id = acc.docente
+					WHERE acc.materia = '{$conjunto}' AND anio = {$anio}
+						AND cuatrimestre = {$cuatrimestre} 
+						{$whereTurno}";
+			 $result = $mysqli->query($query);
+			 
+			 $docentesAsignados = array();
+			 while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+				 $docentesAsignados[$row['dia']][$row['turno']][$row['comision']][] = $row;
+			 }
+			 
+			 $result->free();
+			 $mysqli->close();
+			 return $docentesAsignados;
+		 }
+		 
+		 /**
+		  * Muestra las comisiones abiertas
+		  * @param (int) anio
+		  * @param (int) cuatrimestre
+		  * @param (str) Turno default *
+		  * @return (array) Comisiones Abiertas
+		  */
+		 public function mostrarComisionesAbiertas($anio, $cuatrimestre, $turno = '*') {
+			 require 'conexion.php';
+			 
+			 $cod = $this->mostrarCod();
+			 $conjunto = $this->mostrarConjunto();
+			 
+			 $whereTurno = "";
+			 if ($turno != '*') {
+				 $whereTurno = " AND ca.turno = '{$turno}'";
+			 }
+			 
+			 $query = "SELECT ca.nombre_comision, ca.horario,
+						ca.turno, 
+						CONCAT(ca.materia, IFNULL(ca.observaciones, '')) AS materia
+					FROM comisiones_abiertas AS ca
+					WHERE ca.materia = '{$conjunto}' AND ca.anio = {$anio}
+						AND ca.cuatrimestre = {$cuatrimestre} 
+						{$whereTurno}";
+			 $result = $mysqli->query($query);
+			 $comisionesAbiertas = array();
+			 while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+				 $comisionesAbiertas[] = $row;
+			 }
+			 
+			 $result->free();
+			 $mysqli->close();
+			 return $comisionesAbiertas;
+		 }
+		 
+		 /**
+		  * Muestra La situación de la asignación docente
+		  * @param (int) anio
+		  * @param (int) cuatrimestre
+		  * @param (str) Turno default *
+		  * @return (array) Situacion
+		  */
+		 public function mostrarSituacionAsignacion($anio, $cuatrimestre, $turno = '*') {
+			 require 'conexion.php';
+			 
+			 $cod = $this->mostrarCod();
+			 $conjunto = $this->mostrarConjunto();
+			 
+			 $whereTurno = "";
+			 if ($turno != '*') {
+				 $whereTurno = " AND turno = '{$turno}'";
+			 }
+			 $query = "SELECT ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente
+						FROM comisiones_abiertas AS ca
+						LEFT JOIN turnos_con_conjunto AS t
+							ON t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
+								AND t.anio = ca.anio AND t.cuatrimestre = ca.cuatrimestre
+								AND LEFT(t.turno, 1) = ca.turno
+						LEFT JOIN asignacion_comisiones_calendario AS acc
+							ON acc.anio = ca.anio AND acc.cuatrimestre = ca.cuatrimestre
+								AND acc.comision = ca.nombre_comision AND ca.materia = acc.materia
+								AND t.dia = acc.dia AND t.turno = acc.horario
+						WHERE ca.anio = {$anio} AND ca.cuatrimestre = {$cuatrimestre}
+							AND ca.materia = '{$conjunto}'
+						ORDER BY t.turno, ca.nombre_comision";
+			 
+			 $comisiones = array();
+			 
+			 $result = $mysqli->query($query);
+			 while ($row = $result->fetch_assoc()) {
+				 $comisiones[] = $row;
+			 }
+			 
+			 return $comisiones;
+			 
 		 }
 		 
 		 /** muestra el total de inscriptos por turno y comision

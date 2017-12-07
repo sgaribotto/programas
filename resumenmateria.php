@@ -21,10 +21,10 @@
 			}
 			
 			$materia = new clases\Materia($_REQUEST['materia']);
-			$equipoDocente = $materia->mostrarEquipoDocente('*', $anio, $cuatrimestre, true);
+			$equipoDocente = $materia->mostrarEquipoDocente($anio, $cuatrimestre, true);
 			$cantidadComisiones = $materia->mostrarCantidadComisiones($anio, $cuatrimestre);
 			$comisionesAsignadas = $materia->mostrarResumenAsignacionComisiones($anio, $cuatrimestre);
-			$turnosMateria = $materia->mostrarTurnos();
+			$turnosMateria = $materia->mostrarTurnos($anio, $cuatrimestre);
 			$inscriptosMateria = $materia->mostrarInscriptos($anio, $cuatrimestre);
 			$correlativas = $materia->mostrarCorrelativas();
 			$ratios = $materia->mostrarRatioAprobacion($anio, $cuatrimestre);
