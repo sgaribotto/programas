@@ -44,6 +44,8 @@
 		"S1 - S2" => "8:30 a 12:30"
 	);
 	
+	$horariosPartidos = ['M1', 'M2', 'T1', 'T2', 'N1', 'N2', 'S1', 'S2'];
+	
 	$diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 	
 ?>

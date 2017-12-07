@@ -1306,6 +1306,40 @@
 						echo json_encode($mensajes);
 					}
 					break;
+				case "agregarAsignacionComisionCalendario":
+					
+					
+					//NO LO EMPECÉ
+					
+					if ($ASIGNAR_COMISIONES) {
+						require "./conexion.php";
+						$materia = new clases\Materia($_SESSION['materia']);
+						$docente = $_REQUEST['docente'];
+						$conjunto = $materia->datosMateria['conjunto'];
+						$dia = $_REQUEST['dia'];
+						$turno = $_REQUEST['turno'];
+						$comision = $_REQUEST['comision'];
+						$anio = $ANIO;
+						$cuatrimestre = $CUATRIMESTRE;
+						$usuario = $_SESSION['usuario'];
+					
+						$query = "INSERT INTO asignacion_comisiones_calendario 
+							(docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre, dia)
+									VALUES ({$docente}, '{$conjunto}', '{$turno}', '{$comision}',
+												'EEYN', '{$usuario}', {$ANIO}, {$CUATRIMESTRE}, '$dia')";
+						$mysqli->query($query);
+						$mensajes['exito'] = 'true';
+							
+					
+						echo json_encode($mensajes);			
+						$mysqli->close();
+					} else {
+						$mensajes['exito'] = 'false';
+						$mensajes['error'] = 'El periodo de asignación de comisiones está cerrado';
+						
+						echo json_encode($mensajes);
+					}
+					break;
 					
 				case "eliminarComisionAsignada":
 					require "./conexion.php";
@@ -1717,6 +1751,7 @@
 						}
 					}
 					
+					
 					$query = "SELECT c.cod, m.plan, m.cuatrimestre, 
 								IF(RIGHT(t.materia,1) != ')', 
 									CONCAT(m.cod, LEFT(t.turno,1), RIGHT(t.materia, 1)), 
@@ -1786,7 +1821,7 @@
 					$result = $mysqli->query($query);
 					
 					
-					//echo $query;
+					echo $query;
 					if ($mysqli->errno) {
 						echo $mysqli->error;
 						echo "<br>";
@@ -2159,6 +2194,25 @@
 							$docente->agregarDatoContacto($tipo, $valor);
 						}
 					}
+					
+					
+					break;
+					
+				case "agregarDesignacion":
+					require 'conexion.php';
+					
+					$dedicacion = $mysqli->real_escape_string($_REQUEST['dedicacion']);
+					$categoria = $mysqli->real_escape_string($_REQUEST['categoria']);
+					$caracter = $mysqli->real_escape_string($_REQUEST['caracter']);
+					$observaciones = $mysqli->real_escape_string($_REQUEST['observaciones']);
+					$alta = $_REQUEST['fecha_alta'];
+					$baja = $_REQUEST['fecha_baja'];
+					
+					$docente = new clases\Docente($_REQUEST['dni']);
+					
+					
+					$docente->agregarDesignacion($dedicacion, $categoria, $caracter, $alta, $baja, $observaciones);
+					
 					
 					
 					break;
@@ -3437,6 +3491,92 @@
 					} else {
 						echo "<p>Sin resultados</p>";
 					}
+					
+					break;
+					
+				case "tablaComisionesCalendario":
+					require 'conexion.php';
+					require 'constantes.php';
+					
+					$materia = new clases\Materia($_REQUEST['materia']);
+					
+					$anio = $ANIO;
+					$cuatrimestre = $CUATRIMESTRE;
+					
+					$situacion = $materia->mostrarSituacionAsignacion($anio, $cuatrimestre);
+					$equipoDocente = $materia->mostrarEquipoDocenteConRestricciones($anio, $cuatrimestre);
+					$conjunto = $materia->mostrarConjunto();
+					$cod = $materia->mostrarCod();
+					
+					//print_r($equipoDocente);
+					
+					$comisiones = array();
+					foreach ($situacion as $detalle) {
+						if (!in_array($detalle['turno'], ['N', 'T', 'M', 'S'])) {
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno']][$detalle['dia']] = $detalle;
+						} else {
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '1'][$detalle['dia']] = $detalle;
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '2'][$detalle['dia']] = $detalle;
+						}
+					}
+					//print_r($comisiones);
+					foreach ($comisiones as $nombre => $turnos) {
+						$comision = str_replace($conjunto, '', $nombre);
+						echo "<div class='comision calendario'>";
+						echo "<h3 class='comision'>Comisión {$nombre}</h3>";
+						echo "<table class='comision' border='1'>";
+						echo "<thead class='comision'>
+							<tr class='comision'>
+								
+								<th class='calendario' style='width:10%;'>Horario</th>
+								<th class='calendario' style='width:15%;'>Lunes</th>
+								<th class='calendario' style='width:15%;'>Martes</th>
+								<th class='calendario' style='width:15%;'>Miércoles</th>
+								<th class='calendario' style='width:15%;'>Jueves</th>
+								<th class='calendario' style='width:15%;'>Viernes</th>
+								<th class='calendario' style='width:15%;'>Sábado</th>
+								
+							</tr>
+							</thead>
+							<tbody class='calendario' id='comisionesAsignadas'>";
+							
+							foreach ($turnos as $turno => $dias) {
+								echo "<tr class='calendario turno{$turno}'>";
+								echo "<td class='calendario horario'>{$horasTurno[$turno]}</td>";
+								
+								foreach ($diasSemana as $dia) {
+									echo "<td class='calendario {$dia}'>";
+									
+									if (isset($turnos[$turno][$dia])) {
+										echo "<form class='asignarDocente {$turno}{$dia}' method='POST' action=''>";
+										echo "<input type='hidden' name='dia' value='{$dia}' />";
+										echo "<input type='hidden' name='turno' value='{$turno}' />";
+										echo "<input type='hidden' name='comision' value='{$comision}' />";
+										echo "<input type='hidden' name='conjunto' value='{$conjunto}' />";
+										echo "<input type='hidden' name='materia' value='{$cod}' />";
+										echo "<select class='docente' name='docente' required>";
+										echo "<option value=''>Seleccionar docente</option>";
+										foreach ($equipoDocente as $idDocente => $datos) {
+											if (!isset($datos[$turno][$dia])) {
+												
+												echo "<option value='{$idDocente}'>{$datos['nombre_docente']}</option>";
+											}
+										}
+										echo "</select>";
+										echo "<button type='submit' class='agregarDocente'>+</button>";
+										echo "</form>";
+									}
+									
+									
+									echo "</td>";
+									
+								}
+							}
+
+							echo "</tbody>
+						</table>
+					</div>";
+				}
 					
 					break;
 					

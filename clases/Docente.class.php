@@ -114,23 +114,75 @@ namespace clases {
 		 * @param (int) cuatrimestre
 		 * @return (array) afectaciones
 		 */
-		public function mostrarAfectaciones($anio, $cuatrimestre) {
+		public function mostrarAfectaciones($anio, $cuatrimestre = '*') {
 			require 'conexion.php';
+			
+			$whereCuatrimestre = '';
+			if ($cuatrimestre != '*') {
+				$whereCuatrimestre = "AND ac.cuatrimestre = {$cuatrimestre}";
+			}
 			
 			$query = "SELECT a.id, m.conjunto, a.tipoafectacion, 
 					GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.cod SEPARATOR '/')
 						AS materia, 
 					IFNULL(GROUP_CONCAT(DISTINCT ac.comision ORDER BY ac.comision SEPARATOR ' - '), 
-						'No tiene comisiones asignadas') AS comision
+						'No tiene comisiones asignadas') AS comision,
+					ac.anio, ac.cuatrimestre
 				FROM afectacion AS a
 				LEFT JOIN materia AS m ON m.cod = a.materia
 				LEFT JOIN asignacion_comisiones AS ac 
 					ON ac.materia = m.conjunto AND ac.docente = {$this->id}
-						AND ac.anio = $anio AND ac.cuatrimestre = $cuatrimestre
+						AND ac.anio = a.anio AND ac.cuatrimestre = a.cuatrimestre
 				WHERE a.docente = {$this->id}
-					AND a.anio = $anio 
-					AND a.cuatrimestre = $cuatrimestre
+					AND a.anio = {$anio} 
+					{$whereCuatrimestre}
 				GROUP BY m.conjunto
+				ORDER BY m.cod";
+			$result = $mysqli->query($query);
+			if ($mysqli->error) {
+				echo $mysqli->error;
+			}
+			
+			$afectaciones = array();
+			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+				$afectaciones[] = $row;
+			}
+			
+			$result->free();
+			$mysqli->close();
+			
+			return $afectaciones;
+		}
+		
+		/**
+		 * Muestra las comisiones asignadas al docente
+		 * @param (int) anio
+		 * @param (int) cuatrimestre (optional)
+		 * @return (array) afectaciones
+		 */
+		public function mostrarComisionesAsignadas($anio, $cuatrimestre = '*') {
+			require 'conexion.php';
+			
+			$whereCuatrimestre = '';
+			if ($cuatrimestre != '*') {
+				$whereCuatrimestre = "AND ac.cuatrimestre = {$cuatrimestre}";
+			}
+			
+			$query = "SELECT a.id, m.conjunto, a.tipoafectacion, 
+					GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.cod SEPARATOR '/')
+						AS materia, 
+					IFNULL(GROUP_CONCAT(DISTINCT ac.comision ORDER BY ac.comision SEPARATOR ' - '), 
+						'No tiene comisiones asignadas') AS comision,
+					ac.anio, ac.cuatrimestre
+				FROM asignacion_comisiones AS ac
+				LEFT JOIN materia AS m ON m.conjunto = ac.materia
+				LEFT JOIN afectacion AS a 
+					ON a.materia = m.cod AND a.docente = ac.docente
+						AND ac.anio = a.anio AND ac.cuatrimestre = a.cuatrimestre
+				WHERE ac.docente = {$this->id}
+					AND ac.anio = {$anio} 
+					{$whereCuatrimestre}
+				GROUP BY m.conjunto, ac.comision
 				ORDER BY m.cod";
 			$result = $mysqli->query($query);
 			if ($mysqli->error) {
@@ -214,13 +266,24 @@ namespace clases {
 		  public function mostrarDesignaciones($anio, $cuatrimestre) {
 			  require 'conexion.php';
 			  
-			  $query = "SELECT id, tipo, categoria, caracter, dedicacion
-						FROM designacion
-						WHERE anio = $anio AND cuatrimestre = $cuatrimestre
-							AND docente = {$this->id};";
+			  $query = "SELECT des.id, des.categoria, des.caracter, des.dedicacion,
+							des.fecha_alta, des.fecha_baja, ded.horas_requeridas,
+							IF(fecha_baja != 0 AND MONTH(fecha_baja) < 8,
+								'primero',
+								IF (MONTH(fecha_alta) > 5, 'segundo',
+								'ambos')
+							) AS cuatrimestres
+							
+						FROM designacion AS des
+						LEFT JOIN dedicacion AS ded
+							ON des.dedicacion = ded.dedicacion
+						WHERE docente = {$this->id}
+							AND (YEAR(fecha_alta) = {$anio} OR (YEAR(fecha_alta) <= {$anio}
+							AND (YEAR(fecha_baja) >= {$anio} OR fecha_baja = 0)))
+						ORDER BY fecha_alta, fecha_baja, categoria, dedicacion, caracter;";
 			  $result = $mysqli->query($query);
 			  if ($mysqli->errno) {
-				  echo $mysql->error;
+				  echo $mysqli->error;
 			  }
 			  
 			  $designaciones = array();
@@ -230,6 +293,33 @@ namespace clases {
 			  $result->free();
 			  $mysqli->close();
 			  return $designaciones;
+		  }
+		  
+		  /**
+		   * Agrega una designación al docente
+		   * @param (str) dedicacion 
+		   * @param (str) categoria
+		   * @param (str) caracter
+		   * @param (date) alta
+		   * @param (date) baja
+		   * @param (str) observaciones
+		   * @return (void)
+		   */
+		  public function agregarDesignación($dedicacion, $categoria, $caracter, $alta, $baja, $observaciones) {
+			  require 'conexion.php';
+			  
+			  $query = "INSERT IN designacion
+							(docente, dedicacion, categoria, caracter, alta, baja, observaciones) VALUES
+							({$this->id}, '{$dedicacion}', '{$categoria}', '{$caracter}', '{$alta}', 
+								'{$baja}', '{$observaciones}')";
+			  $result = $mysqli->query($query);
+			  if ($mysqli->errno) {
+				  echo $mysqli->error;
+			  }
+			  
+			  $result->free();
+			  $mysqli->close();
+			  return;
 		  }
 			  
 	}		
