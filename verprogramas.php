@@ -140,7 +140,7 @@
 							<th class="plantelActual" style="width:20%;">Estado</th>
 						</tr>
 						<?php
-							$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE, true);
+							$equipoDocente = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE, true);
 							
 							if (empty($equipoDocente)) {
 								echo "<tr><td colspan='2'>No hay docentes cargados</td></tr>";
