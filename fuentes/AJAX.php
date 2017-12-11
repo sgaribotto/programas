@@ -1308,26 +1308,19 @@
 					break;
 				case "agregarAsignacionComisionCalendario":
 					
-					
-					//NO LO EMPECÉ
-					
 					if ($ASIGNAR_COMISIONES) {
 						require "./conexion.php";
 						$materia = new clases\Materia($_SESSION['materia']);
 						$docente = $_REQUEST['docente'];
-						$conjunto = $materia->datosMateria['conjunto'];
 						$dia = $_REQUEST['dia'];
 						$turno = $_REQUEST['turno'];
 						$comision = $_REQUEST['comision'];
 						$anio = $ANIO;
 						$cuatrimestre = $CUATRIMESTRE;
-						$usuario = $_SESSION['usuario'];
-					
-						$query = "INSERT INTO asignacion_comisiones_calendario 
-							(docente, materia, turno, comision, dependencia, usuario_ultima_modificacion, anio, cuatrimestre, dia)
-									VALUES ({$docente}, '{$conjunto}', '{$turno}', '{$comision}',
-												'EEYN', '{$usuario}', {$ANIO}, {$CUATRIMESTRE}, '$dia')";
-						$mysqli->query($query);
+						
+						$materia->agregarAsignacionComisionCalendario($docente, $dia, $turno, $comision, $anio, $cuatrimestre);
+						
+						
 						$mensajes['exito'] = 'true';
 							
 					
@@ -1481,7 +1474,7 @@
 					//$CUATRIMESTRE = 1;
 					
 					$materia = new clases\Materia($_SESSION['materia']);
-					$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE);
+					$equipoDocente = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE, true);
 					
 					if (empty($equipoDocente)) {
 						echo "<tr><td colspan='2'>No hay docentes cargados</td></tr>";
@@ -3508,15 +3501,15 @@
 					$conjunto = $materia->mostrarConjunto();
 					$cod = $materia->mostrarCod();
 					
-					//print_r($equipoDocente);
+					//print_r($situacion);
 					
 					$comisiones = array();
 					foreach ($situacion as $detalle) {
 						if (!in_array($detalle['turno'], ['N', 'T', 'M', 'S'])) {
-							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno']][$detalle['dia']] = $detalle;
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno']][$detalle['dia']][] = $detalle;
 						} else {
-							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '1'][$detalle['dia']] = $detalle;
-							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '2'][$detalle['dia']] = $detalle;
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '1'][$detalle['dia']][] = $detalle;
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '2'][$detalle['dia']][] = $detalle;
 						}
 					}
 					//print_r($comisiones);
@@ -3545,10 +3538,12 @@
 								echo "<td class='calendario horario'>{$horasTurno[$turno]}</td>";
 								
 								foreach ($diasSemana as $dia) {
-									echo "<td class='calendario {$dia}'>";
+									echo "<td>";
+									echo "<form class='asignarDocente {$turno}{$dia}' method='POST' action='#'>";
+									echo "<table class='subTabla'><tr><td class='calendario {$dia}'>";
 									
 									if (isset($turnos[$turno][$dia])) {
-										echo "<form class='asignarDocente {$turno}{$dia}' method='POST' action=''>";
+										
 										echo "<input type='hidden' name='dia' value='{$dia}' />";
 										echo "<input type='hidden' name='turno' value='{$turno}' />";
 										echo "<input type='hidden' name='comision' value='{$comision}' />";
@@ -3562,13 +3557,22 @@
 												echo "<option value='{$idDocente}'>{$datos['nombre_docente']}</option>";
 											}
 										}
-										echo "</select>";
-										echo "<button type='submit' class='agregarDocente'>+</button>";
-										echo "</form>";
+										echo "</select></td>";
+										echo "<td><button type='submit' class='agregarDocente'>+</button>";
+										echo "</td></tr>";
 									}
 									
+									if (isset($turnos[$turno][$dia])) {
+										foreach ($turnos[$turno][$dia] as $dia => $detalles) {
+											if ($detalles['docente']) {
+												echo "<tr><td>{$detalles['nombre_docente']}</td>
+													<td><button type='button' class='eliminarAsignacionCalendario' data-id='{$detalles['id_asignacion']}'>X</button></td></tr>";
+											}
+										}
+										//print_r($turnos[$turno][$dia][0]['docente']);
+									}
 									
-									echo "</td>";
+									echo "</table></form></td>";
 									
 								}
 							}
