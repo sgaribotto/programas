@@ -1318,14 +1318,10 @@
 						$anio = $ANIO;
 						$cuatrimestre = $CUATRIMESTRE;
 						
-						$materia->agregarAsignacionComisionCalendario($docente, $dia, $turno, $comision, $anio, $cuatrimestre);
+						$mensaje = $materia->agregarAsignacionComisionCalendario($docente, $dia, $turno, $comision, $anio, $cuatrimestre);
 						
+						echo $mensaje;			
 						
-						$mensajes['exito'] = 'true';
-							
-					
-						echo json_encode($mensajes);			
-						$mysqli->close();
 					} else {
 						$mensajes['exito'] = 'false';
 						$mensajes['error'] = 'El periodo de asignación de comisiones está cerrado';
@@ -1334,6 +1330,14 @@
 					}
 					break;
 					
+				case "eliminarAsignacionComisionCalendario":
+					$materia = new clases\Materia($_SESSION['materia']);
+					$id = $_REQUEST['id'];
+					$mensaje = $materia->eliminarAsignacionComisionCalendario($id);
+					echo $mensaje;
+					
+					break;
+				
 				case "eliminarComisionAsignada":
 					require "./conexion.php";
 					
@@ -1345,6 +1349,7 @@
 					$mysqli->close();
 					
 					break;
+					
 				case "tablaAsignacionComisiones":
 					$materia = new clases\Materia($_SESSION['materia']);
 					$conjunto = $materia->mostrarConjunto();
@@ -1814,7 +1819,7 @@
 					$result = $mysqli->query($query);
 					
 					
-					echo $query;
+					//echo $query;
 					if ($mysqli->errno) {
 						echo $mysqli->error;
 						echo "<br>";
