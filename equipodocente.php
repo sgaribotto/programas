@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Plantel docente 1er cuatrimestre 2017</title>
+		
 		
 		<?php 
 			require_once('./fuentes/meta.html');
@@ -11,7 +11,7 @@
 			//$CUATRIMESTRE = 1;
 			require_once 'programas.autoloader.php';
 		?>
-		
+		<title>Plantel docente para el periodo <?php echo "{$ANIO} - {$CUATRIMESTRE}"; ?></title>
 	</head>
 	
 	<body>
