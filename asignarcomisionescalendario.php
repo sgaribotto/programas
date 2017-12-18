@@ -14,6 +14,9 @@
 			$nombres = $materia->mostrarNombresConjunto();
 			$conjunto = $materia->mostrarConjunto();
 			$cod = $_SESSION['materia'];
+			$responsables = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE, true, ['titular', 'adjunto', 'asociado']);
+			$coordinador = $materia->mostrarCoordinador($ANIO, $CUATRIMESTRE);
+			//print_r($coordinador);
 			
 		?>
 		
@@ -30,64 +33,76 @@
 		
 		<div class="formularioLateral">
 			<h1 class="nombreMateria"><span class="conjuntoMateria"><?php echo $conjunto; ?></span> <?php echo $nombres?></h1>
+			<h2 class="formularioLateral">Asignar comisiones del periodo <?php echo "{$ANIO} - {$CUATRIMESTRE}";?></h2>
+			<label for="coordinador" name="coordinador">Coordinador de la materia: </label>
+			<select name="coordinador" class="formularioLaterial coordinador">
+				<option value=''>Seleccionar Coordinador</option>
+				<?php
+					foreach ($responsables as $posicion => $datos) {
+						$selected = "";
+						
+						if ($datos['id_docente'] == $coordinador['id']) {
+							$selected = "selected = 'selected'";
+						}
+						
+						echo "<option value='{$datos['id_docente']}' $selected>{$datos['docente']} - {$datos['tipoafectacion']}</option>";
+					}
+				?>
+			</select>
 			
 			<div class="comisiones">
-				<h2 class="formularioLateral">Asignar comisiones del periodo <?php echo "{$ANIO} - {$CUATRIMESTRE}";?></h2>
-				
-				<hr>
-				
 			</div>
 		</div>
 	</body>
 	<script src="./fuentes/funciones.js"></script>
 	<script>
 		$(document).ready(function() {
-			
-						
-			/*$("#agregarAsignacionComision").submit(function(event) {
-				event.preventDefault();
-				values = $(this).serialize();
-				values.act = "agregarAsignacionComision";
-				
-				$.get("./fuentes/AJAX.php?act=agregarAsignacionComision", values, function(data) {
-					data = eval('(' + data + ')');
-					console.log(data);
-					if (data.error) {
-						$('p.errorValidar').text(data.error);
-						
-					} else {
-						actualizarTabla();
-					}
-				});
-			});
-			
-			$("#botonContinuar").click(function() {
-				location.assign("./objetivos.php");
-			});
-			
-			$("select").combobox();*/
-			
-			
-			
+
 			var actualizarTabla = function() {
 				//formValues = $('form.filtros').serialize();
 				//console.log(formValues);
 				
 				var materia = <?php echo $cod; ?>;
 				$('div.comisiones').load("fuentes/AJAX.php?act=tablaComisionesCalendario&materia=" + materia, function(data) {
+					
 					$('form.asignarDocente').submit(function(event) {
 						event.preventDefault();
+						
 						var values = $(this).serialize();
 						
 						$.get("fuentes/AJAX.php?act=agregarAsignacionComisionCalendario", values, function(data) {
-							
+							actualizarTabla();
 						});
-						
-						
-					});				
+					});
+					
+					$('button.eliminarAsignacionCalendario').click(function(event) {
+						event.preventDefault();
+						var id = $(this).data('id');
+						$.get("fuentes/AJAX.php?act=eliminarAsignacionComisionCalendario", {'id': id}, function(data) {
+							actualizarTabla();
+						});
+					});		
 				});
 			} 
 			actualizarTabla();
+			
+			$('select.coordinador').change(function(event) {
+				//alert('change');
+				event.preventDefault();
+				
+				var docente = $(this).val();
+				var comision = 'Coord';
+				var dia = 'todos';
+				var turno = '';
+				
+				var values = {'comision': comision, 'dia': dia, 'turno': turno, 'docente': docente};
+				console.log(values);
+				$.get("fuentes/AJAX.php?act=agregarAsignacionComisionCalendario", values, function(data) {
+							
+				});
+				
+				
+			});
 			
 		});
 	</script>

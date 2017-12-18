@@ -506,11 +506,11 @@ namespace clases {
 				if (is_string($cargo) ) {
 					$whereClause .= "AND a.tipoafectacion = '{$cargo}' ";
 				} elseif (is_array($cargo)) {
-					$whereClause .= "AND a.tipoafectacion IN (0, ";
+					$whereClause .= "AND a.tipoafectacion IN (0, '";
 					foreach ($cargo as $value) {
-						$whereClause .= $value .", ";
+						$whereClause .= $value ."', '";
 					}
-					$whereClause .= ") ";
+					$whereClause .= "') ";
 				} else {
 					//ERROR
 				}
@@ -518,7 +518,8 @@ namespace clases {
 			
 			$query = "SELECT CONCAT_WS(', ', d.apellido, d.nombres) AS docente, 
 							a.tipoafectacion, d.fechaingreso, a.id, a.estado,
-							GROUP_CONCAT(DISTINCT ac.comision ORDER BY ac.comision SEPARATOR ', ') AS comision
+							GROUP_CONCAT(DISTINCT ac.comision ORDER BY ac.comision SEPARATOR ', ') AS comision,
+							d.id AS id_docente
 						FROM docente AS d
 						INNER JOIN afectacion AS a ON d.id = a.docente
 						LEFT JOIN materia AS m ON a.materia = m.cod
@@ -539,6 +540,7 @@ namespace clases {
 											'id' => $row['id'],
 											'estado' => $row['estado'],
 											'comision' => $row['comision'],
+											'id_docente' => $row['id_docente'],
 										];
 			}
 			
@@ -1046,7 +1048,9 @@ namespace clases {
 			 if ($turno != '*') {
 				 $whereTurno = " AND turno = '{$turno}'";
 			 }
-			 $query = "SELECT ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente
+			 $query = "SELECT ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente,
+							CONCAT(d.apellido, ', ', d.nombres) AS nombre_docente,
+							acc.id AS id_asignacion
 						FROM comisiones_abiertas AS ca
 						LEFT JOIN turnos_con_conjunto AS t
 							ON t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
@@ -1056,6 +1060,8 @@ namespace clases {
 							ON acc.anio = ca.anio AND acc.cuatrimestre = ca.cuatrimestre
 								AND acc.comision = ca.nombre_comision AND ca.materia = acc.materia
 								AND t.dia = acc.dia AND t.turno = acc.horario
+						LEFT JOIN docente AS d
+							ON d.id = acc.docente
 						WHERE ca.anio = {$anio} AND ca.cuatrimestre = {$cuatrimestre}
 							AND ca.materia = '{$conjunto}'
 						ORDER BY t.turno, ca.nombre_comision";
@@ -1818,6 +1824,125 @@ namespace clases {
 				}
 				
 				return $inscriptosEstimados;
+			}
+			
+			/**
+			 * Agregar asignacion desde página de calendario
+			 * @param docente
+			 * @param dia
+			 * @param turno
+			 * @param comision
+			 * @param anio
+			 * @param cuatrimestre
+			 * @return bool (success) or error detail
+			 **/
+			 
+			 public function agregarAsignacionComisionCalendario($docente, $dia, $turno, $comision, $anio, $cuatrimestre) {
+				 
+				 require './conexion.php';
+				 $conjunto = $this->mostrarConjunto();
+				 $usuario = $_SESSION['usuario'];
+				 
+				 if ($comision == 'Coord') {
+					 $this->eliminarCoordinador($anio, $cuatrimestre);
+				 }
+				 
+				 $query = "INSERT INTO asignacion_comisiones_calendario 
+							(docente, materia, horario, comision, usuario_ultima_modificacion, anio, cuatrimestre, dia)
+									VALUES ({$docente}, '{$conjunto}', '{$turno}', '{$comision}',
+													'{$usuario}', {$anio}, {$cuatrimestre}, '{$dia}')";
+						
+				$mysqli->query($query);
+				$exito = true;
+				
+				if ($mysqli->errno) {
+					$exito = $mysqli->error;
+				}
+				$mysqli->close();
+				
+				return $exito;
+						
+			 }
+			 
+			/**
+			 * ELIMINAR asignacion desde página de calendario
+			 * @param id
+			 * @return bool (success) or error detail
+			 **/
+			 
+			 public function eliminarAsignacionComisionCalendario($id) {
+				 
+				 require './conexion.php';
+				 $conjunto = $this->mostrarConjunto();
+				 $usuario = $_SESSION['usuario'];
+				 
+				 $query = "DELETE FROM asignacion_comisiones_calendario 
+							WHERE id = {$id}";
+						
+				$mysqli->query($query);
+				$exito = true;
+				
+				if ($mysqli->errno) {
+					$exito = $mysqli->error;
+				}
+				$mysqli->close();
+				
+				return $exito;
+						
+			 }
+			 
+			/**
+			 * Mostrar el coordinador de una materia en un periodo
+			 * @param anio
+			 * @param cuatrimestre
+			 * @return array coordinador
+			 **/
+			 public function mostrarCoordinador($anio, $cuatrimestre) {
+				 
+				 require './conexion.php';
+				 $conjunto = $this->mostrarConjunto();
+				 
+				 $query = "SELECT CONCAT(d.apellido, ', ', d.nombres) AS nombre, d.id
+							FROM asignacion_comisiones_calendario AS acc
+							LEFT JOIN docente AS d
+								ON d.id = acc.docente
+							WHERE acc.anio = {$anio}
+								AND acc.cuatrimestre = {$cuatrimestre}
+								AND acc.materia = '{$conjunto}'
+								AND acc.comision = 'Coord'";
+								
+				//echo $query;
+				$result = $mysqli->query($query);
+				echo $mysqli->error;
+				$docente = $result->fetch_array(MYSQLI_ASSOC);
+				
+				$mysqli->close();
+				
+				return $docente;
+			}
+					
+		    /**
+		     * ELIMINAR todos los coordinadores del periodo
+		     * @param anio
+		     * @param cuatrimestre
+		     * @return bool (exito)
+		     */
+		    public function eliminarCoordinador($anio, $cuatrimestre) {
+				require './conexion.php';
+				$conjunto = $this->mostrarConjunto();
+				
+				$query = "DELETE
+							FROM asignacion_comisiones_calendario
+							
+							WHERE anio = {$anio}
+								AND cuatrimestre = {$cuatrimestre}
+								AND materia = '{$conjunto}'
+								AND comision = 'Coord'";
+				echo $query;
+				$mysqli->query($query);
+				$mysqli->close();
+				
+				return 1;
 			}
 						
 		// ++AGREGAR DOCENTE A LA MATERIA
