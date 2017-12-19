@@ -120,21 +120,33 @@
 					$result = $mysqli->query($query);
 					$_POST['apellido'] = $mysqli->real_escape_string($_POST['apellido']);
 					if ($result->num_rows == 1) {
-						$query = "UPDATE docente SET apellido = '$_POST[apellido]', nombres = '$_POST[nombre]', fechanacimiento = '$_POST[fechanacimiento]', fechaingreso = '$_POST[fechaingreso]', activo = 1 WHERE dni = '$_POST[dni]'  ";
+						$query = "UPDATE docente SET apellido = '$_POST[apellido]', 
+									nombres = '$_POST[nombre]', fechanacimiento = '$_POST[fechanacimiento]', 
+									fechaingreso = '$_POST[fechaingreso]', activo = 1 WHERE dni = '$_POST[dni]'  ";
+						
+						$query1 = "";
 						$result->free();
 					} else {
-						$query = "INSERT INTO docente SET dni = '$_POST[dni]', apellido = '$_POST[apellido]', nombres = '$_POST[nombre]', fechanacimiento = '$_POST[fechanacimiento]', fechaingreso = '$_POST[fechaingreso]'";
+						$query = "INSERT INTO docente SET dni = '$_POST[dni]', apellido = '$_POST[apellido]', 
+									nombres = '$_POST[nombre]', fechanacimiento = '$_POST[fechanacimiento]', 
+									fechaingreso = '$_POST[fechaingreso]';";
+						
+						$usuario = substr($_POST['nombre'], 0, 1) . strtolower(str_replace(' ','', $_POST['apellido']));
+									
+						$query1 = " INSERT INTO personal SET dni = '$_POST[dni]', apellido = '$_POST[apellido]', 
+									nombres = '$_POST[nombre]', usuario = '{$usuario}', password = MD5('{$usuario}');";
 					}
-					//echo $query;
+					
+					//echo $query . $query1;
+					
+					$mysqli->query($query);
+					$mysqli->query($query1);
 					
 					if ($mysqli->errno) {
 						echo "ERROR: " . $mysqli->error;
 					} else {
 						echo "Se ha cargado el nuevo docente";
 					}
-					
-					
-					$mysqli->query($query);
 					$mysqli->close();
 					break;
 				
