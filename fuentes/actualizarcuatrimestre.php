@@ -1,9 +1,9 @@
 <?php
-	ACTUALIZAR LA BASE DE PROGRAMAS EN UN AÑO
+	/*ACTUALIZAR LA BASE DE PROGRAMAS EN UN AÑO
 	COMENTAR TODO ESTO PARA ARRANCAR
 	HACER SIEMPRE EL BACKUP DE LA BASE ANTES DE EJECUTAR
 	HAY QUE CAMBIAR MANUALMENTE LAS CONSTANTES
-	
+	*/
 	
 	
 	
@@ -29,41 +29,41 @@
 		$cuatrimestreDestino = ($cuatrimestre % 2) + 1;
 		$anioDestino = $cuatrimestre == 1 ? $anio : $anio + 1;
 		
-		$queries['afectacion'] = "INSERT INTO afectacion
+		$queries['afectacion'] = "INSERT IGNORE INTO afectacion
 			SELECT null, docente, materia, {$anioDestino}, 
 				{$cuatrimestreDestino}, 1, tipoafectacion, 'pendiente' 
 			FROM afectacion
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre} 
 				AND activo = 1;";
 				
-		$queries['agregados_cronograma'] = "INSERT INTO agregados_cronograma
+		$queries['agregados_cronograma'] = "INSERT IGNORE INTO agregados_cronograma
 			SELECT null, tipo, valor, 1, materia, clase, 
 				{$anioDestino}, {$cuatrimestreDestino}
 			FROM agregados_cronograma
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre} 
 				AND activo = 1;";
 				
-		$queries['bibliografia'] = "INSERT INTO bibliografia
+		$queries['bibliografia'] = "INSERT IGNORE INTO bibliografia
 			SELECT null, materia, titulo, autor, editorial, paginas,
 			 1, {$anioDestino}, {$cuatrimestreDestino}
 			FROM bibliografia
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre} 
 				AND activo = 1;";
 				
-		$queries['cronograma'] = "INSERT INTO cronograma
+		$queries['cronograma'] = "INSERT IGNORE INTO cronograma
 			SELECT null, materia, clase, fecha, unidadtematica, descripcion,
 				metodo, bibliografia, paginas, 1, docente,
 				{$anioDestino}, {$cuatrimestreDestino}
 			FROM cronograma
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre}";
 				
-		$queries['programa'] = "INSERT INTO programa
+		$queries['programa'] = "INSERT IGNORE INTO programa
 			SELECT null, materia, usuario, campo, valor, fecha, 
 				{$anioDestino}, {$cuatrimestreDestino}
 			FROM programa
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre};";
 			
-		$queries['unidad_tematica'] = "INSERT INTO unidad_tematica
+		$queries['unidad_tematica'] = "INSERT IGNORE INTO unidad_tematica
 			SELECT null, materia, unidad, descripcion, fecha, 1, 
 				{$anioDestino}, {$cuatrimestreDestino}
 			FROM unidad_tematica
@@ -94,5 +94,5 @@
 		$mysqli->close();
 	}
 	
-	actualizarCuatrimestre($tablas, 2016, 1);
+	actualizarCuatrimestre($tablas, 2017, 2);
 ?>
