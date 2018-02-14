@@ -30,13 +30,13 @@
 					<form method="post" class="formularioLateral" action="procesardatos.php?formulario=cambiarClave">
 					
 						<label for="nombre" class="formularioLateral">Contraseña actual: </label>
-						<input class="formularioLateral iconPassword" type="password" name="claveactual" pattern="[A-Za-z0-9]{4,}" placeholder="Contraseña actual" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
+						<input class="formularioLateral iconPassword" type="password" name="claveactual" pattern=".{4,}" placeholder="Contraseña actual" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
 						<br />
 						<label for="nombre" class="formularioLateral">Contraseña nueva: </label>
-						<input class="formularioLateral iconPassword" type="password" name="clavenueva" pattern="[A-Za-z0-9]{4,}" placeholder="Contraseña nueva" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
+						<input class="formularioLateral iconPassword" type="password" name="clavenueva" pattern=".{4,}" placeholder="Contraseña nueva" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
 						<br />
 						<label for="nombre" class="formularioLateral">Repetir contraseña nueva: </label>
-						<input class="formularioLateral iconPassword" type="password" name="clavenueva2" pattern="[A-Za-z0-9]{4,}" placeholder="Contraseña nueva" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
+						<input class="formularioLateral iconPassword" type="password" name="clavenueva2" pattern=".{4,}" placeholder="Contraseña nueva" required title="4 o más caracteres alfanuméricos. Puede incluir mayúsculas o minúsculas.">
 						<br />
 						
 						
