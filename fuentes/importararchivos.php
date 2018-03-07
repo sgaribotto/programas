@@ -1,12 +1,17 @@
 ﻿<?php
+	
 	header('Content-Type: text/html; charset=utf-8');
+	echo 'display_errors = ' . ini_get('upload_max_filesize') . "\n";
+echo 'register_globals = ' . ini_get('register_globals') . "\n";
+echo 'post_max_size = ' . ini_get('post_max_size') . "\n";
+
 //Consultas vía AJAX
 	//Autoload de la clase.
 	session_start();
 	require_once '../programas.autoloader.php';
 	require './constantes.php';
 
-	
+	//print_r($_REQUEST);
 	if (isset($_GET['act'])) {
 		
 			switch($_GET['act']) {
@@ -38,8 +43,8 @@
 					$mysqli->query($query);
 					
 					
-					//print_r($_FILES);
-					//print_r($_POST);
+					print_r($_FILES);
+					print_r($_POST);
 					$dir = "../importaciones";
 					$file = $dir . basename($_FILES['importar']['name']);
 					
@@ -119,7 +124,7 @@
 				case "inscriptos":
 					require 'conexion.php';
 					
-					//print_r($_FILES);
+					print_r($_FILES);
 					//print_r($_REQUEST);
 					//BORRAR TODO LO DEL AÑO EN CUESTION
 					$query = "DELETE FROM inscriptos

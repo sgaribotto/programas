@@ -9,8 +9,8 @@
 		$periodo = $_REQUEST['periodo'];
 		$reporte = $_REQUEST['reporte'];
 		
-		header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
-		header( "Content-disposition: attachment; filename={$reporte}{$periodo}.xls" );
+		//header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
+		//header( "Content-disposition: attachment; filename={$reporte}{$periodo}.xls" );
 		require './fuentes/conexion.php';
 		require './fuentes/constantes.php';
 		
@@ -39,7 +39,7 @@
 						) AS b
 						GROUP BY b.materia, b.comision_agrupada";
 				
-				//echo $query;
+				echo $query;
 				$result = $mysqli->query($query);
 				
 				if ($mysqli->errno) {

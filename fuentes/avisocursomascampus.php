@@ -55,7 +55,7 @@
 	
 	//require 'conexion.php';
 	
-	$host = "10.1.71.121";
+	$host = "localhost";
 	$usuario = "programas";
 	$clave = "TMtrj9rS5di";
 	$db = "programas";

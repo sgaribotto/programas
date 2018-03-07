@@ -7,21 +7,21 @@
 
 	//Algoritmo para repartir alumnos en aulas
 
-	/*$dia = $_REQUEST['dia'];
 	$turno = $_REQUEST['turno'];
 	$letraTurno = substr($turno, 0, 1);
 	$anio = $_REQUEST['anio'];
 	$cuatrimestre = $_REQUEST['cuatrimestre'];
-	$sobreOcupar = 1 + ($_REQUEST['sobreocupar'] / 100);
-	$corteMinimo = $_REQUEST['corteMinimo'];*/
-	
+	//$sobreOcupar = 1 + ($_REQUEST['sobreocupar'] / 100);
+	$sobreOcupar = $_REQUEST['sobreocupar'];
+	$corteMinimo = $_REQUEST['corteMinimo'];
+
 	//$dia = 'lunes';
-	$turno = 'M1';
-	$letraTurno = 'M';
+	/*$turno = 'N1';
+	$letraTurno = 'N';
 	$anio = 2018;
 	$cuatrimestre = 1;
 	$sobreOcupar = 10;
-	$corteMinimo = 6;
+	$corteMinimo = 6;*/
 	
 	require 'fuentes/conexion.php';
 	
@@ -37,46 +37,14 @@
 	 * @return inscriptos sacando el primero
 	 **/
 	function asignarAulas($inscriptos, $turno, $sobreOcupar, $anio, $cuatrimestre, $mysqli) {
-		print_r($inscriptos);
-		//echo count($inscriptos);
-		if (count($inscriptos > 0)) {
-			
+		//print_r($inscriptos);
+		//echo count($inscriptos) . "<br>";
+		if (isset($inscriptos[0])) {
 		
 			$letraTurno = substr($turno, 0, 1);
-			//Ordeno los cursos por doble turno, varios días y cantidad que faltan asignar
-			usort($inscriptos, function($a, $b) {
-				
-				$doble = - ($a['doble'] - $b['doble']);
-				$varios_dias = - ($a['varios_dias'] - $b['varios_dias']);
-				$faltan_asignar = - ($a['faltaAsignar'] - $b['faltaAsignar']);
-				
-				if ($varios_dias != 0) {
-					$orden = $varios_dias;
-				} else if ($doble != 0) {
-					$orden = $doble;
-				} else {
-					$orden = $faltan_asignar;
-				}
-				return  $orden;
-			});
 			
-			//AULAS ABIERTAS
-			//$aulasDisponibles = array();
-			//$sobreOcupar = 1 + ($sobreOcupar / 100);
-			$aulasAbiertas = array();
-			$query = "SELECT cod, ROUND(capacidad * (1 + {$sobreOcupar} / 100)) AS capacidad
-				FROM aulas
-				WHERE abierta = 1;";
-			$result = $mysqli->query($query);
-			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-				$aulasAbiertas[$row['cod']] = $row['capacidad'];
-			}
-			
+			$aulasAbiertas = calcularAulasAbiertas($sobreOcupar, $mysqli);
 			$aulasTodas = $aulasAbiertas;
-			
-			//$aulasDisponiblesTurno = calcularAulasDisponiblesTodosLosDias($letraTurno, $sobreOcupar, $anio, $cuatrimestre);
-			
-			$dias = array();
 			
 			//print_r($inscriptos[0]);
 			
@@ -85,7 +53,6 @@
 				if (in_array($detalles['turnos'], ['M', 'N', 'T', 'S'])) {
 					for ($i = 1; $i <= 2; $i++) {
 						$aulasTurno[$i] = calcularAulasDisponibles($dia, $detalles['turnos'] . $i, $sobreOcupar, $anio, $cuatrimestre);
-						
 					}
 					
 					$aulasAbiertas = array_intersect_key($aulasAbiertas, $aulasTurno[1], $aulasTurno[2]);
@@ -93,34 +60,32 @@
 					$aulasTurno = calcularAulasDisponibles($dia, $detalles['turnos'], $sobreOcupar, $anio, $cuatrimestre);
 					$aulasAbiertas = array_intersect_key($aulasAbiertas, $aulasTurno);
 				}
-				
-				echo $dia;
-				
 			}
+			$cantidadAulasDisponibles = count($aulasAbiertas);
+			//print_r($aulasAbiertas);
 
-			//$aulasDisponibles = sumarCapacidades($aulasAbiertas, 1);
 			//Aulas disponibles para los dias de esa materia
+			$aulasDisponibles = sumarCapacidades($aulasAbiertas, 1);
 			
 			$entra = false;
 			$i = 1;
 			
 			while (!$entra) {
 				
-				if ($i > 6) {
+				if ($i >= $cantidadAulasDisponibles) {
 					echo "NO HAY LUGAR PARA LA MATERIA {$inscriptos[0]['conjunto']} <br>";
 					array_shift($inscriptos);
 					asignarAulas($inscriptos, $turno, $sobreOcupar, $anio, $cuatrimestre, $mysqli);
-					break;
+					return;
 				}
 				$aulasDisponibles = sumarCapacidades($aulasAbiertas, $i);
 				//print_r($aulasDisponibles);
+				
 				foreach ($aulasDisponibles as $capacidad => $aulas) {
 					if ($capacidad >= $inscriptos[0]['cantidad']) {
 						$entra = true;
-						//print_r($aulas);
-						//echo $inscriptos[0]['conjunto'] . ": " . $inscriptos[0]['cantidad'] . ' --> ' . key($aulas) . ' capacidad: ' . $capacidad;
+						
 						$porcentajeOcupado = ($inscriptos[0]['cantidad'] / $capacidad);
-						//echo "<br>Porcentaje ocupado: " . $porcentajeOcupado;
 						
 						$aulasParaOcupar = array();
 						foreach (explode(' + ', str_replace('AULA', '', key($aulas))) as $cod) {
@@ -135,8 +100,12 @@
 						break;
 					} 
 				}
+				
 				$i++;
 			}
+			
+			//print_r($aulasParaOcupar);
+			
 			
 			
 			foreach ($aulasParaOcupar as $aula => $cantidad) {
@@ -144,6 +113,7 @@
 					
 					$comision = calcularComision($datos['conjunto'], $dia, $datos['turnos'], $anio, $cuatrimestre, $mysqli);
 					
+					print_r($datos);
 					echo $datos['conjunto'] . "<br>";
 					echo $aula . "<br>";
 					echo $cantidad . "<br>";
@@ -162,13 +132,13 @@
 				}
 			}
 			
-			print_r($inscriptos);
 			array_shift($inscriptos);
-			print_r($inscriptos);
 			
 			asignarAulas($inscriptos, $turno, $sobreOcupar, $anio, $cuatrimestre, $mysqli);
 			
 		
+		} else {
+			return "TERMINADO";
 		}
 		
 		
@@ -208,7 +178,7 @@
 		}
 		
 		$result->free();
-	return $comision;
+		return $comision;
 	}
 	
 	
@@ -270,6 +240,27 @@
 	}
 	
 	/**
+	 * Devuelve todas las aulas abiertas con la capacidad ajustada a un porcentaje
+	 * de sobreocupación
+	 * @param int sobreocupar
+	 * @param obj conexion a SQL
+	 * @return array aulas abiertas
+	 **/
+	function calcularAulasAbiertas($sobreOcupar, $mysqli) {
+		
+		$aulasAbiertas = array();
+		$query = "SELECT cod, ROUND(capacidad * (1 + {$sobreOcupar} / 100)) AS capacidad
+			FROM aulas
+			WHERE abierta = 1;";
+		$result = $mysqli->query($query);
+		while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+			$aulasAbiertas[$row['cod']] = $row['capacidad'];
+		}
+		
+		return $aulasAbiertas;
+	}
+	
+	/**
 	 * Calcula las aulas diponibles para un dia y turno
 	 * @param str dia
 	 * @param str turno
@@ -311,6 +302,11 @@
 		return $aulas;
 		
 	}
+	//$aulas = calcularAulasDisponibles('miercoles', $turno, $sobreOcupar, $anio, $cuatrimestre);
+	//print_r($aulas);
+	//$capacidades = sumarCapacidades($aulas, 9);
+	//print_r($capacidades);
+	
 	
 	/**
 	 * Calcula las aula sdisponibles para todos los días y turnos de la letra
@@ -417,7 +413,7 @@
 		}
 		
 		foreach ($inscriptos as $key => $value) {
-			if ($value['cantidad'] == $value['cantidad_asignada']) {
+			if ($value['cantidad'] <= $value['cantidad_asignada']) {
 				unset($inscriptos[$key]);
 			} else {
 				$inscriptos[$key]['faltaAsignar'] = $value['cantidad'] - $value['cantidad_asignada'];
@@ -425,8 +421,27 @@
 			
 		}
 		
-		return $inscriptos;
+		//ORDENAMIENTO
+		
+		usort($inscriptos, function($a, $b) {
+				
+			$doble = - ($a['doble'] - $b['doble']);
+			$varios_dias = - ($a['varios_dias'] - $b['varios_dias']);
+			$faltan_asignar = - ($a['faltaAsignar'] - $b['faltaAsignar']);
+			
+			if ($doble != 0) {
+				$orden = $doble;
+			} else if ($varios_dias != 0) {
+				$orden = $varios_dias;
+			} else {
+				$orden = $faltan_asignar;
+			}
+			return  $orden;
+		});
+		
 		$result->free();
+		return $inscriptos;
+		
 	}
 	 
 	//$inscriptos = calcularInscriptos('M', 2018, 1);
@@ -439,6 +454,7 @@
 	//
 	//print_r($inscriptos);
 	$inscriptos = calcularInscriptos($letraTurno, $anio, $cuatrimestre);
+	print_r($inscriptos);
 	asignarAulas($inscriptos, $turno, $sobreOcupar, $anio, $cuatrimestre, $mysqli);
 ?>
 </pre>

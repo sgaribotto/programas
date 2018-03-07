@@ -1,10 +1,8 @@
-
-	<?php
-	
+﻿<?php	header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+		header("Content-disposition: attachment; filename=dist_analitica.xls");
 		$periodo = $_REQUEST['periodo'];
 		
-		header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
-		header( "Content-disposition: attachment; filename=dist_analitica{$periodo}.xls" );
+		
 		require './fuentes/conexion.php';
 		require './fuentes/constantes.php';
 		
@@ -77,10 +75,11 @@
 				foreach ($datosTabla as $key => $value) {
 					echo "<tr>";
 					foreach ($value as $k => $v) {
-						if ($k = 'materia' and !strpos($v, ', ')) {
+						if ($k == 'materia' and !strpos($v, ', ')) {
 							$v = "'" . $v;
 						}
-						echo "<td>" . mb_convert_encoding($v, 'utf16', 'utf8') . "</td>";
+						//echo "<td>" . mb_convert_encoding($v, 'utf16', 'utf8') . "</td>";
+						echo "<td>" . $v . "</td>";
 					}
 					echo "</tr>";
 				}	

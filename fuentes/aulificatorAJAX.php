@@ -64,7 +64,8 @@
 								FROM estimacion AS e
 								LEFT JOIN turnos_con_conjunto AS t ON t.materia = e.materia AND t.anio = e.anio AND t.cuatrimestre = e.cuatrimestre
 								LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = e.anio AND aa.activo = 1
-									AND aa.cuatrimestre = e.cuatrimestre AND (RIGHT(aa.turno, 1) = '$numeroTurno' OR aa.turno IN ('S', 'M', 'N', 'T')) AND aa.dia = 'sábado'
+									AND aa.cuatrimestre = e.cuatrimestre AND (RIGHT(aa.turno, 1) = '$numeroTurno' 
+									OR aa.turno IN ('S', 'M', 'N', 'T')) AND aa.dia = 'sábado'
 								WHERE (RIGHT(t.turno, 1) = '$numeroTurno' OR t.turno IN ('S', 'M', 'N', 'T'))
 									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre} AND t.dia = 'sábado'
 								GROUP BY e.materia, aa.comision, aa.aula, t.turno
@@ -78,7 +79,7 @@
 								FROM estimacion AS e
 								LEFT JOIN turnos_con_conjunto AS t ON t.materia = e.materia AND t.anio = e.anio AND t.cuatrimestre = e.cuatrimestre
 								LEFT JOIN asignacion_aulas AS aa ON aa.materia = e.materia AND aa.anio = e.anio AND aa.activo = 1
-									AND aa.cuatrimestre = e.cuatrimestre AND (aa.turno = t.turno) AND aa.dia = '$dia'
+									AND aa.cuatrimestre = e.cuatrimestre AND (aa.turno = t.turno OR aa.turno = LEFT(t.turno, 1)) AND aa.dia = '$dia'
 								WHERE e.turno = '$letraTurno'
 									AND (t.turno = '$turno' OR t.turno = '$letraTurno')
 									AND e.anio = {$anio} AND e.cuatrimestre = {$cuatrimestre}
@@ -150,7 +151,8 @@
 										AND aa.dia = '$dia'
 										AND (aa.turno = '$turno' OR aa.turno = '$letraTurno'))
 								LEFT JOIN materia AS m ON m.conjunto = aa.materia OR aa.materia LIKE CONCAT(m.conjunto, '_')
-								LEFT JOIN turnos AS t ON m.cod = t.materia AND t.turno = '$turno' AND t.dia = '$dia'
+								LEFT JOIN turnos_con_conjunto AS t ON m.conjunto = t.materia AND t.turno = '$turno' AND t.dia = '$dia'
+									AND t.anio = {$anio} AND t.cuatrimestre = {$cuatrimestre}
 								
 								WHERE a.activo = 1
 								GROUP BY aa.materia, aa.aula, a.cod, t.dia
@@ -176,8 +178,8 @@
 										AND aa.dia = 'sábado'
 										AND (RIGHT(aa.turno, 1) = '{$numeroTurno}' OR aa.turno IN ('S', 'M', 'T', 'N')))
 								LEFT JOIN materia AS m ON m.conjunto = aa.materia OR aa.materia LIKE CONCAT(m.conjunto, '_')
-								LEFT JOIN turnos AS t ON m.cod = t.materia AND RIGHT(t.turno, 1) = RIGHT(aa.turno, 1) AND t.dia = 'sábado'
-								
+								LEFT JOIN turnos_con_conjunto AS t ON m.conjunto = t.materia AND RIGHT(t.turno, 1) = RIGHT(aa.turno, 1) AND t.dia = 'sábado'
+										AND t.anio = {$anio} AND t.cuatrimestre = {$cuatrimestre}
 								WHERE a.activo = 1
 								GROUP BY aa.materia, aa.aula, a.cod, t.dia
 								ORDER BY a.cod+0";
@@ -287,7 +289,8 @@
 				if ($asignarTodosLosDias and $dia != 'sábado') {
 					$query = "SELECT DISTINCT t.dia
 								FROM turnos_con_conjunto AS t
-								WHERE materia = '{$materia}' AND turno = '$turno';";
+								WHERE materia = '{$materia}' AND turno = '$turno'
+									AND t.anio = {$anio} AND t.cuatrimestre = {$cuatrimestre};";
 					$result = $mysqli->query($query);
 					//echo $query;
 					echo $mysqli->error;
