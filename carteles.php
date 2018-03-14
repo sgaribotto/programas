@@ -136,7 +136,7 @@
 							b.nombre_comision, b.comision, b.primero, b.ultimo, b.horario, aa.aula, aa.comision_real, b.comision_real
 					FROM (
 						SELECT GROUP_CONCAT(DISTINCT 
-								i.carrera ORDER BY i.carrera SEPARATOR ' - '
+								REPLACE(i.carrera, 'EINI', 'EYN-3') ORDER BY i.carrera SEPARATOR ' - '
 							) AS carrera,
 							m.plan,
 							t.dia,
@@ -170,7 +170,6 @@
 						WHERE CONCAT(i.anio_academico, ' - ', periodo_lectivo + 0) = '{$periodo}'
 							AND i.estado != 'P' {$dia}
 						GROUP BY i.nombre_comision, t.dia
-						#ORDER BY  turno, t.dia, m.plan, carrera, materia_, i.nombre_comision
 					) AS b
 					LEFT JOIN asignacion_aulas AS aa
 						ON aa.anio = b.anio_academico AND aa.cuatrimestre = b.periodo_lectivo
@@ -178,12 +177,12 @@
 										REPLACE(b.comision_real, 'MTS', 'S')
                                     , 'MT', 'M')
 							AND aa.materia = b.conjunto
-					#WHERE b.turno IN ('M', 'N', 'T') AND b.horario != ''
+							AND aa.dia = b.dia
 					ORDER BY FIELD(b.dia, 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'), b.turno, materia, b.horario, b.nombre_comision";
 			
 			//echo $query;
 			$result = $mysqli->query($query);
-			echo $mysqli->error;
+			//echo $mysqli->error;
 			$carteles = array();
 			
 			

@@ -51,7 +51,10 @@
 					ca.turno, 
 					ca.nombre_comision,
 					ca.horario, 
-					aa.aula,
+					GROUP_CONCAT(DISTINCT CONCAT('AULA: ', aa.aula, ' (', aa.dia, ')') 
+									ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado')
+									SEPARATOR ' | ' 
+					) AS aula,
 					aa.cantidad_alumnos,
 					GROUP_CONCAT(DISTINCT CONCAT(d.apellido, ', ', d.nombres) SEPARATOR '/') AS docentes
 				FROM comisiones_abiertas AS ca
@@ -68,9 +71,11 @@
 					ON d.id = ac.docente
 				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}' {$materia}
 				GROUP BY ca.materia, ca.nombre_comision
-				HAVING NOT ISNULL(aula) AND NOT ISNULL(docentes)
+				#HAVING NOT ISNULL(aula) AND NOT ISNULL(docentes)
 				ORDER BY materia";
 			
+			
+			//echo $query;
 			$result = $mysqli->query($query);
 			echo $mysqli->error;
 			$caratulas = array();
