@@ -13,18 +13,20 @@
 		
 		$query = "SELECT aa.materia,
 					ca.materia AS conjunto,
-					CONCAT(ca.turno, IFNULL(ca.observaciones, '')) AS observaciones,
+					CONCAT(ca.turno, IFNULL(REPLACE(ca.observaciones, 'S', ''), '')) AS observaciones,
 					aa.comision_real,
 					GROUP_CONCAT(DISTINCT aa.cantidad_alumnos ORDER BY aa.aula SEPARATOR '***') AS cantidades,
-					GROUP_CONCAT(DISTINCT aa.aula ORDER BY aa.dia SEPARATOR ' / ') AS aulas,
-					GROUP_CONCAT(DISTINCT aa.dia ORDER BY aa.dia SEPARATOR ' / ') AS dias
+					GROUP_CONCAT(DISTINCT aa.aula ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado') 
+						SEPARATOR ' / ') AS aulas,
+					GROUP_CONCAT(DISTINCT aa.dia ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado')
+						SEPARATOR ' / ') AS dias
 				FROM asignacion_aulas AS aa
                 LEFT JOIN comisiones_abiertas AS ca
 					ON aa.materia LIKE CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
 					AND aa.comision_real = ca.nombre_comision
 				WHERE aa.anio = {$anio} AND aa.cuatrimestre = {$cuatrimestre}
 				GROUP BY aa.materia, aa.comision_real
-				ORDER BY aa.materia, aa.comision_real
+				ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'), aa.materia, aa.comision_real
 				#LIMIT 164";
 				
 		$result = $mysqli->query($query);
@@ -60,7 +62,7 @@
 									FROM inscriptos
 									WHERE anio_academico = 2018 AND periodo_lectivo = 1
 										AND materia IN {$datos['conjunto']}
-										AND nombre_comision LIKE '%{$turno}'
+										AND REPLACE(nombre_comision, 'MT', 'M') LIKE '%{$turno}'
 										
 									ORDER BY nombre_alumno
 									LIMIT {$particiones['puestos']}, {$datos['cantidad']} 
@@ -99,7 +101,7 @@
 				<th>Materia</th>
 				<th>Sale de</th>
 				<th>Comisión</th>
-				
+				<th>Nueva</th>
 				<th>Total</th>
 				<th>dias</th>
 				<th>Aula</th>
@@ -116,20 +118,31 @@
 						foreach ($particiones['comisiones'] as $comision => $datos) {
 							echo "<tr style='vertical-align: middle; border: 1px solid black;'>";
 							
-							echo "<td>{$materia}</td>";
+							echo "<td>{$materia}'</td>";
 							echo "<td>{$turno}</td>";
+							
 							echo "<td>{$comision}</td>";
+							
+							if ($turno != $comision) {
+								echo "<td>X</td>";
+							} else {
+								echo "<td></td>";
+							}
+							
 							echo "<td>{$datos['cantidad']}</td>";
 							echo "<td>{$datos['dias']}</td>";
 							echo "<td>{$datos['aulas']}</td>";
-							echo "<td><table>";
+							//echo "<td><table>";
+							//echo "<td>";
 							foreach ($datos['materias'] as $cod => $cantidadParcial) {
-								echo "<tr><td>{$cod}-->{$cantidadParcial}</td></tr>";
+								echo "<td>{$cod}-->{$cantidadParcial}</td>";
+								//echo "{$cod}-->{$cantidadParcial}  ";
 							}
-							echo "</table></td>";
-								if (isset($datos['query'])) {
+							//echo "</table></td>";
+							//echo "</td>";
+								/*if (isset($datos['query'])) {
 									//echo "<td>{$datos['query']}</td>";
-								}
+								}*/
 							echo "</tr>";
 						}
 					}
