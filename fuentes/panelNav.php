@@ -181,8 +181,8 @@
 			<ul class="navLateral">
 				<li class="navLateral"><a href="verprogramas.php" class="navLateral">Ver programas</a></li>
 				<li class="navLateral"><a href="verplandeclases.php" class="navLateral">Ver plan de clases</a></li>
-				<!--<li class="navLateral"><a href="responsables.php" class="navLateral">Responsables</a></li>
-				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
+				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
+				<!--<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
 				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
 			</ul>
 			
@@ -202,6 +202,22 @@
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
 				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
+			</ul>
+			
+		</ol>
+		
+		<ol class="navLateral" >
+			<li class="navLateral">Aulas</li>
+			
+			<ul class="navLateral">
+				<li class="navLateral"><a href="aulificatorreport.php" class="navLateral">Requerimiento de aulas</a></li>
+				<li class="navLateral"><a href="imprimirCarteles.php" class="navLateral">Carteles</a></li>
+				<li class="navLateral"><a href="imprimirCaratulas.php" class="navLateral">Carátulas</a></li>
+				<!--<li class="navLateral"><a href="agregarcursos.php" class="navLateral">Agregar curso de extension</a></li>
+				<li class="navLateral"><a href="turnosExtension.php" class="navLateral">Turnos de Extensión</a></li>
+				<li class="navLateral"><a href="estimacionpreliminar.php" class="navLateral">Estimación inscriptos</a></li>
+				<li class="navLateral"><a href="aulificatorreportExcel.php" class="navLateral">Reporte en Excel</a></li>-->
+				
 			</ul>
 			
 		</ol>
