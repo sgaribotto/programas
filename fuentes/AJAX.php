@@ -367,10 +367,81 @@
 					
 					$mysqli->close();
 					break;
+					
+				case "agregarEstimacion":
+					require "./conexion.php";
+					
+					$materia = $_REQUEST['materia'];
+					if ($_REQUEST['letra'] != 'A') {
+						$materia .= $_REQUEST['letra'];
+					}
+					$periodo = $_REQUEST['periodo'];
+					$turno = $_REQUEST['turno'];
+					$cantidad = $_REQUEST['cantidad'];
+					$periodoExplotado = explode(' - ', $periodo);
+					$anio = $periodoExplotado[0];
+					$cuatrimestre = $periodoExplotado[1];
+					
+					//Verificar si la materia ya tiene estimación en ese cuatrimestre y turno.
+					
+					$query = "SELECT e.materia
+								FROM estimacion AS e
+								WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$periodo}'
+									AND materia = '{$materia}'
+									AND turno = '{$turno}';";
+					
+					$result = $mysqli->query($query);
+					if($mysqli->errno) {
+						echo $mysqli->error;
+						echo "<br>" . $query;
+					}
+					
+					
+					if ($result->num_rows > 0) {
+						$query = "UPDATE estimacion
+									SET cantidad = {$cantidad}
+									WHERE CONCAT(anio, ' - ', cuatrimestre) = '{$periodo}'
+									AND materia = '{$materia}'
+									AND turno = '{$turno}';";
+					} else {
+						$query = "SELECT m.nombres
+									FROM vista_materias_por_conjunto AS m
+									WHERE '{$materia}' LIKE CONCAT(m.conjunto, '%')";
+						$result = $mysqli->query($query);
+						//echo $mysqli->error;
+						$row = $result->fetch_array(MYSQLI_ASSOC);
+						$nombreMateria = $row['nombres'];
+						
+						$query = "INSERT INTO estimacion SET
+									anio = {$anio},
+									cuatrimestre = {$cuatrimestre},
+									materia = '{$materia}',
+									turno = '{$turno}',
+									cantidad = {$cantidad},
+									nombre_materia = '{$nombreMateria}'";
+						
+					}
+					
+					//echo $query;
+									
+					$mysqli->query($query);
+					if ($mysqli->errno) {
+						echo $mysqli->error;
+					}
+					
+					$mysqli->close();
+					break;
 				
 				case "eliminarTurno":
 					require "./conexion.php";
 					$query = "DELETE FROM turnos_con_conjunto WHERE id = $_POST[id]";
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+				
+				case "eliminarEstimacion":
+					require "./conexion.php";
+					$query = "DELETE FROM estimacion WHERE id = $_POST[id]";
 					$mysqli->query($query);
 					$mysqli->close();
 					break;
@@ -2614,6 +2685,64 @@
 					}
 					break;
 				
+				case "tablaEstimacion":
+					require 'conexion.php';
+					
+					$where = '';
+					
+					//print_r($_REQUEST);
+					
+					if (isset($_REQUEST['filtro']) AND $_REQUEST['filtro'] != '') {
+						$where .= " AND CONCAT(e.materia, m.nombres) LIKE '%{$_REQUEST['filtro']}%' ";
+					}
+					
+					if (isset($_REQUEST['periodo']) AND $_REQUEST['periodo'] != '') {
+						$where .= " AND CONCAT(e.anio, ' - ',  e.cuatrimestre) = '{$_REQUEST['periodo']}' ";
+					}
+					
+					$query = "SELECT e.id, e.materia, m.nombres, e.turno, e.cantidad  
+									FROM estimacion AS e
+									LEFT JOIN vista_materias_por_conjunto AS m
+										ON m.conjunto = e.materia OR e.materia LIKE CONCAT(m.conjunto, '_')
+									WHERE 1 = 1 {$where} 
+									ORDER BY e.turno, e.materia 
+									#LIMIT 30";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$estimacion = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$estimacion[] = $row;
+					}
+					
+					if (sizeof($estimacion)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:20%;'>Cod</th>
+								<th class='subtitulo'style='width:50%;'>Nombre</th>
+								<th class='subtitulo' style='width:15%;'>Turno</th>
+								<th class='subtitulo' style='width:8%;'>Cantidad</th>
+								<th class='subtitulo' style='width:7%;'>Eliminar</th>
+							</tr>";
+						foreach ($estimacion AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[materia]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[nombres]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[turno]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[cantidad]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarTurno' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron materias</p>";
+					}
+					break;
+				
 				case "tablaComisionesPorDia":
 					require 'conexion.php';
 					require 'constantes.php';
@@ -3426,7 +3555,7 @@
 							$option = "";
 							foreach ($dias as $dia => $horas) {
 								foreach ($horas as $hora) {
-									$option .= $dia . $hora . ", ";
+									$option .= $dia . " " . $hora . ", ";
 									//$imprimir .= "<option value='{$option}'>{$option}</option>";
 								}
 								
