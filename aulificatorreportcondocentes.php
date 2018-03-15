@@ -40,6 +40,7 @@
 			h2.tituloTurno {
 				text-align:center;
 				margin-top:0px;
+				page-break-before: always;
 			}
 
 			td {
@@ -59,7 +60,7 @@
 			table {
 				border-collapse:collapse;
 				font-size: .7em;
-			
+			}
 			
 			
 
@@ -71,7 +72,7 @@
 	</head>
 	
 	<body>
-		<a href="aulificatorreportExcelcondocentes.php" target="_blank"><button id="btnExport">Excel</button></a>	
+		<a href="aulificatorreportExcelcondocentes.php" target="_blank" class="no-print"><button id="btnExport">Excel</button></a>	
 		<?php
 			//require_once('./fuentes/botonera.php');
 			//require("./fuentes/panelNav.php");
