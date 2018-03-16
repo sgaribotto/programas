@@ -130,10 +130,16 @@
 				'LITUR' => 'Lic. Turismo',
 				'GTUR - LITUR' => 'Lic. Turismo',
 				'CCCCP' => 'Ciclo Complementario Contador Público',
+				'CPUT - EYN-1' => 'CPU',
 			);
 			
 			$query = "SELECT  DISTINCT b.carrera, b.plan, b.dia, b.turno, b.materia_ AS materia, b.nombre_materia,
-							b.nombre_comision, b.comision, b.primero, b.ultimo, b.horario, aa.aula, aa.comision_real, b.comision_real
+							b.nombre_comision, b.comision, b.primero, b.ultimo, IF(b.dia = 'sábado', 
+							IF (RIGHT(b.horario, 1) IN (1, 2),
+								CONCAT('S', RIGHT(b.horario, 1)),
+								'S'),
+							b.horario
+						) AS horario, aa.aula, aa.comision_real, b.comision_real
 					FROM (
 						SELECT GROUP_CONCAT(DISTINCT 
 								REPLACE(i.carrera, 'EINI', 'EYN-3') ORDER BY i.carrera SEPARATOR ' - '
@@ -206,7 +212,11 @@
 						foreach ($carreras as $carrera => $materias) {
 							echo "<img src='images/logo.jpg' />";
 							echo "<h1>AULAS PLAN " . $nombres_planes["{$plan}"] . "</h1>";
-							echo "<h2>DIA " . mb_strtoupper($dia, 'UTF8') . " - TURNO " . mb_strtoupper($turno, 'UTF8') . "</h2>";
+							echo "<h2>DIA " . mb_strtoupper($dia, 'UTF8');
+							if ($dia != 'sábado') {
+								echo " - TURNO " . mb_strtoupper($turno, 'UTF8');
+							}
+							echo "</h2>";
 							echo "<h3>{$carrera}</h3>";
 							
 							echo "<table class='turnos-comisiones'>";
