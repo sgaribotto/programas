@@ -89,7 +89,7 @@
 	
 	
 	//TEMPLATE Y ASUNTO
-	$template = "Estimado/a responsable de cátedra <b>%s:</b>\n
+	$template = "Estimad%s profesor%s <b>%s:</b>\n
 		<br />
 		Por medio de la presente tenemos el agrado de informarle que la <b>Lic. Clara
 		Lopez</b> se desempeñará en la <b>Lic. en Administración</b> colaborando con el
