@@ -413,17 +413,19 @@
 				case "abiertasVSinscriptos":
 					
 					$query = "SELECT ca.materia, ca.anio, ca.cuatrimestre, ca.nombre_comision,
-								IFNULL(ca.observaciones, '') AS letra,
-								ca.turno
-							FROM comisiones_abiertas AS ca
-							LEFT JOIN vista_inscriptos_por_conjunto AS i
-								ON ca.anio = i.anio
-									AND ca.cuatrimestre = i.cuatrimestre
-									AND ca.nombre_comision = REPLACE(i.comision_real, 'MS', 'S')
-									AND ca.materia = i.conjunto
-							WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
-								AND ISNULL(i.conjunto)
-							ORDER BY ca.materia, ca.nombre_comision";
+									IFNULL(ca.observaciones, '') AS letra, m.nombres,
+									ca.turno
+								FROM comisiones_abiertas AS ca
+								LEFT JOIN vista_inscriptos_por_conjunto AS i
+									ON ca.anio = i.anio
+										AND ca.cuatrimestre = i.cuatrimestre
+										AND ca.nombre_comision = REPLACE(i.comision_real, 'MS', 'S')
+										AND ca.materia = i.conjunto
+								LEFT JOIN vista_materias_por_conjunto AS m
+									ON m.conjunto = ca.materia
+								WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
+									AND ISNULL(i.conjunto)
+								ORDER BY ca.materia, ca.nombre_comision";
 					$result = $mysqli->query($query);
 					echo $mysqli->error;
 					$datosTabla = array();
@@ -438,18 +440,16 @@
 								<th>Nombre Materia</th>
 								<th>Turno</th>
 								<th>comision</th>
-								<th>Cantidad</th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php
 								foreach ($datosTabla as $detalle) {
 									echo "<tr>";
-										echo "<td>" . $detalle['conjunto'] . "</td>";
+										echo "<td>" . $detalle['materia'] . "</td>";
 										echo "<td>" . $detalle['nombres'] . "</td>";
 										echo "<td>" . $detalle['turno'] . "</td>";
-										echo "<td>" . $detalle['comision_real'] . "</td>";
-										echo "<td>" . $detalle['cantidad'] . "</td>";
+										echo "<td>" . $detalle['nombre_comision'] . "</td>";
 										
 									
 									echo "</tr>";
@@ -460,7 +460,117 @@
 					
 				<?php
 					break;
-			}
+					
+				case "inscriptosVSaulas":
+					
+					$query = "SELECT i.conjunto, SUM(i.cantidad) AS total_turno,
+								REPLACE(CONCAT(LEFT(i.comision_real, 1), IFNULL(ca.observaciones, '')), 'SS', 'S') AS turno_llave,
+								m.nombres
+							FROM vista_inscriptos_por_conjunto AS i
+							LEFT JOIN comisiones_abiertas AS ca
+								ON ca.materia = i.conjunto
+									AND ca.nombre_comision = i.comision_real
+									AND ca.anio = i.anio
+									AND ca.cuatrimestre = ca.cuatrimestre
+							LEFT JOIN vista_materias_por_conjunto AS m
+								ON m.conjunto = i.conjunto
+
+							WHERE CONCAT(i.anio, ' - ', i.cuatrimestre) = '{$periodo}'
+							GROUP BY turno_llave, i.conjunto
+							ORDER BY i.conjunto, turno_llave";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[$row['conjunto']][$row['turno_llave']]['inscriptos'] = $row['total_turno'];
+						$datosTabla[$row['conjunto']][$row['turno_llave']]['en_aulas'] = 0;
+						$datosTabla[$row['conjunto']]['nombre'] = $row['nombres'];
+					}
+					
+					
+					$query = "SELECT aa.materia AS prueba, 
+									LEFT(aa.turno, 1) AS turno_llave, 
+									SUM(aa.cantidad_alumnos) / COUNT(DISTINCT CONCAT(aa.dia, aa.turno)) AS cantidad,
+									LEFT(aa.materia, LOCATE(')', aa.materia)) AS conjunto,
+									REPLACE(CONCAT(LEFT(aa.turno, 1), 
+												SUBSTRING(aa.materia, LOCATE(')', aa.materia) + 1)),
+											'SS', 'S'
+									) AS letra
+									
+								FROM asignacion_aulas AS aa
+								WHERE aa.anio = 2018
+									AND aa.cuatrimestre = 1
+								GROUP BY aa.materia, turno_llave";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[$row['conjunto']][$row['letra']]['en_aulas'] = $row['cantidad'];
+						if (!isset($datosTabla[$row['conjunto']][$row['letra']]['inscriptos'])) {
+							$datosTabla[$row['conjunto']][$row['letra']]['inscriptos'] = 0;
+						}
+					}
+					
+					//print_r($datosTabla);
+					
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th colspan="3">
+									<table><tr><td colspan='3'>M</td></tr>
+										<tr><td>Insc.</td><td>Aulas</td><td>Dif.</td></tr>
+									</table>
+								</th>
+								<th colspan="3">
+									<table><tr><td colspan='3'>M</td></tr>
+										<tr><td>Insc.</td><td>Aulas</td><td>Dif.</td></tr>
+									</table></th>
+								<th colspan="3">
+									<table><tr><td colspan='3'>M</td></tr>
+										<tr><td>Insc.</td><td>Aulas</td><td>Dif.</td></tr>
+									</table></th>
+								<th colspan="3">
+									<table><tr><td colspan='3'>M</td></tr>
+										<tr><td>Insc.</td><td>Aulas</td><td>Dif.</td></tr>
+									</table></th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $materia => $turnos) {
+									echo "<tr>";
+									echo "<td>" . $materia . "</td>";
+									echo "<td>" . $turnos['nombre'] . "</td>";
+									
+									foreach (['M', 'N', 'T', 'S'] as $turno) {
+										if (isset($turnos[$turno])) {
+											echo "<td>" . $turnos[$turno]['inscriptos'] . "</td>";
+											echo "<td>" . (int) $turnos[$turno]['en_aulas'] . "</td>";
+											
+											
+											$diferencia = $turnos[$turno]['inscriptos'] - $turnos[$turno]['en_aulas'];
+											
+											$resaltado = '';
+											if ($diferencia != 0) {
+												$resaltado = "style='background-color: red;'";
+											}
+											echo "<td $resaltado>" . $diferencia . "</td>";
+										} else {
+											echo "<td></td><td></td><td></td>";
+										}
+									}
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
+				}
 			
 			?>
 			

@@ -60,6 +60,9 @@
 							<option value="abiertasVSoferta">Comisiones abiertas vs. Oferta</option>
 							<option value="ofertaVSabierta">Oferta vs. Comisiones abiertas</option>
 							<option value="inscriptosVSabiertas">Inscriptos sin Comisiones abiertas</option>
+							<option value="abiertasVSinscriptos">Comisiones abiertas sin inscriptos</option>
+							<option value="inscriptosVSaulas">Diferencia inscriptos y aulas	</option>
+							
 						</select>
 						<br />
 						
