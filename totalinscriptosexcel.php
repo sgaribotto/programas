@@ -8,11 +8,29 @@
 		//print_r($_REQUEST);
 		$periodo = $_REQUEST['periodo'];
 		$reporte = $_REQUEST['reporte'];
+		$excel = false;
 		
-		//header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
-		//header( "Content-disposition: attachment; filename={$reporte}{$periodo}.xls" );
+		if (isset($_REQUEST['excel'])) {
+			$excel = true;
+		}
+		
+		if ($excel) {
+			header("Content-Type:   application/vnd.ms-excel; charset=utf-8");;
+			header( "Content-disposition: attachment; filename={$reporte}{$periodo}.xls" );
+		} else {
+			require_once './fuentes/meta.html';
+			require_once('./fuentes/botonera.php');
+			require("./fuentes/panelNav.php");
+			
+			echo "<div class='formularioLateral'>";
+		}
 		require './fuentes/conexion.php';
 		require './fuentes/constantes.php';
+		
+		echo "<button class='excel' id='reporteXLS' 
+				onclick='location.assign(\"totalinscriptosexcel.php?periodo={$periodo}&reporte={$reporte}&excel=1\")'>
+					Reporte en Excel
+			</button>";
 		
 		switch ($reporte) {
 		
@@ -336,7 +354,112 @@
 					</table>
 					
 				<?php
-					break;	
+					break;
+					
+				case "inscriptosVSabiertas":
+					
+					$query = "SELECT i.conjunto, i.cantidad, i.anio, i.cuatrimestre, i.comision_real,
+									IFNULL(ca.observaciones, '') AS letra,
+									LEFT(i.comision_real, 1) AS turno,
+									m.nombres
+								FROM vista_inscriptos_por_conjunto AS i
+								LEFT JOIN comisiones_abiertas AS ca
+									ON ca.anio = i.anio
+										AND ca.cuatrimestre = i.cuatrimestre
+										AND ca.nombre_comision = REPLACE(i.comision_real, 'MS', 'S')
+										AND ca.materia = i.conjunto
+								LEFT JOIN vista_materias_por_conjunto AS m
+									ON m.conjunto = i.conjunto
+								WHERE CONCAT(i.anio, ' - ', i.cuatrimestre) = '{$periodo}'
+									AND ISNULL(ca.materia)
+								ORDER BY i.conjunto, i.comision_real";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[] = $row;
+					}
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th>Turno</th>
+								<th>comision</th>
+								<th>Cantidad</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $detalle) {
+									echo "<tr>";
+										echo "<td>" . $detalle['conjunto'] . "</td>";
+										echo "<td>" . $detalle['nombres'] . "</td>";
+										echo "<td>" . $detalle['turno'] . "</td>";
+										echo "<td>" . $detalle['comision_real'] . "</td>";
+										echo "<td>" . $detalle['cantidad'] . "</td>";
+										
+									
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
+					
+				case "abiertasVSinscriptos":
+					
+					$query = "SELECT ca.materia, ca.anio, ca.cuatrimestre, ca.nombre_comision,
+								IFNULL(ca.observaciones, '') AS letra,
+								ca.turno
+							FROM comisiones_abiertas AS ca
+							LEFT JOIN vista_inscriptos_por_conjunto AS i
+								ON ca.anio = i.anio
+									AND ca.cuatrimestre = i.cuatrimestre
+									AND ca.nombre_comision = REPLACE(i.comision_real, 'MS', 'S')
+									AND ca.materia = i.conjunto
+							WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
+								AND ISNULL(i.conjunto)
+							ORDER BY ca.materia, ca.nombre_comision";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[] = $row;
+					}
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th>Turno</th>
+								<th>comision</th>
+								<th>Cantidad</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $detalle) {
+									echo "<tr>";
+										echo "<td>" . $detalle['conjunto'] . "</td>";
+										echo "<td>" . $detalle['nombres'] . "</td>";
+										echo "<td>" . $detalle['turno'] . "</td>";
+										echo "<td>" . $detalle['comision_real'] . "</td>";
+										echo "<td>" . $detalle['cantidad'] . "</td>";
+										
+									
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
 			}
 			
 			?>

@@ -28,7 +28,7 @@
 			<div id="mostrarFormulario">Mostrar Formulario</div>
 			<div id="formulario">
 				<fieldset class="formularioLateral">
-					<form method="post" class="formularioLateral" action="totalinscriptosexcel.php" id="formularioCarga" target="_blank">
+					<form method="post" class="formularioLateral" action="totalinscriptosexcel.php" id="formularioCarga" >
 						
 						<label class="formularioLateral" for="periodo">Periodo: </label>
 						<select name="periodo" class="formularioLateral">
@@ -59,6 +59,7 @@
 							<option value="comisiones_abiertas">Detalle de comisiones abiertas</option>
 							<option value="abiertasVSoferta">Comisiones abiertas vs. Oferta</option>
 							<option value="ofertaVSabierta">Oferta vs. Comisiones abiertas</option>
+							<option value="inscriptosVSabiertas">Inscriptos sin Comisiones abiertas</option>
 						</select>
 						<br />
 						

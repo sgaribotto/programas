@@ -140,7 +140,7 @@
 			
 			<ul class="navLateral">
 				<li class="navLateral"><a href="importarinscriptos.php" class="navLateral">Importar reporte de inscriptos</a></li>
-				<li class="navLateral"><a href="imprimirreportesinscriptos.php" class="navLateral">Total inscriptos</a></li>
+				<li class="navLateral"><a href="imprimirreportesinscriptos.php" class="navLateral">Reportes - Inscriptos</a></li>
 				<li class="navLateral"><a href="imprimirdistribucionanalitica.php" class="navLateral">Distribución analítica</a></li>
 				<li class="navLateral"><a href="inscriptosencorrelativas.php" class="navLateral">Inscriptos en correlativas</a></li>
 				<li class="navLateral"><a href="cantidadcomisionespordia.php" class="navLateral">Cantidad de comisiones por día</a></li>
