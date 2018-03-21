@@ -63,6 +63,7 @@
 							<option value="abiertasVSinscriptos">Comisiones abiertas sin inscriptos</option>
 							<option value="inscriptosVSaulas">Diferencia inscriptos y aulas	</option>
 							<option value="comisionesVSaulas">Comisiones con aulas</option>
+							<option value="aulasVScomisiones">Aulas sin comisión</option>
 						</select>
 						<br />
 						

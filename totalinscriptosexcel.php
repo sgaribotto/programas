@@ -589,7 +589,7 @@
 										AND aa.cuatrimestre = ca.cuatrimestre
 								LEFT JOIN vista_materias_por_conjunto AS m
 									ON ca.materia = m.conjunto
-								WHERE ca.anio = 2018 AND ca.cuatrimestre = 1
+								WHERE CONCAT(aa.anio, ' - ', aa.cuatrimestre) = '{$periodo}'
 								GROUP BY ca.materia, ca.observaciones, ca.nombre_comision
 								ORDER BY ca.materia, ca.nombre_comision";
 					$result = $mysqli->query($query);
@@ -620,6 +620,68 @@
 										echo "<td>" . $detalle['materia'] . "</td>";
 										echo "<td>" . $detalle['nombres'] . "</td>";
 										echo "<td>" . $detalle['nombre_comision'] . "</td>";
+										echo "<td>" . $detalle['aulas'] . "</td>";
+										echo "<td>" . $detalle['cantidad'] . "</td>";
+									
+									echo "</tr>";
+								}	
+							?>
+						</tbody>
+					</table>
+					
+				<?php
+					break;
+					
+					case "aulasVScomisiones":
+					
+					$query = "SELECT aa.materia, m.nombres,
+									IFNULL(ca.nombre_comision, CONCAT('Sin comisión (', IFNULL(aa.comision_real, aa.comision), ')')) AS comision,
+									IF(COUNT(DISTINCT aa.aula) > 1,
+										GROUP_CONCAT(DISTINCT CONCAT(aa.dia, ' --> Aula: ', aa.aula, ' ') 
+											ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado')
+											SEPARATOR ' / '),
+									aa.aula) AS aulas,
+									GROUP_CONCAT(DISTINCT aa.cantidad_alumnos SEPARATOR '***') AS cantidad
+								FROM asignacion_aulas AS aa
+								LEFT JOIN comisiones_abiertas AS ca
+									ON aa.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
+										AND aa.comision_real = ca.nombre_comision
+										AND aa.anio = ca.anio
+										AND aa.cuatrimestre = ca.cuatrimestre
+								LEFT JOIN vista_materias_por_conjunto AS m
+									ON aa.materia LIKE CONCAT(m.conjunto, '%')
+								WHERE CONCAT(aa.anio, ' - ', aa.cuatrimestre) = '{$periodo}'
+									AND ISNULL(ca.nombre_comision)
+								GROUP BY aa.materia, aa.comision_real 
+								ORDER BY ca.nombre_comision";
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					$datosTabla = array();
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$datosTabla[] = $row;
+					}
+					
+					
+					//print_r($datosTabla);
+					
+				?>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Materia</th>
+								<th>Nombre Materia</th>
+								<th>Comisión</th>
+								<th>Aulas</th>
+								<th>Alumnos</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+								foreach ($datosTabla as $detalle) {
+									echo "<tr>";
+										echo "<td>" . $detalle['materia'] . "</td>";
+										echo "<td>" . $detalle['nombres'] . "</td>";
+										echo "<td>" . $detalle['comision'] . "</td>";
 										echo "<td>" . $detalle['aulas'] . "</td>";
 										echo "<td>" . $detalle['cantidad'] . "</td>";
 									
