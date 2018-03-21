@@ -217,6 +217,7 @@
 				$anio = $_REQUEST['anio'];
 				$cuatrimestre = $_REQUEST['cuatrimestre'];
 				$materia = $_REQUEST['materia'];
+				$comision = $_REQUEST['comision'];
 				
 				$query = "SELECT SUM(cantidad) as cantidad
 							FROM vista_inscriptos_por_materia
@@ -230,6 +231,8 @@
 									WHERE materia = '$materia'
 									AND turno = '$letraTurno'";
 				}
+				
+				
 				$result = $mysqli->query($query);
 				echo $mysqli->error;
 				$inscriptos = $result->fetch_array(MYSQLI_ASSOC);
@@ -415,8 +418,11 @@
 				break;
 				
 			case "ajustarAula":
+			
+				print_r($_REQUEST);	
 				$id = $_REQUEST['id_asignacion'];
 				$cantidad = $_REQUEST['cantidad'];
+				$comision = $_REQUEST['comision'];
 				
 				$query = "SELECT materia, dia, turno, cuatrimestre, anio, comision, aula
 							FROM asignacion_aulas
@@ -425,13 +431,15 @@
 				$result = $mysqli->query($query);
 				$row = $result->fetch_array(MYSQLI_ASSOC);
 				
-				$query = "UPDATE asignacion_aulas SET cantidad_alumnos = $cantidad 
+				$query = "UPDATE asignacion_aulas 
+							SET cantidad_alumnos = $cantidad,
+								comision_real = '{$comision}'
 							WHERE materia = '$row[materia]'
-							AND turno = '$row[turno]'
-							AND aula = '$row[aula]'
-							AND comision = '$row[comision]'
-							AND anio = $row[anio]
-							AND cuatrimestre = $row[cuatrimestre]";
+								AND turno = '$row[turno]'
+								AND aula = '$row[aula]'
+								AND comision = '$row[comision]'
+								AND anio = $row[anio]
+								AND cuatrimestre = $row[cuatrimestre]";
 				$mysqli->query($query);
 				$result->free();
 				echo $mysqli->error;

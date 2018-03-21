@@ -100,6 +100,11 @@
 				<label for="cantidadAsignada" class="dialogAula">Cantidad asignada</label>
 				<br />
 				<input type="number" min="1" class="dialogAula" name="cantidadAsignada" max="100" id="cantidadAsignada" />
+				<br />
+				<label for="comisionReal" class="dialogAula">Comisión</label>
+				<br />
+				<input type="text" class="dialogAula" name="comisionReal" id="comisionReal" style="width:60px;"/>
+				<br />
 				<button type="submit" class="dialogAula">Ajustar</button>
 			</form>
 		</div>
@@ -474,6 +479,7 @@
 					//console.log(data);
 					formValues = $('#formulario_asignacion').serialize();
 					formValues += "&act=inscriptosMateria&materia=" + data.materia;
+					formValues += "&comision=" + data.comision;
 					
 					data.faltaAsignar = $('div.materia[id="' + data.materia + '"]').data('cantidad') || 0;
 					
@@ -481,6 +487,7 @@
 					$dialog.dialog('open');
 					$dialog.find('#materia').empty();
 					$dialog.find('#cantidadAsignada').val('');
+					$dialog.find('#comisionReal').val('');
 					dialogHtml = $dialog.html();
 					$dialog.empty();
 					$dialog.append($loaderDiv);
@@ -503,6 +510,10 @@
 							.attr('max', maxAsignable)
 							.attr('min', minAsignable)
 							.val(data.cantidad_asignada);
+						
+						$dialog.find('#comisionReal')
+							.val(data.comision);
+							
 						$dialog.dialog({
 							title: "Aula " + data.cod + " (" + data.capacidad + " alumnos)",
 						});
@@ -512,6 +523,7 @@
 							event.preventDefault();
 							var values = {};
 							values.cantidad = $(this).find('#cantidadAsignada').val();
+							values.comision = $(this).find('#comisionReal').val();
 							values.id_asignacion = data.id_asignacion;
 							values.ajuste = values.cantidad - data.cantidad_asignada;
 							values.faltaAsignar = data.faltaAsignar - values.ajuste;
@@ -533,6 +545,10 @@
 								data.cantidad_asignada = values.cantidad;
 								$aula.find('td.cantidad-asignada').hide()
 									.text('(' + values.cantidad + ' Alumnos)')
+									.first()
+									.fadeIn();
+								$aula.find('td.materia-comision').hide()
+									.text(data.materia + values.comision)
 									.first()
 									.fadeIn();
 								
