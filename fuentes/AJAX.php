@@ -508,7 +508,7 @@
 					require "./conexion.php";
 					
 					$query = "SELECT id FROM responsable WHERE usuario = '$_POST[usuario]' AND materia = '$_POST[materia]' ";
-					echo $query;
+					//echo $query;
 					$result = $mysqli->query($query);
 					
 					if ($result->num_rows == 1) {
@@ -517,7 +517,30 @@
 					} else {
 						$query = "INSERT INTO responsable SET usuario = '$_POST[usuario]', materia = '$_POST[materia]' ";
 					}
-					echo $query;
+					//echo $query;
+					
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+					
+				case "agregarPermiso":
+					require "./conexion.php";
+					
+					$query = "SELECT id 
+								FROM permiso 
+								WHERE usuario = '{$_POST['usuario']}' 
+									AND tipo_de_permiso = '{$_POST['permiso']}' ";
+					//echo $query;
+					$result = $mysqli->query($query);
+					
+					if ($result->num_rows >= 1) {
+						$result->free();
+					} else {
+						$query = "INSERT INTO permiso 
+									SET usuario = '{$_POST['usuario']}', 
+									tipo_de_permiso = '{$_POST['permiso']}' ";
+					}
+					//echo $query;
 					
 					$mysqli->query($query);
 					$mysqli->close();
@@ -526,6 +549,13 @@
 				case "eliminarResponsable":
 					require "./conexion.php";
 					$query = "UPDATE responsable SET activo = 0 WHERE id = '$_POST[id]' LIMIT 1";
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+					
+				case "eliminarPermiso":
+					require "./conexion.php";
+					$query = "DELETE FROM permiso WHERE id = '$_POST[id]' LIMIT 1";
 					$mysqli->query($query);
 					$mysqli->close();
 					break;
@@ -2974,6 +3004,59 @@
 						echo "</table>";
 					} else {
 						echo "<p>No se encontraron docentes</p>";
+					}
+					break;
+					
+				case "tablaPermisos":
+					require 'conexion.php';
+					
+					$where = '';
+					
+					if (isset($_REQUEST['filtro']) AND $_REQUEST['filtro'] != '') {
+						$where = " WHERE CONCAT(perm.tipo_de_permiso, p.apellido, ', ', p.nombres) LIKE '%{$_REQUEST['filtro']}%' ";
+					}
+					
+					$query = "SELECT perm.id, 
+									CONCAT(p.apellido, ', ', p.nombres) AS personal,
+									tp.nombre
+								FROM permiso AS perm
+								LEFT JOIN tipo_de_permiso AS tp
+									ON perm.tipo_de_permiso = tp.id
+								LEFT JOIN personal AS p
+									ON perm.usuario = p.id
+								{$where}
+								ORDER BY p.apellido, p.nombres
+								LIMIT 20";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$personal = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$personal[] = $row;
+					}
+					
+					if (sizeof($personal)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								
+								<th class='subtitulo'style='width:45%;'>Agente</th>
+								<th class='subtitulo' style='width:45%;'>Permiso</th>
+								<th class='subtitulo' style='width:10%;'>Eliminar</th>
+							</tr>";
+						foreach ($personal AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['personal']}</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['nombre']}</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarPermiso' data-id='{$valores['id']}'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron agentes</p>";
 					}
 					break;
 					

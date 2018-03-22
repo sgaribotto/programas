@@ -18,6 +18,7 @@
 				<li class="navLateral"><a href="responsables.php" class="navLateral">Responsables</a></li>
 				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
 				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>
+				<li class="navLateral"><a href="permisos.php" class="navLateral">Permisos</a></li>
 			</ul>
 			
 			<li class="navLateral">Programas Cargados</li>
