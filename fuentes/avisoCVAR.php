@@ -14,20 +14,19 @@
 			//$mail-­>Encoding = "quoted­printable"; 
 			$mail->Mailer = 'SMTP';
 			$mail->SMTPDebug = 0;
-			$mail->Host = 'smtp.unsam.edu.ar';
+			$mail->Host = 'smtp.gmail.com';
 			
-			$mail->Username = "planes.eeyn@unsam.edu.ar";
-			$mail->Password = "Pla2017nes";
+			$mail->Username = "sgaribotto@unsam.edu.ar";
+			$mail->Password = "unsa2017";
 			$mail->SMTPSecure = "ssl";
 			$mail->Port = '465';
 			$mail->SMTPAuth = true;
-			$mail->AddReplyTo('valeria.errecart@unsam.edu.ar', 'Lic. Valeria Errecart');
+			$mail->AddReplyTo('verrecart@unsam.edu.ar', 'Valeria Errecart');
+			$mail->AddReplyTo('secretariaacademica.eeyn@unsam.edu.ar', 'Secretaría Académica EEYN');
 			$mail->setFrom('planes.eeyn@unsam.edu.ar', 'Planes EEYN');
 			$mail->isHTML(true);
 			
-			$mail->AddAttachment('adjuntosCVAR/Manual usuario CVAR.pdf');
-			$mail->AddAttachment('adjuntosCVAR/Intructivo Importación cvar.pdf');
-			$mail->AddAttachment('adjuntosCVAR/instructivo navegación cvar.pdf');
+			//$mail->AddAttachment('Taller Práctico_Inicial_EEyN2017.pdf');
 			
 			$mail->addAddress($direccion, $docente);
 			$mail->Subject = $asunto;

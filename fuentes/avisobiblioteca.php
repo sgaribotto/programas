@@ -15,7 +15,6 @@
 			$mail->Mailer = 'SMTP';
 			$mail->SMTPDebug = 0;
 			$mail->Host = 'smtp.gmail.com';
-			
 			$mail->Username = "sgaribotto@unsam.edu.ar";
 			$mail->Password = "unsa2017";
 			$mail->SMTPSecure = "ssl";
@@ -25,7 +24,7 @@
 			$mail->setFrom('planes.eeyn@unsam.edu.ar', 'Planes EEYN');
 			$mail->isHTML(true);
 			
-			//$mail->AddAttachment('Taller Práctico_Inicial_EEyN2017.pdf');
+			$mail->AddAttachment('R-BI-01 Planilla de Sugerencia de Compras.pdf');
 			
 			$mail->addAddress($direccion, $docente);
 			$mail->Subject = $asunto;
@@ -88,7 +87,7 @@
 			LIMIT 1000;";*/
 			
 	//RESPONSABLES
-	$query = "SELECT DISTINCT d.id AS docente, 
+	/*$query = "SELECT DISTINCT d.id AS docente, 
 				CONCAT(p.apellido, ', ', p.nombres) AS nombre_docente,
 				GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.cod SEPARATOR ' | ') AS materias,
 				dd.valor AS mail,
@@ -117,41 +116,45 @@
 		$docentes[$row['nombre_docente']]['materias'][] = $row['materias'];
 		$docentes[$row['nombre_docente']]['genero'] = $row['genero'];
 		$docentes[$row['nombre_docente']]['profesor'] = $row['profesor'];
-	}
+	}*/
 	
 	//print_r($docentes);
 	
-	$template = "Estimad%s profesor%s <b>%s:</b>\n
-		<br />
-		TEXTO.
-		 <br />
-		 MATERIAS:
-		 <br /> * 
-		 %s
-		 <br />
-		Saluda a Ud. Cordialmente,  
-		<br /> 
-		<br /> 
-		Laura Favale
-		<br />
-		Biblioteca.";
+	$template = "<p>Estimad%s profesor%s <b>%s</b></p>
+<br>
+<br>
+<p>Por la presente, nos dirigimos a Usted para informarle que como parte de la constante actualización del fondo bibliográfico de nuestra Biblioteca, estamos organizando la compra de bibliografía para el ciclo lectivo 2018.
+En este sentido, como responsable de las asignaturas:</p> 
+* %s
+</p>Le solicitamos indique que material considera de interés para incorporar en su Cátedra a fin de poder gestionar la compra, pudiendo solicitar hasta 3 (tres) títulos diferentes. Los datos deben ser consignados en la planilla que se adjunta, pudiendo entregarla personalmente en nuestra Biblioteca, o bien, remitirla vía correo electrónico.
+Las sugerencias serán recepcionadas hasta el 20 de abril.</p>
+<p>Sin más, me despido de Usted quedando a la espera de vuestras sugerencias. Saludos cordiales,</p>
+<br>
+<br>
+                                                                                                           
+<p><b>Lic. Laura M. Favale</b></p>
+<p><b>Coordinadora</b></p>
+<p><b>Biblioteca Profesor Elías Salama</b></p>
+<p><b>EEyN - UNSAM</b></p>";
 	
-	$asunto = "Asunto MAIL";	
+	$asunto = "Solicitud de bibliografía 2018";	
 	
 	
 	//TEST MAIL A planes.eeyn@unsam.edu.ar
-	/*$materias[] = 'materia 1';
-	$materias[] = 'materia 2';
+	$materias[] = 'Asignatura 1';
+	$materias[] = 'Asignatura 2';
 	
 	$materiasImp = implode('<br /> * ', $materias);
-	$mensaje = sprintf($template, 'o', '', 'Santiago Garibotto', $materiasImp);
+	
+	//$mensaje = sprintf($template, 'o', '', 'Santiago Garibotto', $materiasImp);
+	$mensaje = sprintf($template, 'a', 'a', 'Laura Favale', $materiasImp);
 	echo $mensaje;
-	mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);*/
-	//mailAvisoMasCampus('Patricia Rieger', 'prieger@unsam.edu.ar', 'TEST ' . $asunto, $mensaje);
+	mailAvisoMasCampus('Santiago Garibotto', 'sgaribotto@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
+	//mailAvisoMasCampus('Laura Favale', 'lfavale@unsam.edu.ar', 'TEST ' . $asunto, $mensaje);
 	
 	
 	//ARMADO DE LOS MAILS A ENVIAR
-	foreach ($docentes as $nombre => $datos) {
+	/*foreach ($docentes as $nombre => $datos) {
 		
 		//$materia = $row['nombre_materia'];
 		$materias = implode('<br /> * ', $datos['materias']);
@@ -166,11 +169,11 @@
 		$asunto = $mysqli->real_escape_string($asunto);
 		$message = $mysqli->real_escape_string($message);
 		
-		/*$insertQuery = "INSERT INTO envios_por_mail 
+		$insertQuery = "INSERT INTO envios_por_mail 
 			(id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje) VALUES
 			($docente, '$tipo', '$nombre_docente', '$mail', '$asunto', '$message');";
 		$mysqli->query($insertQuery);
-		echo $mysqli->error;*/
+		echo $mysqli->error;
 		echo "$docente --> $datos[mail] <br />";
 		echo $message;
 		
@@ -179,7 +182,7 @@
 		
 		
 		
-	}
+	}*/
 	
 
 	
