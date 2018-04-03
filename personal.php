@@ -89,7 +89,7 @@
 				
 				
 				$.post("./fuentes/AJAX.php?act=agregarPersonal", formValues, function(data) {
-					alert(data);
+					alert('Se ha cargado un nuevo agente');
 					actualizarTabla();
 				});
 				

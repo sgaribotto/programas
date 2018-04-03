@@ -113,7 +113,10 @@
 <?php } ?>
 
 <?php //AULAS
-	if (in_array(2, $_SESSION['permiso']) or in_array(3, $_SESSION['permiso']) or in_array(1, $_SESSION['permiso'])) {  //EQUIVALENCIAS ?> 
+	if (in_array(2, $_SESSION['permiso']) 
+			or in_array(3, $_SESSION['permiso']) 
+			or in_array(1, $_SESSION['permiso']) 
+			or in_array(10, $_SESSION['permiso'])) {   ?> 
 		<div class="navDir">
 		<h2 class="navLateral">Distribución de Aulas</h2>
 		

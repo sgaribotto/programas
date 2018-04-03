@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Responsables</title>
+		<title>Permisos</title>
 		<?php 
 			require_once('./fuentes/meta.html');
 			
