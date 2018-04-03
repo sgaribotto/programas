@@ -599,6 +599,22 @@
 				//$mysqli->close();
 				break;
 				
+			case "guardarDistribucion":
+				
+				$anio = $_REQUEST['anio'];
+				$cuatrimestre = $_REQUEST['cuatrimestre'];
+				
+				$query = "SELECT * FROM asignacion_aulas
+							WHERE anio = {$anio}
+								AND cuatrimestre = {$cuatrimestre}";
+				$result = $mysqli->query($query);
+				
+				while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+					
+				}
+				
+				break;
+				
 			default:
 				echo "No existe la acción solicitada";
 				

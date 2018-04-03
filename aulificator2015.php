@@ -79,6 +79,8 @@
 						
 						<button type="button" class="formularioLateral recodificar" id="recodificarComisiones">Recodificar comisiones</button>
 						
+						<button type="button" class="formularioLateral guardarDistribucion" id="guardarDistribucion">Guardar Distribución</button>
+						
 					</form>
 				</fieldset>
 		</div>
@@ -422,6 +424,21 @@
 					//console.log(data);
 					//alert('actualizo?');
 					actualizarGrillaAulas();
+					
+				}, 'html');
+			});
+			
+			$('#guardarDistribucion').click(function(event) {
+				//alert('recodificando');
+				event.preventDefault();
+				var anio = $('#anio').val();
+				var cuatrimestre = $('#cuatrimestre').val();
+				var act = 'guardarDistribucion';
+				
+				$.get('fuentes/aulificatorAJAX.php', {'act': act, 'anio': anio, 'cuatrimestre': cuatrimestre}, function(data) {
+					//console.log(data);
+					//alert('actualizo?');
+					//actualizarGrillaAulas();
 					
 				}, 'html');
 			});
