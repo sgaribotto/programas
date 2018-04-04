@@ -19,6 +19,7 @@
 				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
 				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>
 				<li class="navLateral"><a href="permisos.php" class="navLateral">Permisos</a></li>
+				
 			</ul>
 			
 			<li class="navLateral">Programas Cargados</li>
@@ -205,6 +206,7 @@
 			<ul class="navLateral">
 				<li class="navLateral"><a href="consultacomisiones.php" class="navLateral">Ver comisiones</a></li>
 				<li class="navLateral"><a href="consultadocentesasignados.php" class="navLateral">Consulta por docente</a></li>
+				<li class="navLateral"><a href="horariospordocente.php" class="navLateral">Horarios por docente</a></li>
 				<li class="navLateral"><a href="consultacomisionesoferta.php" class="navLateral">Ver oferta académica</a></li>
 			</ul>
 			
@@ -296,6 +298,7 @@
 					
 					<li class="navLateral"><a href="equipodocente.php" class="navLateral">Equipo docente</a></li>
 					<li class="navLateral"><a href="asignarcomisiones.php" class="navLateral">Asignar comisiones</a></li>
+					<li class="navLateral"><a href="asignarcomisionescalendario.php" class="navLateral">Asignar comisiones calendario</a></li>
 					<li class="navLateral"><a href="objetivos.php" class="navLateral">Objetivos</a></li>
 					<li class="navLateral"><a href="fundamentacion.php" class="navLateral">Enfoque metodológico</a></li>
 					<li class="navLateral"><a href="unidadestematicas.php" class="navLateral">Unidades temáticas</a></li>

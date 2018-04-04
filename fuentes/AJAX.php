@@ -2960,6 +2960,67 @@
 						echo "<p>No se encontraron materias</p>";
 					}
 					break;
+				
+				case "tablaHorariosPorDocente":
+					require 'conexion.php';
+					
+					
+						$periodo = $_REQUEST['periodo'];
+						$docente = $_REQUEST['docente'];
+					
+					
+					$query = "SELECT acc.dia, acc.horario, CONCAT(acc.materia, acc.comision, '<br />Aula: ', aa.aula) AS materia
+									FROM asignacion_comisiones_calendario AS acc
+									LEFT JOIN asignacion_aulas AS aa
+										ON aa.dia = acc.dia
+											AND aa.turno = acc.horario
+											AND acc.materia = aa.materia
+											AND acc.comision = aa.comision_real
+											AND acc.anio = aa.anio
+											AND acc.cuatrimestre = aa.cuatrimestre
+										
+									WHERE docente = {$docente}
+										AND CONCAT(acc.anio, ' - ', acc.cuatrimestre) = '{$periodo}'
+										AND acc.horario != ''
+									ORDER BY FIELD(acc.horario, 'M', 'M1', 'M2', 'T', 'T1', 'T2', 'N' , 'N1', 'N2'), acc.dia";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$horariosDocente = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$horariosDocente[$row['horario']][$row['dia']] = $row['materia'];
+					}
+					
+					if (sizeof($horariosDocente)) {
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:16%;'>Horario</th>";
+						foreach ($diasSemana as $dia) {
+							echo "	<th class='subtitulo'style='width:12%;text-align:center;'>{$dia}</th>";
+						}
+								
+						echo "</tr>";
+						foreach ($horariosDocente AS $horario => $dias) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='horario'>$horasTurno[$horario]</td>";
+							foreach ($diasSemana AS $dia) {
+								$materia = '';
+								if (isset($dias[$dia])) {
+									$materia = $dias[$dia];
+								}
+							
+								echo "<td class='info masInfo' data-id='$dia-$horario' style='text-align:center;'>$materia</td>";
+							}
+							echo "</tr>";
+						}
+						
+						
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron horarios para el docente</p>";
+					}
+					break;
 					
 				case "tablaResponsables":
 					require 'conexion.php';
