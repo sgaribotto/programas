@@ -3839,7 +3839,8 @@
 										echo "<input type='hidden' name='comision' value='{$comision}' />";
 										echo "<input type='hidden' name='conjunto' value='{$conjunto}' />";
 										echo "<input type='hidden' name='materia' value='{$cod}' />";
-										echo "<select class='docente' name='docente' required>";
+										echo "<select class='docente' name='docente' required 
+													style='width: 140px;font-size: 12px;padding: 1px;margin: 1px;'>";
 										echo "<option value=''>Seleccionar docente</option>";
 										foreach ($equipoDocente as $idDocente => $datos) {
 											if (!isset($datos[$turno][$dia])) {
@@ -3848,15 +3849,16 @@
 											}
 										}
 										echo "</select></td>";
-										echo "<td><button type='submit' class='agregarDocente'>+</button>";
+										echo "<td><button type='submit' class='agregarDocente' style='font-size: 12px;padding: 1px;margin: 1px;'>+</button>";
 										echo "</td></tr>";
 									}
 									
 									if (isset($turnos[$turno][$dia])) {
 										foreach ($turnos[$turno][$dia] as $dia => $detalles) {
 											if ($detalles['docente']) {
-												echo "<tr><td>{$detalles['nombre_docente']}</td>
-													<td><button type='button' class='eliminarAsignacionCalendario' data-id='{$detalles['id_asignacion']}'>X</button></td></tr>";
+												echo "<tr><td style='font-size: 10px; text-overflow: ellipsis;white-space: nowrap;overflow: hidden;'>{$detalles['nombre_docente']}</td>
+													<td><button type='button' class='eliminarAsignacionCalendario' data-id='{$detalles['id_asignacion']}'
+														style='font-size: 12px;padding: 1px;margin: 1px;'>X</button></td></tr>";
 											}
 										}
 										//print_r($turnos[$turno][$dia][0]['docente']);
