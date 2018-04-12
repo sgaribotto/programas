@@ -11,13 +11,16 @@
 			require('./conexion.php');
 			$materia = new clases\Materia($_SESSION['materia']);
 			$cronograma = $materia->mostrarCronograma($ANIO, $CUATRIMESTRE);
-			//print_r($cronograma);
+			//$equipoDocente = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE);
+			//print_r($equipoDocente);
 		?>
 		<style>
 			table, tr, td {
 				text-align:center;
 			}
+			
 		</style>
+		
 	</head>
 	
 	<body>
@@ -27,6 +30,8 @@
 			require_once('./fuentes/botonera.php');
 			require("./fuentes/panelNav.php");
 		?>
+		
+		
 		<div class="formularioLateral">
 			<h2 class="formularioLateral">Cronograma</h2>
 			<div id="mostrarFormulario">Mostrar Formulario</div>
@@ -58,6 +63,8 @@
 							<button type="submit" class="formularioLateral iconAgregar" id="guardarCargarOtro">Guardar clase</button><span class="ayuda">(Debe guardar la clase para continuar con la carga)</span>
 						</fieldset>
 					</form>	
+					
+					
 						<!--EQUIPO DOCENTE-->
 						
 						<fieldset class="subFormulario formularioLateral agregadosCronograma">
@@ -67,19 +74,23 @@
 							
 							
 							<br />
+							
+							
 							<label class="formularioLateral" for="docente">Docentes asignados:</label>
 							<select class="formularioLateral iconDocente" name="docente[]" required="required" id="docente" />
 								<!--<option value="Todos" selected="selected">Todos</option>-->
 								<?php 
 									
 									
-									$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE);
+									$equipoDocente = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE);
 									
 									foreach ($equipoDocente as $value) {
 										echo "<option value='$value[id]'>$value[docente]</option>";
 									}
 								?>
 							</select>
+							
+							
 							<br />
 							<label for="horasClase" class="formularioLateral">Horas de clase: </label>
 							<input type="number" class="formularioLateral iconDocente" id="horasClase" name="horasClase" min="0" />
@@ -102,6 +113,7 @@
 							</div>
 							
 						</fieldset>
+						
 						
 						
 						<!--MÉTODOS UTILIZADOS-->
@@ -343,11 +355,17 @@
 			
 		</div>
 	</body>
+	
 	<?php require "./fuentes/jqueryScripts.html"; ?>
+	
+	
 	<script src="./fuentes/funciones.js"></script>
+	
 	
 	<script>
 		$(document).ready(function() {
+			
+			//alert('test');
 			
 			var actualizarTabla = function (tabla) {
 				cuerpo = $('#' + tabla);
@@ -465,6 +483,8 @@
 				}
 			);
 			
+			
+			$('div #formulario').show();
 			$('#mostrarFormulario').click(function() {
 				$('div #formulario').toggle();
 			});
