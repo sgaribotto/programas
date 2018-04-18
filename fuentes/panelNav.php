@@ -250,6 +250,27 @@
 		</ol>
 	</div>
 <?php } ?>
+
+<?php 
+	if (in_array(1, $_SESSION['permiso']) or in_array(11, $_SESSION['permiso'])) {  //Acreditacion CONEAU ?> 
+		<div class="navDir">
+		<h2 class="navLateral">Acreditación CONEAU</h2>
+		
+		<ol class="navLateral" >
+			<li class="navLateral">Información Estadística</li>
+			
+			<ul class="navLateral">
+				<li class="navLateral"><a href="situacioncursadas.php" class="navLateral">Situación Cursadas</a></li>
+				<!--<li class="navLateral"><a href="listadomaterias.php" class="navLateral">Cargos por materia</a></li>
+				<li class="navLateral"><a href="infoafectaciones.php" class="navLateral">Información de Designaciones/Cargos</a></li>
+				<li class="navLateral"><a href="estadocargacomisiones.php" class="navLateral">Estado de la carga de comisiones</a></li>
+				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
+				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
+			</ul>
+			
+		</ol>
+	</div>
+<?php } ?>
 	
 	<?php if ((in_array(7, $_SESSION['permiso']) or in_array(8, $_SESSION['permiso']))
 			and !in_array(4, $_SESSION['permiso']) and !in_array(5, $_SESSION['permiso']) 

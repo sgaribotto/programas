@@ -1608,6 +1608,383 @@
 					}
 					
 					break;
+					
+				case "tablaSituacionCursadasCONEAUIST":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$materia = $_REQUEST['materia'];
+					
+					$resultados = array();
+					for ($anio = $inicio; $anio <= $fin; $anio++) {
+						
+						
+						foreach ([1, 2] as $cuatrimestre) {
+							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+																FROM analiticos_convenios
+																WHERE carrera = 'CCCCP'), 'CCCCP', carrera) AS carrera,
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+												FROM actas_convenios
+												WHERE (anio_academico < {$anio} OR 
+													(anio_academico = {$anio} AND periodo_lectivo < {$cuatrimestre}))
+													AND materia = {$materia}), 'Recursante', 'Cursante') AS calidad
+									FROM actas_convenios
+									WHERE anio_academico = {$anio}
+										AND periodo_lectivo = {$cuatrimestre}
+										AND materia = {$materia}
+									GROUP BY resultado, calidad";
+							
+							//echo $query;
+							//echo "<hr>";	
+							$result = $mysqli->query($query);
+							
+							
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								if (!isset($resultados[$row['carrera']][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultados['Total'][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+							}
+						}
+						
+					}
+				
+					
+					
+					//print_r($resultados);
+					
+					foreach ($resultadosConCarrera as $carrera => $resultados) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Inscriptos C</th>";
+						echo "<th style='text-align: center;'>Inscriptos R</th>";
+						echo "<th style='text-align: center;'>Inscriptos</th>";
+						echo "<th style='text-align: center;'>Aprobados C</th>";
+						echo "<th style='text-align: center;'>Aprobados R</th>";
+						echo "<th style='text-align: center;'>Aprobados</th>";
+						echo "<th style='text-align: center;'>Promovidos C</th>";
+						echo "<th style='text-align: center;'>Promovidos R</th>";
+						echo "<th style='text-align: center;'>Promovidos</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+							foreach (['inscriptos', 'Aprobó', 'Promocionó'] as $resultado) {
+								$total = 0;
+								foreach (['Cursante', 'Recursante'] as $calidad) {
+									$cantidad = 0;
+									if (isset($resultados[$anio][$resultado][$calidad])) {
+										$cantidad = $resultados[$anio][$resultado][$calidad];
+										$total += $cantidad;
+									}
+									echo "<td style='text-align: center;'>{$cantidad}</td>";
+								}
+								echo "<td style='text-align: center;'>{$total}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
+				
+				case "tablaSituacionFinalesCONEAU":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$materia = $_REQUEST['materia'];
+					
+					$resultadosConCarrera = array();
+					$query = "SELECT COUNT(DISTINCT CONCAT(fecha_examen, materia)) AS cantidad,
+								RIGHT(fecha_examen, 4) AS anio, resultado,
+								carrera
+								FROM analiticos
+								WHERE tipo = 'Final'
+									AND materia = {$materia}
+									AND RIGHT(fecha_examen, 4) BETWEEN {$inicio} AND {$fin}
+								GROUP BY anio, resultado, carrera
+								ORDER BY carrera, anio, resultado";
+							
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						if (!isset($resultados[$row['carrera']][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+						
+						if (!isset($resultados['Total'][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+					}
+					
+				
+					
+					
+					//print_r($resultadosConCarrera);
+					
+					foreach ($resultadosConCarrera as $carrera => $anios) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Rindieron Examen Final</th>";
+						echo "<th style='text-align: center;'>Aprobados</th>";
+						echo "<th style='text-align: center;'>Desaprobados</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+						
+							$aprobados = 0;
+							$reprobados = 0;
+							if (isset($anios[$anio]['A '])) {
+								$aprobados = $anios[$anio]['A '];
+							}
+							if (isset($anios[$anio]['R '])) {
+								$reprobados = $anios[$anio]['R '];
+							}
+							$total = $aprobados + $reprobados;
+							
+							echo "<td style='text-align: center;'>{$total}</td>";
+							echo "<td style='text-align: center;'>{$aprobados}</td>";
+							echo "<td style='text-align: center;'>{$reprobados}</td>";
+							
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
+					
+				case "tablaSituacionFinalesCONEAUIST":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$materia = $_REQUEST['materia'];
+					
+					$resultadosConCarrera = array();
+					$query = "SELECT COUNT(DISTINCT CONCAT(fecha_examen, materia)) AS cantidad,
+								RIGHT(fecha_examen, 4) AS anio, resultado,
+								carrera
+								FROM analiticos_convenios
+								WHERE tipo = 'Final'
+									AND materia = {$materia}
+									AND RIGHT(fecha_examen, 4) BETWEEN {$inicio} AND {$fin}
+									AND nombre_ua = 'EEyN-04 Escuela de Economía y '
+								GROUP BY anio, resultado, carrera
+								ORDER BY carrera, anio, resultado";
+							
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						if (!isset($resultados[$row['carrera']][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+						
+						if (!isset($resultados['Total'][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+					}
+					
+				
+					
+					
+					//print_r($resultadosConCarrera);
+					
+					foreach ($resultadosConCarrera as $carrera => $anios) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Rindieron Examen Final</th>";
+						echo "<th style='text-align: center;'>Aprobados</th>";
+						echo "<th style='text-align: center;'>Desaprobados</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+						
+							$aprobados = 0;
+							$reprobados = 0;
+							if (isset($anios[$anio]['A '])) {
+								$aprobados = $anios[$anio]['A '];
+							}
+							if (isset($anios[$anio]['R '])) {
+								$reprobados = $anios[$anio]['R '];
+							}
+							$total = $aprobados + $reprobados;
+							
+							echo "<td style='text-align: center;'>{$total}</td>";
+							echo "<td style='text-align: center;'>{$aprobados}</td>";
+							echo "<td style='text-align: center;'>{$reprobados}</td>";
+							
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
+					
+				case "tablaSituacionCursadasCONEAU":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$materia = $_REQUEST['materia'];
+					
+					$resultados = array();
+					for ($anio = $inicio; $anio <= $fin; $anio++) {
+						
+						
+						foreach ([1, 2] as $cuatrimestre) {
+							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+																FROM analiticos
+																WHERE carrera = 'CCCCP'), 'CCCCP', carrera) AS carrera,
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+												FROM actas
+												WHERE (anio_academico < {$anio} OR 
+													(anio_academico = {$anio} AND periodo_lectivo < {$cuatrimestre}))
+													AND materia = {$materia}), 'Recursante', 'Cursante') AS calidad
+									FROM actas
+									WHERE anio_academico = {$anio}
+										AND periodo_lectivo = {$cuatrimestre}
+										AND materia = {$materia}
+									GROUP BY resultado, calidad";
+							
+							//echo $query;
+							//echo "<hr>";	
+							$result = $mysqli->query($query);
+							
+							
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								if (!isset($resultados[$row['carrera']][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultados['Total'][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+							}
+						}
+						
+					}
+				
+					
+					
+					//print_r($resultados);
+					
+					foreach ($resultadosConCarrera as $carrera => $resultados) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Inscriptos C</th>";
+						echo "<th style='text-align: center;'>Inscriptos R</th>";
+						echo "<th style='text-align: center;'>Inscriptos</th>";
+						echo "<th style='text-align: center;'>Aprobados C</th>";
+						echo "<th style='text-align: center;'>Aprobados R</th>";
+						echo "<th style='text-align: center;'>Aprobados</th>";
+						echo "<th style='text-align: center;'>Promovidos C</th>";
+						echo "<th style='text-align: center;'>Promovidos R</th>";
+						echo "<th style='text-align: center;'>Promovidos</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+							foreach (['inscriptos', 'Aprobó', 'Promocionó'] as $resultado) {
+								$total = 0;
+								foreach (['Cursante', 'Recursante'] as $calidad) {
+									$cantidad = 0;
+									if (isset($resultados[$anio][$resultado][$calidad])) {
+										$cantidad = $resultados[$anio][$resultado][$calidad];
+										$total += $cantidad;
+									}
+									echo "<td style='text-align: center;'>{$cantidad}</td>";
+								}
+								echo "<td style='text-align: center;'>{$total}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
 				
 				case "tablaUnidadesTematicas":
 					$materia = new clases\Materia($_SESSION['materia']);

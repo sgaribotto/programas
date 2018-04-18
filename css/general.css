@@ -111,7 +111,7 @@
 	
 	a.navLateral {
 		text-decoration:none;
-		font-weight:none;
+		font-weight:normal;
 	}
 	
 	a.navLateral:active {
@@ -274,7 +274,7 @@
 	
 	.listItem {
 		font-size:.9em;
-		font-weight:none;
+		font-weight:normal;
 	}
 	
 	.custom-combobox-input {
