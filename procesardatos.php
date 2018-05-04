@@ -63,6 +63,20 @@
 				$validar->cambiarClave($_POST['clavenueva']);
 				header('location:cerrarsesion.php');
 				break;
+				
+			case "autoevaluacion_coneau":
+				require 'fuentes/conexion.php';
+				$respuesta = $mysqli->real_escape_string($_REQUEST['respuesta']);
+				$pregunta = $mysqli->real_escape_string($_REQUEST['pregunta']);
+				$query = "REPLACE INTO autoevaluacion_coneau
+							SET respuesta = '{$respuesta}',
+							pregunta = '{$pregunta}',
+							usuario = '{$_SESSION['usuario']}',
+							materia = '{$_SESSION['materia']}'";
+				$mysqli->query($query);
+				$mysqli->close();
+				//header('location:autoevaluacionconeau.php');
+				break;
 		}
 	}
 ?>

@@ -1717,7 +1717,626 @@
 					
 					
 					break;
+					
+				case "tablaAlumnosCarreraCONEAU":
 				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//POSTULANTES Y ALUMNOS
+					$query = "SELECT COUNT(DISTINCT nro_documento) AS cantidad, anio_academico, 
+									IF(nro_documento IN (SELECT DISTINCT nro_documento 
+															FROM analiticos 
+															WHERE carrera = 'CCCCP'), 
+											'CCCCP', 
+											carrera
+									) AS carrera_
+									FROM actas
+									WHERE anio_academico >= {$inicio}
+										AND anio_academico <= {$fin}
+								GROUP BY anio_academico, carrera_";
+					
+					$result = $mysqli->query($query);
+					//echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera_']][$row['anio_academico']]['alumnos'] = $row['cantidad'];
+					}
+					
+					$resultados['EYN-1'][2011]['alumnos'] = 757;
+					$resultados['EYN-1'][2012]['alumnos'] = 756;
+					$resultados['EYN-1'][2013]['alumnos'] = 839;
+					$resultados['EYN-1'][2014]['alumnos'] = 901;
+					$resultados['EYN-1'][2015]['alumnos'] = 789;
+					$resultados['EYN-1'][2016]['alumnos'] = 965;
+					$resultados['EYN-1'][2017]['alumnos'] = 861;
+					$resultados['EYN-1'][2018]['alumnos'] = 861;
+						
+					//INGRESANTES
+					$query = "SELECT p_anio, carrera_, COUNT(DISTINCT nro_documento) AS cantidad
+								FROM (
+									SELECT nro_documento, min(p_anio) AS p_anio, 
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+																FROM analiticos
+																WHERE carrera = 'CCCCP'),
+											'CCCCP',
+											carrera
+										) AS carrera_
+									FROM analiticos
+									GROUP BY nro_documento
+								) AS b
+								WHERE p_anio >= {$inicio}
+									AND p_anio <= {$fin}
+								GROUP BY carrera_, p_anio";
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera_']][$row['p_anio']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					//EGRESADOS
+					$query = "SELECT COUNT(DISTINCT nro_documento) AS cantidad, 
+									carrera, RIGHT(fecha_examen, 4) AS anio_tesis
+								FROM analiticos
+								WHERE materia IN (327, 424, 799, 634)
+									AND RIGHT(fecha_examen, 4) >= {$inicio}
+									AND RIGHT(fecha_examen, 4) <= {$fin}
+								GROUP BY carrera, anio_tesis";
+					
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera']][$row['anio_tesis']]['egresados'] = $row['cantidad'];
+					}
+					
+					//print_r($resultados);
+					$resultadosConCarrera = $resultados;
+					foreach ($resultadosConCarrera as $carrera => $resultados) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Vacantes</th>";
+						echo "<th style='text-align: center;'>Postulantes</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						echo "<th style='text-align: center;'>Alumnos</th>";
+						echo "<th style='text-align: center;'>Egresados</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+							foreach (['vacantes', 'postulantes', 'ingresantes', 'alumnos', 'egresados'] as $resultado) {
+								$cantidad = 0;
+								if (isset($resultados[$anio][$resultado])) {
+									$cantidad = $resultados[$anio][$resultado];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
+				
+				case "tablaAlumnosCarreraCONEAUIST":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//POSTULANTES Y ALUMNOS
+					$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, anio_academico, 
+									IF(nro_documento IN (SELECT DISTINCT nro_documento 
+															FROM analiticos 
+															WHERE carrera = 'CCCCP'), 
+											'CCCCP', 
+											carrera
+									) AS carrera_
+									FROM actas_convenios
+									WHERE anio_academico >= {$inicio}
+										AND anio_academico <= {$fin}
+								GROUP BY anio_academico, carrera_";
+					
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera_']][$row['anio_academico']]['alumnos'] = $row['cantidad'];
+					}
+					
+					//$resultados['CPU-1'][2011]['alumnos'] = 757;
+					//$resultados['CPU-1'][2012]['alumnos'] = 756;
+					//$resultados['CPU-1'][2013]['alumnos'] = 839;
+					$resultados['CPU-1'][2014]['alumnos'] = 37;
+					$resultados['CPU-1'][2015]['alumnos'] = 41;
+					$resultados['CPU-1'][2016]['alumnos'] = 26;
+					$resultados['CPU-1'][2017]['alumnos'] = 31;
+					//$resultados['CPU-1'][2018]['alumnos'] = 861;
+						
+					//INGRESANTES
+					$query = "SELECT p_anio, carrera_, COUNT(DISTINCT nro_documento + 0) AS cantidad
+								FROM (
+									SELECT nro_documento, min(p_anio) AS p_anio, 
+										IF(nro_documento IN (SELECT DISTINCT nro_documento
+																FROM analiticos
+																WHERE carrera = 'CCCCP'),
+											'CCCCP',
+											carrera
+										) AS carrera_
+									FROM analiticos_convenios
+									WHERE nombre_ua LIKE '%04%'
+									GROUP BY nro_documento
+								) AS b
+								WHERE p_anio >= {$inicio}
+									AND p_anio <= {$fin}
+									#AND nombre_ua LIKE '%04%'
+								GROUP BY carrera_, p_anio";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera_']][$row['p_anio']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					//EGRESADOS
+					$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, 
+									carrera, RIGHT(fecha_examen, 4) AS anio_tesis
+								FROM analiticos_convenios
+									
+								WHERE materia IN (614)
+									AND RIGHT(fecha_examen, 4) >= {$inicio}
+									AND RIGHT(fecha_examen, 4) <= {$fin}
+									AND nombre_ua LIKE '%04%'
+								GROUP BY carrera, anio_tesis";
+					
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['carrera']][$row['anio_tesis']]['egresados'] = $row['cantidad'];
+					}
+					
+					//print_r($resultados);
+					$resultadosConCarrera = $resultados;
+					foreach ($resultadosConCarrera as $carrera => $resultados) {
+						
+						echo "<h2>{$carrera}</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Año</th>";
+						echo "<th style='text-align: center;'>Vacantes</th>";
+						echo "<th style='text-align: center;'>Postulantes</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						echo "<th style='text-align: center;'>Alumnos</th>";
+						echo "<th style='text-align: center;'>Egresados</th>";
+						echo "</tr>";
+						
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anio}</td>";
+							foreach (['vacantes', 'postulantes', 'ingresantes', 'alumnos', 'egresados'] as $resultado) {
+								$cantidad = 0;
+								if (isset($resultados[$anio][$resultado])) {
+									$cantidad = $resultados[$anio][$resultado];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					}
+					
+					
+					break;
+				
+				case "cursantesPorCohorteCONEAU":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//CURSANTES
+					$query = "SELECT COUNT(DISTINCT i.nro_documento) AS cantidad,
+								anio_academico, b.anio_ingreso
+							FROM  (
+									SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CCCCP' AS carrera
+									FROM analiticos
+									WHERE nro_documento IN 
+										(SELECT DISTINCT nro_documento FROM analiticos WHERE carrera = 'CCCCP')
+									GROUP BY nro_documento
+									HAVING anio_ingreso >= {$inicio}
+										AND anio_ingreso <= {$fin}
+								) AS b
+							LEFT JOIN actas AS i
+								ON b.nro_documento = i.nro_documento
+							WHERE i.anio_academico >= {$inicio}
+								AND i.anio_academico <= {$fin}
+
+							GROUP BY anio_ingreso, anio_academico
+							ORDER BY anio_ingreso, anio_academico";
+					
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']][$row['anio_academico']] = $row['cantidad'];
+					}
+					
+					//INGRESANTES
+					$query = "SELECT COUNT(DISTINCT b.nro_documento) AS cantidad, b.anio_ingreso
+								FROM  (
+										SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CCCCP' AS carrera
+										FROM analiticos
+										WHERE nro_documento IN 
+											(SELECT DISTINCT nro_documento FROM analiticos WHERE carrera = 'CCCCP')
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+
+
+								GROUP BY anio_ingreso
+								ORDER BY anio_ingreso;";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					
+					//$resultadosConCarrera = $resultados;
+					
+						
+						echo "<h2>CCCCP</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Cohorte</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							echo "<th style='text-align: center;'>{$anio}</th>";
+						}
+						echo "</tr>";
+					//foreach ($resultados as $anioIngreso => $cohortes) {	
+						for ($anioCohorte = $inicio; $anioCohorte <= $fin; $anioCohorte++) {
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anioCohorte}</td>";
+							$ingresantes = 0;
+							if (isset($resultados[$anioCohorte]['ingresantes'])) {
+								$ingresantes = $resultados[$anioCohorte]['ingresantes'];
+							}
+							echo "<td style='font-weight: bold;'>{$ingresantes}</td>";
+							for ($anio = $inicio; $anio <= $fin; $anio++) {
+								$cantidad = 0;
+								if (isset($resultados[$anioCohorte][$anio])) {
+									$cantidad = $resultados[$anioCohorte][$anio];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					//	}
+					
+					
+					break;
+				
+				case "cursantesPorCohorteCONEAUIST":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//CURSANTES
+					$query = "SELECT COUNT(DISTINCT i.nro_documento) AS cantidad,
+								anio_academico, b.anio_ingreso
+							FROM  (
+									SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CP' AS carrera
+									FROM analiticos_convenios
+									WHERE nro_documento IN 
+										(SELECT DISTINCT nro_documento FROM analiticos_convenios WHERE carrera IN ('CCCCP', 'EYN-6'))
+										AND nombre_ua LIKE '%04%'
+									GROUP BY nro_documento
+									HAVING anio_ingreso >= {$inicio}
+										AND anio_ingreso <= {$fin}
+								) AS b
+							LEFT JOIN actas_convenios AS i
+								ON b.nro_documento = i.nro_documento
+							WHERE i.anio_academico >= {$inicio}
+								AND i.anio_academico <= {$fin}
+
+							GROUP BY anio_ingreso, anio_academico
+							ORDER BY anio_ingreso, anio_academico";
+					
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']][$row['anio_academico']] = $row['cantidad'];
+					}
+					
+					//INGRESANTES
+					$query = "SELECT COUNT(DISTINCT b.nro_documento) AS cantidad, b.anio_ingreso
+								FROM  (
+										SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CP' AS carrera
+										FROM analiticos_convenios
+										WHERE nro_documento IN 
+											(SELECT DISTINCT nro_documento FROM analiticos_convenios WHERE carrera IN ('CCCCP', 'EYN-6'))
+											AND nombre_ua LIKE '%04%'
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+
+
+								GROUP BY anio_ingreso
+								ORDER BY anio_ingreso;";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					
+					//$resultadosConCarrera = $resultados;
+					
+						
+						echo "<h2>CCCCP</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Cohorte</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							echo "<th style='text-align: center;'>{$anio}</th>";
+						}
+						echo "</tr>";
+					//foreach ($resultados as $anioIngreso => $cohortes) {	
+						for ($anioCohorte = $inicio; $anioCohorte <= $fin; $anioCohorte++) {
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anioCohorte}</td>";
+							$ingresantes = 0;
+							if (isset($resultados[$anioCohorte]['ingresantes'])) {
+								$ingresantes = $resultados[$anioCohorte]['ingresantes'];
+							}
+							echo "<td style='font-weight: bold;'>{$ingresantes}</td>";
+							for ($anio = $inicio; $anio <= $fin; $anio++) {
+								$cantidad = 0;
+								if (isset($resultados[$anioCohorte][$anio])) {
+									$cantidad = $resultados[$anioCohorte][$anio];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					//	}
+					
+					
+					break;
+				
+				case "graduadosPorCohorteCONEAU":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//EGRESADOS
+					$query = "SELECT COUNT(DISTINCT a.nro_documento) AS cantidad, 
+									RIGHT(a.fecha_examen, 4) AS anio_tesis,
+									b.anio_ingreso
+								FROM analiticos AS a
+								LEFT JOIN (SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CCCCP' AS carrera
+										FROM analiticos
+										WHERE nro_documento IN 
+											(SELECT DISTINCT nro_documento FROM analiticos WHERE carrera = 'CCCCP')
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+									ON a.nro_documento = b.nro_documento
+								WHERE materia = 634
+									AND RIGHT(fecha_examen, 4) >= {$inicio}
+									AND RIGHT(fecha_examen, 4) <= {$fin}
+								
+								GROUP BY anio_tesis, anio_ingreso";
+					
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']][$row['anio_tesis']] = $row['cantidad'];
+					}
+					
+					//INGRESANTES
+					$query = "SELECT COUNT(DISTINCT b.nro_documento) AS cantidad, b.anio_ingreso
+								FROM  (
+										SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CCCCP' AS carrera
+										FROM analiticos
+										WHERE nro_documento IN 
+											(SELECT DISTINCT nro_documento FROM analiticos WHERE carrera = 'CCCCP')
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+
+
+								GROUP BY anio_ingreso
+								ORDER BY anio_ingreso;";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					
+					//$resultadosConCarrera = $resultados;
+					
+						
+						echo "<h2>CCCCP</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Cohorte</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							echo "<th style='text-align: center;'>{$anio}</th>";
+						}
+						echo "</tr>";
+					//foreach ($resultados as $anioIngreso => $cohortes) {	
+						for ($anioCohorte = $inicio; $anioCohorte <= $fin; $anioCohorte++) {
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anioCohorte}</td>";
+							$ingresantes = 0;
+							if (isset($resultados[$anioCohorte]['ingresantes'])) {
+								$ingresantes = $resultados[$anioCohorte]['ingresantes'];
+							}
+							echo "<td style='font-weight: bold;'>{$ingresantes}</td>";
+							for ($anio = $inicio; $anio <= $fin; $anio++) {
+								$cantidad = 0;
+								if (isset($resultados[$anioCohorte][$anio])) {
+									$cantidad = $resultados[$anioCohorte][$anio];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					//	}
+					
+					
+					break;
+				
+				case "graduadosPorCohorteCONEAUIST":
+				
+					require 'conexion.php';
+					
+					$inicio = $_REQUEST['anioInicio'];
+					$fin = $_REQUEST['anioFinal'];
+					$carrera = $_REQUEST['carrera'];
+					
+					$resultados = array();
+					
+					
+					//EGRESADOS
+					$query = "SELECT COUNT(DISTINCT a.nro_documento) AS cantidad, 
+									RIGHT(a.fecha_examen, 4) AS anio_tesis,
+									b.anio_ingreso
+								FROM analiticos_convenios AS a
+								LEFT JOIN (SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'EYN-6' AS carrera
+										FROM analiticos_convenios
+										WHERE nro_documento IN
+											(SELECT DISTINCT nro_documento FROM analiticos_convenios WHERE carrera IN ('EYN-6'))
+												AND nombre_ua LIKE '%04%'
+												
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+									ON a.nro_documento = b.nro_documento
+								WHERE materia = 614
+									AND RIGHT(fecha_examen, 4) >= {$inicio}
+									AND RIGHT(fecha_examen, 4) <= {$fin}
+									AND nombre_ua LIKE '%04%'
+								
+								GROUP BY anio_tesis, anio_ingreso";
+					
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']][$row['anio_tesis']] = $row['cantidad'];
+					}
+					
+					//INGRESANTES
+					$query = "SELECT COUNT(DISTINCT b.nro_documento) AS cantidad, b.anio_ingreso
+								FROM  (
+										SELECT nro_documento, MIN(p_anio) AS anio_ingreso, 'CP' AS carrera
+										FROM analiticos_convenios
+										WHERE nro_documento IN 
+											(SELECT DISTINCT nro_documento FROM analiticos_convenios WHERE carrera IN ('CCCCP', 'EYN-6'))
+											AND nombre_ua LIKE '%04%'
+										GROUP BY nro_documento
+										HAVING anio_ingreso >= {$inicio}
+											AND anio_ingreso <= {$fin}
+									) AS b
+
+
+								GROUP BY anio_ingreso
+								ORDER BY anio_ingreso;";
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						$resultados[$row['anio_ingreso']]['ingresantes'] = $row['cantidad'];
+					}
+					
+					
+					//$resultadosConCarrera = $resultados;
+					
+						
+						echo "<h2>CCCCP</h2>";
+					
+						echo "<table border='1'>";
+						echo "<tr>";
+						echo "<th>Cohorte</th>";
+						echo "<th style='text-align: center;'>Ingresantes</th>";
+						for ($anio = $inicio; $anio <= $fin; $anio++) {
+							echo "<th style='text-align: center;'>{$anio}</th>";
+						}
+						echo "</tr>";
+					//foreach ($resultados as $anioIngreso => $cohortes) {	
+						for ($anioCohorte = $inicio; $anioCohorte <= $fin; $anioCohorte++) {
+							echo "<tr>";
+							echo "<td style='font-weight: bold;'>{$anioCohorte}</td>";
+							$ingresantes = 0;
+							if (isset($resultados[$anioCohorte]['ingresantes'])) {
+								$ingresantes = $resultados[$anioCohorte]['ingresantes'];
+							}
+							echo "<td style='font-weight: bold;'>{$ingresantes}</td>";
+							for ($anio = $inicio; $anio <= $fin; $anio++) {
+								$cantidad = 0;
+								if (isset($resultados[$anioCohorte][$anio])) {
+									$cantidad = $resultados[$anioCohorte][$anio];
+								}
+								echo "<td style='text-align: center;'>{$cantidad}</td>";
+							}
+							echo "</tr>";
+						}
+						
+						echo "</table>";
+					//	}
+					
+					
+					break;
+					
 				case "tablaSituacionFinalesCONEAU":
 				
 					require 'conexion.php';
@@ -2790,10 +3409,18 @@
 					$query = "SELECT ac.docente AS id, ac.materia, 
 								GROUP_CONCAT(DISTINCT m.nombre ORDER BY m.cod SEPARATOR '/ ') AS nombre,
 								CONCAT_WS(', ', d.apellido, d.nombres) AS docente,
-								GROUP_CONCAT(DISTINCT ac.comision ORDER BY ac.comision SEPARATOR ', ') AS comisiones
+								GROUP_CONCAT(DISTINCT CONCAT(ac.comision, '(', ca.horario, ')')
+									ORDER BY ac.comision
+									SEPARATOR ' <br /> ') AS comisiones
 							FROM asignacion_comisiones as ac
 							LEFT JOIN materia AS m ON m.conjunto = ac.materia
 							LEFT JOIN docente AS d ON d.id = ac.docente
+							LEFT JOIN
+								comisiones_abiertas AS ca
+									ON ca.materia = ac.materia
+								AND ac.comision = ca.nombre_comision
+								AND ca.anio = ac.anio
+								AND ca.cuatrimestre = ac.cuatrimestre
 							WHERE $where
 								
 							GROUP BY ac.materia, ac.docente

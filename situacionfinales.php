@@ -38,9 +38,9 @@
 							<option value="todas">Todas</option>
 							<?php
 								require 'fuentes/conexion.php';
-								$query = "SELECT DISTINCT carrera, carrera_nombre
+								$query = "SELECT DISTINCT carrera, nombre_carrera
 											FROM analiticos
-											ORDER BY carrera_nombre";
+											ORDER BY nombre_carrera";
 								$result = $mysqli->query($query);
 								
 								while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
@@ -56,6 +56,7 @@
 								require 'fuentes/conexion.php';
 								$query = "SELECT DISTINCT materia, nombre_materia
 											FROM analiticos
+											WHERE tipo = 'Final'
 											ORDER BY materia + 0";
 								$result = $mysqli->query($query);
 								
