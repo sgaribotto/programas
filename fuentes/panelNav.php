@@ -261,11 +261,16 @@
 			
 			<ul class="navLateral">
 				<li class="navLateral"><a href="situacioncursadas.php" class="navLateral">Situación Cursadas</a></li>
-				<!--<li class="navLateral"><a href="listadomaterias.php" class="navLateral">Cargos por materia</a></li>
-				<li class="navLateral"><a href="infoafectaciones.php" class="navLateral">Información de Designaciones/Cargos</a></li>
-				<li class="navLateral"><a href="estadocargacomisiones.php" class="navLateral">Estado de la carga de comisiones</a></li>
-				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
-				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
+				<li class="navLateral"><a href="situacioncursadasIST.php" class="navLateral">Situación Cursadas IST</a></li>
+				<li class="navLateral"><a href="situacionfinales.php" class="navLateral">Situación Finales</a></li>
+				<li class="navLateral"><a href="situacionfinalesIST.php" class="navLateral">Situación Finales IST</a></li>
+				<li class="navLateral"><a href="alumnosdelacarrera.php" class="navLateral">Alumnos de la carrera</a></li>
+				<li class="navLateral"><a href="alumnosdelacarreraIST.php" class="navLateral">Alumnos de la carrera IST</a></li>
+				<li class="navLateral"><a href="cursantesporcohorte.php" class="navLateral">Cursantes por cohorte</a></li>
+				<li class="navLateral"><a href="cursantesporcohorteIST.php" class="navLateral">Cursantes por cohorte IST</a></li>
+				<li class="navLateral"><a href="graduadosporcohorte.php" class="navLateral">Graduados por cohorte</a></li>
+				<li class="navLateral"><a href="graduadosporcohorteIST.php" class="navLateral">Graduados por cohorte IST</a></li>
+				
 			</ul>
 			
 		</ol>
@@ -314,6 +319,16 @@
 					<li class="navLateral"><a href="datosadicionales.php" class="navLateral">Resultado cursadas</a></li>
 					
 				</ul>
+				
+				<li class="navLateral" style='color:red;'>Acreditación CONEAU</li>
+				
+				<ul class="navLateral">
+					
+					<li class="navLateral"><a href="autoevaluacionconeau.php" class="navLateral">Autoevaluación CONEAU</a></li>
+					
+					
+				</ul>
+				
 				<li class="navLateral">Programa vigente - Estructura</li>
 				<ul class="navLateral">
 					
