@@ -254,7 +254,7 @@
 <?php 
 	if (in_array(1, $_SESSION['permiso']) or in_array(11, $_SESSION['permiso'])) {  //Acreditacion CONEAU ?> 
 		<div class="navDir">
-		<h2 class="navLateral">Acreditación CONEAU</h2>
+		<h2 class="navLateral">Acreditación Carrera CONTADOR PÚBLICO</h2>
 		
 		<ol class="navLateral" >
 			<li class="navLateral">Información Estadística</li>
@@ -320,7 +320,7 @@
 					
 				</ul>
 				
-				<li class="navLateral" style='color:red;'>Acreditación CONEAU</li>
+				<li class="navLateral" style='color:red;'>Acreditación Carrera CONTADOR PÚBLICO</li>
 				
 				<ul class="navLateral">
 					
