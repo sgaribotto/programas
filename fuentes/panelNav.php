@@ -102,10 +102,11 @@
 			<li class="navLateral">Cargos y Designaciones</li>
 			
 			<ul class="navLateral">
-				<li class="navLateral"><a href="aceptardesignacion.php" class="navLateral">Aceptar Cargos</a></li>
-				<li class="navLateral"><a href="listadomaterias.php" class="navLateral">Cargos por materia</a></li>
-				<!--<li class="navLateral"><a href="responsables.php" class="navLateral">Responsables</a></li>
-				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
+				<li class="navLateral"><a href="consultaautoevaluacionconeau.php" class="navLateral">Consulta autoevaluacion Acreditación</a></li>
+				<!--<li class="navLateral"><a href="aceptardesignacion.php" class="navLateral">Aceptar Cargos</a></li>
+				<li class="navLateral"><a href="listadomaterias.php" class="navLateral">Cargos por materia</a></li>-->
+				
+				<!--<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
 				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>-->
 			</ul>
 			

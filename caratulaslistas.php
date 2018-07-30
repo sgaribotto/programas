@@ -51,10 +51,11 @@
 					ca.turno, 
 					ca.nombre_comision,
 					ca.horario, 
-					GROUP_CONCAT(DISTINCT CONCAT('AULA: ', aa.aula, ' (', aa.dia, ')') 
+					IF(COUNT(DISTINCT aa.aula) > 1, 
+					GROUP_CONCAT(DISTINCT CONCAT(aa.dia, ': ', aa.aula) 
 									ORDER BY FIELD(aa.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado')
-									SEPARATOR ' | ' 
-					) AS aula,
+									SEPARATOR '<br>' 
+					), aa.aula) AS aula,
 					aa.cantidad_alumnos,
 					GROUP_CONCAT(DISTINCT CONCAT(d.apellido, ', ', d.nombres) SEPARATOR '/') AS docentes
 				FROM comisiones_abiertas AS ca
@@ -93,17 +94,17 @@
 			<br />
 			COMISION: %s
 			<br />
-			AULA: %s
-			<br />
 			DOCENTES: %s
 			<br />
 			HORARIO: %s
+			<br />
+			AULA: %s
 			</div>
 			<br />
 			<br />
 			<br />
 
-			<span style='display: block; text-align:right'>San Martín, 12 de Marzo de 2018</span>
+			<span style='display: block; text-align:right'>San Martín, 06 de Agosto de 2018</span>
 			<br />
 			<br />
 			Señores Profesores:
@@ -112,7 +113,7 @@
 			<p class='cuerpo'>En el caso de detectar omisiones, se solicita no incluir a los alumnos en el listado de asistencia, sino indicarles que deberán pasar por la oficina de la Dirección de Asuntos Académicos en el horario de atención al público, para efectuar el reclamo de acuerdo a la normativa vigente, y cumpliendo con el mecanismo que se ha implementado para tal fin.</p>
 			<p class='cuerpo'>Los alumnos tienen un plazo máximo de 7 (siete) días para realizar el trámite, a contarse a partir del primer día en que se inicia la cursada de la asignatura correspondiente.  Todo alumno que no efectúe el trámite en tiempo y forma y/o que no se notifique de la resolución de esta Dirección, no estará incluido en el Acta de Calificaciones Parciales que le será entregada oportunamente.</p>
 			<p class='cuerpo'>La Dirección de Asuntos Académicos le informará a Ud., e incluirá en el Acta de Calificaciones Parciales a aquellos alumnos que, habiendo cumplido con el trámite de reclamo, se encuentran habilitados para continuar cursando la asignatura correspondiente.</p>
-			<p class='cuerpo'>Tengan en cuenta que el segundo cuatrimestre finaliza el 23 de junio del presente y las actas de cursada deberán ser entregadas hasta esta fecha.</p>
+			<p class='cuerpo'>Tengan en cuenta que el segundo cuatrimestre finaliza el 24 de noviembre del presente y <b><u>las actas de cursada deberán ser entregadas hasta esta fecha.</u></b></p>
 			Gracias por su colaboración.
 			<br />
 			<br />
@@ -123,7 +124,7 @@
 			
 			foreach ($caratulas as $detalles) {
 				//print_r($detalles);
-				printf($texto, $detalles['materia'] . ' ' . mb_strtoupper($detalles['nombres'], 'utf8'), $detalles['nombre_comision'], $detalles['aula'], $detalles['docentes'], $detalles['horario']);
+				printf($texto, $detalles['materia'] . ' ' . mb_strtoupper($detalles['nombres'], 'utf8'), $detalles['nombre_comision'], $detalles['docentes'], $detalles['horario'], $detalles['aula']);
 			}
 		?>
 			

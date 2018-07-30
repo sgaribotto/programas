@@ -120,36 +120,36 @@
 	
 	$anio = 2018;
 	$cuatrimestre = 2;
-	$query = "SELECT DISTINCT CONCAT(p.apellido, ', ', p.nombres) AS nombre_docente, d.id AS docente, p.id, dd.valor AS mail,
-				GROUP_CONCAT(DISTINCT ca.materia) AS materias
-			FROM responsable AS r
-			LEFT JOIN personal AS p ON p.id = r.usuario
-			LEFT JOIN docente AS d ON d.dni = p.dni
-			LEFT JOIN datos_docentes AS dd ON dd.docente = d.id AND dd.tipo = 'mail'
-			LEFT JOIN materia AS m ON r.materia = m.cod
-			LEFT JOIN comisiones_abiertas AS ca ON m.conjunto = ca.materia
-			WHERE r.activo = 1 AND ca.anio = {$anio} AND ca.cuatrimestre = {$cuatrimestre}
-			GROUP BY d.id
-			HAVING NOT ISNULL(materias);";
+	$query = "SELECT DISTINCT CONCAT(p.apellido, ', ', p.nombres) AS nombre_docente,
+					d.id, 'docente' AS tipo, dd.valor AS mail, p.usuario, d.id AS docente
+				FROM responsable AS r
+				LEFT JOIN personal AS p
+					ON p.id = r.usuario
+				LEFT JOIN docente AS d
+					ON d.dni = p.dni
+				LEFT JOIN datos_docentes AS dd
+					ON dd.docente = d.id
+						AND dd.tipo = 'mail'
+				WHERE r.activo = 1
+					AND (r.materia BETWEEN 700 AND 799
+							OR r.materia IN (1503, 1505, 1509)
+							OR r.materia BETWEEN 1512 AND 1599)";
 	
 	//TEMPLATE Y ASUNTO
 	$template = "<p 'style=text-align:justify;'>Estimado Responsable de Cátedra <b>%s</b>:
 <br />
 <br />
-A efectos de poder realizar las designaciones de docentes para el segundo cuatrimestre del ciclo lectivo 2018​ y 
-con el fin de lograr una adecuada coordinación de cursos y​ alumnos le solicitamos realice la asignación 
-de docentes a través de la aplicación web de Solicitud de Cátedra. En la misma pantalla, deberá indicar 
-qué docentes utilizarán el aula virtual de MásCampus. <br />
+Se le ha asignado un usuario para ingresar a: <a href='http://planeseeyn.unsam.edu.ar/programas'>http://planeseeyn.unsam.edu.ar/programas</a> <br />
 <br />
-La distribución  de comisiones de la materia que usted tiene a cargo estará disponible ingresando a la 
-dirección: <a href='http://planeseeyn.unsam.edu.ar/programas'>http://planeseeyn.unsam.edu.ar/programas</a> 
-con el usuario y contraseña habituales y accediendo a la opción
-asignar comisiones. El sistema estará habilitado para ello desde el martes 19 de junio de 2018 hasta el domingo 1 de julio de 2018.
-Una vez terminada la inscripción por parte de los alumnos, de acuerdo a la cantidad de inscriptos, haremos los ajustes necesarios. 
+Usuario: %s
+<br />
+Contraseña: %s
 <br />
 
 <br />
-Cualquier duda o consulta sobre la plataforma no dude en comunicarse a la Dirección de Asuntos Académicos.
+
+<br />
+Cualquier duda o consulta sobre la plataforma no dude en comunicarse a <a href='mailto:webmaster.eeyn@unsam.edu.ar'>webmaster.eeyn@unsam.edu.ar</a>
 <br />
 <br />
 Saluda Cordialmente.<br />
@@ -157,15 +157,15 @@ Dirección de Asuntos Académicos.<br />
 Secretaría Académica<br />
 EEYN - UNSAM </p>";
 	
-	$asunto = "Solicitud de cátedra {$cuatrimestre}do cuatrimestre {$anio}";
+	$asunto = "Usuario Sistema Planes EEYN";
 	
 	// ARMADO DE LA BASE DE DATOS PARA EL ENVÏO DE MAILS
 	
-	/*$result = $mysqli->query($query);
+	$result = $mysqli->query($query);
 	while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 		
 		//$materia = $row['nombre_materia'];
-		$message = sprintf($template, $row['nombre_docente']);
+		$message = sprintf($template, $row['nombre_docente'], $row['usuario'], $row['usuario']);
 		
 		
 		
@@ -188,10 +188,10 @@ EEYN - UNSAM </p>";
 		
 		
 		
-	}*/
+	}
 	
 	//TEST MAIL A planes.eeyn@unsam.edu.ar
-	//$mensaje = sprintf($template, 'Santiago Garibotto');
+	//mensaje = sprintf($template, 'Santiago Garibotto', 'sgaribotto', 'sgaribotto');
 	//mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Matías López', 'matias.lopez@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Lorena Penna', 'lpenna@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
@@ -199,7 +199,7 @@ EEYN - UNSAM </p>";
 	
 	
 	//ENVIO DE MAILS GUARDADOS EN LA BASE
-	$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
+	/*$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
 			FROM envios_por_mail
 			WHERE NOT ISNULL(mail) AND mail != '' AND enviado = 0
 			LIMIT 30;";
@@ -218,7 +218,7 @@ EEYN - UNSAM </p>";
 	}
 	
 	$result->free();
-	$mysqli->close();
+	$mysqli->close();*/
 	
 	
 	

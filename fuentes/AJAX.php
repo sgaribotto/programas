@@ -740,7 +740,9 @@
 					
 					$query = "SELECT valor, id
 										FROM agregados_cronograma
-										WHERE clase = $clase AND materia = $materia AND anio = $ANIO AND cuatrimestre = $CUATRIMESTRE AND activo = 1 AND tipo = '$tabla' ";
+										WHERE clase = $clase AND materia = $materia 
+											AND anio = $ANIO AND cuatrimestre = $CUATRIMESTRE 
+											AND activo = 1 AND tipo = '$tabla' ";
 					$result = $mysqli->query($query);
 					switch ($tabla){
 						case "bibliografia":
@@ -3973,7 +3975,7 @@
 						$docente = $_REQUEST['docente'];
 					
 					
-					$query = "SELECT acc.dia, acc.horario, CONCAT(acc.materia, acc.comision, '<br />Aula: ', aa.aula) AS materia
+					$query = "SELECT acc.dia, acc.horario, CONCAT(acc.materia, acc.comision, '<br />Aula: ', IFNULL(aa.aula, '')) AS materia
 									FROM asignacion_comisiones_calendario AS acc
 									LEFT JOIN asignacion_aulas AS aa
 										ON aa.dia = acc.dia

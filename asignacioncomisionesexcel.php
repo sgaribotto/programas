@@ -18,6 +18,7 @@
 					CONCAT(d.apellido, ', ', d.nombres) AS docentes,
 					
 					a.tipoafectacion AS Cargo,
+					IF(aula_virtual = 1, 'Sí', 'No') AS aula_virtual,
 					ca.responsable
 					
 				FROM programas.vista_comisiones_abiertas_con_responsables AS ca
@@ -69,6 +70,7 @@
 				<th>Inscriptos</th>
 				<th>Docentes</th>
 				<th>Cargo</th>
+				<th>Aula Virtual</th>
 				<th>Responsable</th>
 			</tr>
 		</thead>

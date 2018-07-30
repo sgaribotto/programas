@@ -57,7 +57,7 @@
 						) AS b
 						GROUP BY b.materia, b.comision_agrupada";
 				
-				echo $query;
+				//echo $query;
 				$result = $mysqli->query($query);
 				
 				if ($mysqli->errno) {

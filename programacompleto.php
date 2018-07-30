@@ -113,7 +113,7 @@
 							
 							$result = $mysqli->query($query);*/
 							//$materia = new Materia($_SESSION['materia']);
-							$equipoDocente = $materia->mostrarEquipoDocente('*', $ANIO, $CUATRIMESTRE);
+							$equipoDocente = $materia->mostrarEquipoDocente($ANIO, $CUATRIMESTRE);
 							
 							if (empty($equipoDocente)) {
 								echo "<tr><td colspan='2'>No hay docentes cargados</td></tr>";

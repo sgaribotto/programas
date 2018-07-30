@@ -102,13 +102,14 @@
 		<div class="formularioLateral">
 			<div id="accordion">
 				<h3 class="formularioLateral">Analizar y evaluar la suficiencia y adecuación de los 
-					ámbitos donde se dearrolla la actividad: aulas, equipamiento didáctico, 
+					ámbitos donde se desarrolla la actividad: aulas, equipamiento didáctico, 
 					equipamiento informático, otros; y su disponibilidad para todos los alumnos.
 				</h3>
 				<div id="formulario">
 					<fieldset class="formularioLateral">
 						<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau91" data-pregunta='coneau91'>
-							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;"><?php echo $respuestas['coneau91']; ?></textarea>
+							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990";><?php echo $respuestas['coneau91']; ?></textarea>
+							<button class="formularioLateral" type="submit">Guardar</button>
 						</form>
 						
 					</fieldset>
@@ -120,8 +121,10 @@
 					
 					<fieldset class="formularioLateral">
 						<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau92" data-pregunta='coneau92'>
-							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;"><?php echo $respuestas['coneau92']; ?></textarea>
+							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990"><?php echo $respuestas['coneau92']; ?></textarea>
+							<button class="formularioLateral" type="submit">Guardar</button>
 						</form>
+							
 							<!--<img src="images/chart_example.png" />-->
 							<div class="graph92" id="graph92"></div>
 					</fieldset>
@@ -132,7 +135,8 @@
 				<div id="formulario">
 					<fieldset class="formularioLateral">
 						<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau93" data-pregunta='coneau93'>
-							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;"><?php echo $respuestas['coneau93']; ?></textarea>
+							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990"><?php echo $respuestas['coneau93']; ?></textarea>
+							<button class="formularioLateral" type="submit">Guardar</button>
 						</form>
 						
 					</fieldset>
@@ -143,7 +147,8 @@
 				<div id="formulario">
 					<fieldset class="formularioLateral">
 						<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau94" data-pregunta='coneau94'>
-							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;"><?php echo $respuestas['coneau94']; ?></textarea>
+							<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990"><?php echo $respuestas['coneau94']; ?></textarea>
+							<button class="formularioLateral" type="submit">Guardar</button>
 						</form>
 						
 					</fieldset>
@@ -178,6 +183,12 @@
 	  $('form').keyup(function() {
 		  $(this).submit();
 	  });
+	  
+	  $('textarea').on('change', function() {
+		  $(this).parent('form').submit();
+	  });
+	  
+	  
 	  </script>
 	  
 	  <!-- GRAFICO HIGHCHARTS -->

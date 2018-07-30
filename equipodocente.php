@@ -22,7 +22,7 @@
 		?>
 		
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Equipo docente 2do cuatrimestre 2017</h2>
+			<h2 class="formularioLateral">Equipo docente - <?php echo $CUATRIMESTRE; ?>º cuatrimestre <?php echo $ANIO; ?></h2>
 			<div id="plantelActual">
 				<table class="plantelActual">
 					<thead class="plantelActual">

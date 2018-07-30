@@ -70,7 +70,7 @@
 			WHERE anio = {$anio} AND cuatrimestre = {$cuatrimestre} 
 				AND activo = 1;";
 				
-		$host = "10.1.71.121";
+		$host = "planeseeyn.unsam.edu.ar";
 		$usuario = "programas";
 		$clave = "TMtrj9rS5di";
 		$db = "programas";
@@ -84,6 +84,7 @@
 				if ($mysqli->errno) {
 					echo "ERROR MYSQL: " . $mysqli->error;
 				} else {
+					echo "QUERY: " . $queries[$tabla];
 					echo "Afectadas: " . $mysqli->affected_rows;
 					echo "<br />";
 					echo "WARNINGS: " . $mysqli->warning_count;
@@ -94,5 +95,5 @@
 		$mysqli->close();
 	}
 	
-	actualizarCuatrimestre($tablas, 2017, 2);
+	actualizarCuatrimestre($tablas, 2018, 1);
 ?>
