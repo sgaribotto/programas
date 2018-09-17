@@ -133,47 +133,44 @@
 						equipamiento informático, otros; y su disponibilidad para todos los alumnos.
 					</h3>
 					<div id="formulario">
-						<fieldset class="formularioLateral">
-							<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau91" data-pregunta='coneau91'>
-								<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990" readonly><?php echo $respuestas['coneau91']; ?></textarea>
-							</form>
+						
+							<p>
+								<?php echo $respuestas['coneau91']; ?>
+							</p>
 							
-						</fieldset>
+						
 					</div>
 					<h3 class="formularioLateral">Analizar los datos de la inscripción y promoción de los alumnos. 
 						Explicar los datos destacados y enunciar causas probables.
 					</h3>
 					<div id="formulario">
 						
-						<fieldset class="formularioLateral">
-							<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau92" data-pregunta='coneau92'>
-								<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990" readonly><?php echo $respuestas['coneau92']; ?></textarea>
-							</form>
+						
+							<p>
+								<?php echo $respuestas['coneau92']; ?>
+							</p>
 								
 								<div class="graph92" id="graph92"></div>
-						</fieldset>
+						
 					</div>
 					<h3 class="formularioLateral">Analizar y evaluar la composición del equipo docente a cargo de la actividad para llevar adelante
 						las funciones de docencia, investigación, extensión y vinculación inherentes a los cargos que han sido designados
 					</h3>
 					<div id="formulario">
-						<fieldset class="formularioLateral">
-							<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau93" data-pregunta='coneau93'>
-								<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990" readonly><?php echo $respuestas['coneau93']; ?></textarea>
-							</form>
-							
-						</fieldset>
+						<p>
+								<?php echo $respuestas['coneau93']; ?>
+							</p>
 					</div>
 					<h3 class="formularioLateral">Describir las acciones, reuniones, comisiones en las que participa el equipo docente para trabajar
 						sobre la articulación vertical y horizontal de los contenidos y la formación.
 					</h3>
 					<div id="formulario">
-						<fieldset class="formularioLateral">
-							<form method="post" class="formularioLateral" action="procesardatos.php?formulario=autoevaluacion_coneau&pregunta=coneau94" data-pregunta='coneau94'>
-								<textarea class="formularioLateral" name="respuesta" placeholder="" style="height:150px;" maxlength="1990" readonly><?php echo $respuestas['coneau94']; ?></textarea>
-							</form>
+						
+							<p>
+								<?php echo $respuestas['coneau94']; ?>
+							</p>
 							
-						</fieldset>
+						
 					</div>
 				</div>
 			<?php } ?>
@@ -183,12 +180,12 @@
 	  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	  <script>
-	  $( function() {
+	  /*$( function() {
 		$( "#accordion" ).accordion({
 			collapsible: true,
 			heightStyle: "content"
 		});
-	  } );
+	  } );*/
 	  
 	  $(document).ready(function() {
 		  $('form').submit(function(event) {
@@ -382,6 +379,19 @@
 		textarea {
 			height: 100px;
 			width: 98%;
+		}
+	  </style>
+	  
+	  <style media="print">
+		div.navLateral {
+			display:none;
+		}
+		
+		div.formularioLateral {
+			margin-top: 10;
+			float: none;
+			display: initial;
+			
 		}
 	  </style>
 </html>

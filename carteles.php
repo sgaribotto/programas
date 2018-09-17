@@ -200,11 +200,17 @@
 				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['horario'] = $row['horario'];
 				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['aula'] = $row['aula'];
 				$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']][$row['nombre_comision']]['nombre_materia'] = $row['nombre_materia'];
-				if (in_array(substr($row['nombre_comision'], -1), [1, 2, 3, 4, 5]))  {
-					//$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad']++;
+				
+				
+				/*if (!isset($carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'])) {
+					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'] = 1;
+				} else {
+					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad']++;
+				}*/
+				
+				if (in_array(substr($row['nombre_comision'], -1), ['1', '2', '3', '4', '5'])) {
 					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'] = 2;
 				}
-				
 				if (!isset($carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'])) {
 					$carteles[$row['dia']][$diasTurnos[$row['turno']]][$row['plan']][$nombres_carreras[$row['carrera']]][$row['materia']]['cantidad'] = 1;
 				} 
@@ -240,7 +246,6 @@
 										echo "<td>{$comision}</td>";
 										echo "<td style='text-align:left;'>{$detalle['nombre_materia']}";
 										if ($comisiones['cantidad'] > 1) {
-										//if (strstr($comision, '1')) {
 											echo "  <span style='font-weight:normal'>(Desde </span>{$detalle['primero']} <span style='font-weight:normal'>hasta</span> {$detalle['ultimo']})</td>";
 										}
 										echo "<td>{$horasTurno[$detalle['horario']]}</td>";

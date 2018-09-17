@@ -110,7 +110,7 @@
 
 				<h3 class="cuatrimestre caratula">CUATRIMESTRE:<span class="cuatrimestre"> <?php echo $datosMateria['cuatrimestre']; ?>º cuatrimestre</span></h3> 
 
-				<h3 class="vigencia caratula">VIGENCIA:<span class="vigencia"> <?php echo $CUATRIMESTRE . "º cuatrimestre de " . $ANIO; ?></span></h3>
+				<!--<h3 class="vigencia caratula">VIGENCIA:<span class="vigencia"> <?php echo $CUATRIMESTRE . "º cuatrimestre de " . $ANIO; ?></span></h3>-->
 				
 				<h3 class="equipo-docente contenido">EQUIPO DOCENTE</h3>
 				<div class="equipo-docente">

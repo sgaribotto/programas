@@ -22,6 +22,8 @@
 						FROM autoevaluacion_coneau
 						WHERE materia IN {$conjunto}";
 			$result = $mysqli->query($query);
+			//print_r($result);
+			echo $query;
 			echo $mysqli->error;
 			$respuestas = array();
 			foreach (['coneau91', 'coneau92', 'coneau93', 'coneau94'] as $pregunta) {
@@ -30,6 +32,8 @@
 			while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 				$respuestas[$row['pregunta']] = $row['respuesta'];
 			}
+			
+			print_r($respuestas);
 			
 		?>
 		<?php 
