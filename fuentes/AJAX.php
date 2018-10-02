@@ -3966,6 +3966,179 @@
 						echo "<p>No se encontraron materias</p>";
 					}
 					break;
+					
+				case "tablaProyectos":
+					require 'conexion.php';
+					
+					$where = '';
+					
+					/*if (isset($_REQUEST['filtro']) AND $_REQUEST['filtro'] != '') {
+						$where = " AND CONCAT(m.nombre, m.cod, m.conjunto, m.plan) LIKE '%{$_REQUEST['filtro']}%' ";
+					}*/
+					
+					$query = "SELECT p.id, p.modalidad, p.titulo, estado
+									FROM proyectos_finales AS p
+									
+									WHERE 1 = 1 {$where} 
+									ORDER BY p.id DESC
+									LIMIT 30";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$proyectos = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$proyectos[] = $row;
+					}
+					
+					if (sizeof($proyectos)) {
+						
+						echo "<table class='proyectos' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:2%;'>Nº</th>
+								<th class='subtitulo'style='width:16%;'>Modalidad</th>
+								<th class='subtitulo'style='width:58%;'>Título</th>
+								<th class='subtitulo' style='width:20%;'>Estado</th>
+								<!--<th class='subtitulo' style='width:10%;'>Eliminar</th>-->
+							</tr>";
+						foreach ($proyectos AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['id']}</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['modalidad']}</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['titulo']}</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['estado']}</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[carrera]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[plan]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[cuatrimestre]</td>";
+							/*echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarDocente' data-id='$valores[id]'>
+								X</button>";*/
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron proyectos</p>";
+					}
+					break;
+					
+				case "tablaParticipantes":
+					require 'conexion.php';
+										
+					$query = "SELECT DISTINCT p.id, p.participante, p.rol, 
+								CONCAT(IFNULL(d.apellido, a.apellido), ', ', IFNULL(d.nombres, a.nombres)) AS nombre_completo, 
+								IFNULL(p.carrera, '') AS carrera
+									FROM participantes_pf AS p
+									LEFT JOIN docente AS d
+										ON d.id = participante
+										AND rol != 'autor'
+									LEFT JOIN analiticos AS a
+										ON a.nro_documento = participante
+										AND rol = 'autor'
+									
+									ORDER BY rol, nombre_completo";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$autores = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$autores[] = $row;
+					}
+					
+					if (sizeof($autores)) {
+						
+						/*echo "<table class='autores' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:16%;'>Rol</th>
+								<th class='subtitulo'style='width:58%;'>Participante</th>
+								<th class='subtitulo' style='width:20%;'>Carrera</th>
+								<th class='subtitulo' style='width:10%;'>Eliminar</th>
+							</tr>";*/
+						foreach ($autores AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='{$valores['id']}'>" . ucfirst($valores['rol']) . "</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['nombre_completo']}</td>
+									<td class='info masInfo' data-id='{$valores['id']}'>{$valores['carrera']}</td>";
+									//<td class='info masInfo' data-id='{$valores['id']}'>{$valores['estado']}</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[carrera]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[plan]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[cuatrimestre]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar participantes' id='eliminarParticipante' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron proyectos</p>";
+					}
+					break;
+					
+				case "tablaEvaluaciones":
+					require 'conexion.php';
+										
+					$query = "SELECT DISTINCT e.id, CONCAT(d.apellido, ', ', d.nombres) AS evaluador, 
+								e.estado, 
+								IF(nota != '', fecha_dictamen, 
+									IF(fecha_retiro = '', fecha_notificacion,
+									'')) AS fecha, 	e.nota
+									FROM evaluaciones_pf AS e
+									LEFT JOIN docente AS d
+										ON d.id = e.evaluador
+									WHERE proyecto = {$_REQUEST['proyecto']}
+									ORDER BY evaluador";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$autores = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$autores[] = $row;
+					}
+					
+					if (sizeof($autores)) {
+						
+						/*echo "<table class='autores' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:16%;'>Rol</th>
+								<th class='subtitulo'style='width:58%;'>Participante</th>
+								<th class='subtitulo' style='width:20%;'>Carrera</th>
+								<th class='subtitulo' style='width:10%;'>Eliminar</th>
+							</tr>";*/
+						foreach ($autores AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo evaluaciones' data-id='{$valores['id']}'>{$valores['evaluador']}</td>
+									<td class='info masInfo evaluaciones' data-id='{$valores['id']}'>{$valores['estado']}</td>
+									<td class='info masInfo evaluaciones' data-id='{$valores['id']}'>{$valores['fecha']}</td>
+									<td class='info masInfo evaluaciones' data-id='{$valores['id']}'>{$valores['nota']}</td>";
+									//<td class='info masInfo' data-id='{$valores['id']}'>{$valores['estado']}</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[carrera]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[plan]</td>";
+							//echo "<td class='materia' style='text-align:left;'>$valores[cuatrimestre]</td>";
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar evaluaciones' id='eliminarEvaluacion' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						//echo "</table>";
+					} else {
+						echo "<p>No se encontraron evaluaciones</p>";
+					}
+					break;
+				
+				case "editarEvaluacion":
+					$id = $_REQUEST['id'];
+					$query = "SELECT id, evaluador, estado, fecha_notificacion, fecha_retiro, nota, fecha_dictamen, observaciones
+								FROM evaluaciones_pf
+								WHERE id = {$id}";
+					$result = $mysqli->query($query);
+					
+					$row = $result->fetch_array(MYSQLI_ASSOC);
+					
+					echo json_encode($row);
+					
+					
+					break;
 				
 				case "tablaHorariosPorDocente":
 					require 'conexion.php';
@@ -4730,6 +4903,171 @@
 				
 					break;
 					
+					case "buscarParticipantes":
+						require 'conexion.php';
+						
+						$rol = $mysqli->real_escape_string($_REQUEST['rol']);
+						//$periodo = $_REQUEST['periodo'];
+						
+						if ($rol == 'autor') {
+							$imprimir = "<label class='formularioLateral' for='buscarAlumno'>Alumno: </label>
+								<input name='buscarAlumno' class='formularioLateral iconModalidad buscarAlumno'  required id='buscarAlumno'>
+								
+								<button type='button' class='buscarAlumno'>Buscar</button>
+								<div class='datosAlumno'></div>
+								<br />";
+						} else {
+							$query = "SELECT id, CONCAT(apellido, ', ', nombres) AS docente
+										FROM docente
+										WHERE activo = 1
+										ORDER BY apellido, nombres";
+							$result = $mysqli->query($query);
+							
+							$imprimir = "<label class='formularioLateral' for='participante'>Participante: </label>
+								<select name='participante' class='formularioLateral iconModalidad'  required id='participante'>
+									<option value=''>Seleccione docente</option>";
+							
+								
+							
+							$participantes = array();
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								$participantes[$row['id']] = $row['docente'];
+							}
+														
+							//print_r($horarios);
+							foreach ($participantes as $id => $participante) {
+								$imprimir .= "<option value='{$id}'>{$participante}</option>";
+							}
+							
+							$imprimir .= "</select><br />";
+							$imprimir .= "<button type='submit' form='agregarAutores'>Agregar autor</button>";
+						}
+						
+						
+						echo $imprimir;			
+					
+						break;
+						
+					case "agregarEvaluacion":
+						require 'conexion.php';
+						
+						
+						$evaluacion = $_REQUEST['numeroEvaluacion'];
+						$proyecto = $_REQUEST['numero'];
+						$evaluador = $_REQUEST['evaluador'];
+						$estado = $_REQUEST['estadoEvaluacion'];
+						$notificacion = $_REQUEST['notificacion'];
+						$retiro = $_REQUEST['retiro'];
+						$nota = $mysqli->real_escape_string($_REQUEST['nota']);
+						$dictamen = $_REQUEST['dictamen'];
+						$observaciones = $mysqli->real_escape_string($_REQUEST['observaciones']);
+						
+						
+						if ($evaluacion == 0) {
+							$query = "INSERT INTO evaluaciones_pf
+										(proyecto, evaluador, estado, fecha_notificacion, fecha_retiro, fecha_dictamen, nota, observaciones) VALUES
+										({$proyecto}, {$evaluador}, '{$estado}', '{$notificacion}', '{$retiro}', '{$nota}', '{$dictamen}', '{$observaciones}')";
+							
+						} else {
+							$query = "UPDATE evaluaciones_pf SET
+										evaluador = {$evaluador},
+										estado = '{$estado}',
+										fecha_notificacion = '{$notificacion}',
+										fecha_retiro = '{$retiro}',
+										nota = {$nota},
+										fecha_dictamen = '{$dictamen}',
+										observaciones = '{$observaciones}'
+									WHERE id = {$evaluacion}";
+						}
+							
+						$mysqli->query($query);
+						echo $mysqli->error;
+						echo $query;
+						break;
+					
+					case "eliminarParticipante":
+						$id = $_REQUEST['id'];
+						$query = "DELETE FROM participantes_pf
+									WHERE id = {$id}";
+						$mysqli->query($query);
+						
+						break;
+						
+					case "eliminarEvaluacion":
+						$id = $_REQUEST['id'];
+						$query = "DELETE FROM evaluaciones_pf
+									WHERE id = {$id}";
+						$mysqli->query($query);
+						
+						break;
+					
+					case "buscarAlumnoTFPP":
+						require 'conexion.php';
+						
+						$dni = $mysqli->real_escape_string($_REQUEST['dni']);
+						$query = "SELECT CONCAT(apellido , ', ', nombres) AS alumno,
+									COUNT(DISTINCT materia) AS cantidad_aprobadas, carrera, nombre
+									FROM analiticos
+									WHERE resultado = 'A '
+										AND nro_documento = '{$dni}'
+								GROUP BY nro_documento, carrera";
+						$result = $mysqli->query($query);
+						//echo $mysqli->error;
+						$alumnos = array();
+						
+						if ($result->num_rows > 1) {
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								$alumnos[$row['carrera']] = $row;
+							}
+							foreach($alumnos as $carrera => $datos) {
+								echo "<p class='datosAlumno'>{$datos['alumno']} - {$datos['nombre']} - {$datos['cantidad_aprobadas']} Materias</p>";
+							}
+								echo "<label class='formularioLateral' for='carrera'>Carrera: </label>";
+								echo "<select name='carrera'>";
+								
+									
+							foreach ($alumnos as $carrera => $datos) {
+								echo "<option value='{$carrera}'>{$datos['nombre']}</option>";
+							}
+							echo "</select>";
+							echo "<input name='participante' class='formularioLateral iconModalidad alumno' value='{$dni}' id='participante' hidden>";
+							echo "<button type='submit'>Agregar autor</button>";
+						} elseif ($result->num_rows == 1) {
+							$row = $result->fetch_array(MYSQLI_ASSOC);
+							
+							echo "<p class='datosAlumno'>{$row['alumno']} - {$row['nombre']} - {$row['cantidad_aprobadas']} Materias</p>";
+							echo "<label class='formularioLateral' for='carrera'>Carrera: </label>";
+							echo "<input name='carrera' type='text' value='{$row['carrera']}' readonly>";
+							echo "<input name='participante' class='formularioLateral iconModalidad alumno'  value='{$dni}' id='participante' hidden>";
+						} else {
+							echo "<p class='errorBusqueda'>No se encontró el número de documento</p>";
+						}
+							
+								
+						//print_r($alumnos);
+						
+						break;
+						
+					case "agregarParticipantes":
+						require 'conexion.php';
+						$participante = $_REQUEST['participante'];
+						$rol = $_REQUEST['rol'];
+						$carrera = "";
+						$proyecto = $_REQUEST['numero'];
+						$observaciones = $mysqli->real_escape_string($_REQUEST['observaciones']);
+						
+						if (isset($_REQUEST['carrera'])) {
+							$carrera = $_REQUEST['carrera'];
+						}
+						
+						$query = "INSERT INTO participantes_pf
+							(proyecto, rol, participante, carrera, observaciones) VALUES
+							({$proyecto}, '{$rol}', '{$participante}', '{$carrera}', '{$observaciones}');";
+						$mysqli->query($query);
+						
+						
+						break;
+					
 					case "inscriptosEnCorrelativas":
 					require 'conexion.php';
 					//print_r($_REQUEST);
@@ -4781,6 +5119,55 @@
 						echo "<p>Sin resultados</p>";
 					}
 					
+					break;
+					
+				case "agregarProyecto":
+					require 'conexion.php';
+					
+					print_r($_REQUEST);
+					$numero = $_REQUEST['numero'];
+					$datos = array();
+					$datos['licencia'] = 0;
+					$datos['digital'] = 0;
+					foreach ($_REQUEST AS $key => $value) {
+						if (!is_int($value)) {
+							$datos[$key] = $mysqli->real_escape_string($value);
+						} else {
+							$datos[$key] = $value;
+						}
+					}
+					
+					
+					
+					if ($numero == 'nuevo') {
+						$query = "INSERT INTO proyectos_finales SET
+									modalidad = '{$datos['modalidad']}',
+									titulo = '{$datos['titulo']}',
+									fecha_inicio = '{$datos['inicio']}',
+									estado = '{$datos['estado']}',
+									fecha_final = '{$datos['final']}',
+									nota_final = '{$datos['nota']}',
+									cantidad_ejemplares = {$datos['cantidad_ejemplares']} + 0,
+									digital = {$datos['digital']},
+									licencia = {$datos['licencia']},
+									observaciones = '{$datos['observaciones']}'";
+					} else {
+						$query = "UPDATE proyectos_finales SET
+									modalidad = '{$datos['modalidad']}',
+									titulo = '{$datos['titulo']}',
+									fecha_inicio = '{$datos['inicio']}',
+									estado = '{$datos['estado']}',
+									fecha_final = '{$datos['fecha_cierre']}',
+									nota_final = {$datos['nota']} + 0,
+									cantidad_ejemplares = {$datos['cantidad_ejemplares']} + 0,
+									digital = {$datos['digital']} + 0,
+									licencia = {$datos['licencia']} + 0,
+									observaciones = '{$datos['observaciones']}'
+								WHERE id = {$datos['numero']}";
+					}
+					
+					$mysqli->query($query);
+					echo $mysqli->error;
 					break;
 					
 				case "tablaComisionesCalendario":
