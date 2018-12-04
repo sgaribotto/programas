@@ -127,7 +127,7 @@
 			
 			
 			$("#botonContinuar").click(function() {
-				location.assign("./asignarcomisiones.php");
+				location.assign("./asignarcomisionescalendario.php");
 			});
 			
 			$("select").combobox();

@@ -1048,9 +1048,9 @@ namespace clases {
 			 if ($turno != '*') {
 				 $whereTurno = " AND turno = '{$turno}'";
 			 }
-			 $query = "SELECT ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente,
+			 $query = "SELECT DISTINCT ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente,
 							CONCAT(d.apellido, ', ', d.nombres) AS nombre_docente,
-							acc.id AS id_asignacion
+							acc.id AS id_asignacion, acc.aula_virtual
 						FROM comisiones_abiertas AS ca
 						LEFT JOIN turnos_con_conjunto AS t
 							ON t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
@@ -1070,7 +1070,8 @@ namespace clases {
 			 
 			 $result = $mysqli->query($query);
 			 while ($row = $result->fetch_assoc()) {
-				 $comisiones[] = $row;
+				
+				$comisiones[] = $row;
 			 }
 			 
 			 return $comisiones;

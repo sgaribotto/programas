@@ -2,7 +2,7 @@
 //CONSTANTES PHP
 	require 'conexion.php';
 	
-	$anio = 2017;
+	$anio = 2018;
 	$cuatrimestre = 2;
 	
 	if ($cuatrimestre == 2) {
@@ -14,7 +14,7 @@
 	}
 	
 	// AFECTACION - - EQUIPO DOCENTE
-	$query = "INSERT IGNORE INTO `programas`.`afectacion`
+/*	$query = "INSERT IGNORE INTO `programas`.`afectacion`
 		(`id`, `docente`, `materia`, `anio`, `cuatrimestre`, `activo`, `tipoafectacion`, `estado`)
 		SELECT NULL as id, docente, materia, {$anioSiguiente}, {$cuatrimestreSiguiente}, activo,
 			tipoafectacion, estado
@@ -26,7 +26,7 @@
 		echo "<br />";
 		echo $query;
 		echo "<br />";
-	}
+	}*/
 	
 	//AGREGADOS CRONOGRAMA
 	$query = "INSERT IGNORE INTO `programas`.`agregados_cronograma`

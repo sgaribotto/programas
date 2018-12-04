@@ -34,6 +34,7 @@
 		<div class="formularioLateral">
 			<h1 class="nombreMateria"><span class="conjuntoMateria"><?php echo $conjunto; ?></span> <?php echo $nombres?></h1>
 			<h2 class="formularioLateral">Asignar comisiones del periodo <?php echo "{$ANIO} - {$CUATRIMESTRE}";?></h2>
+			<p class="error"></p>
 			<label for="coordinador" name="coordinador">Coordinador de la materia: </label>
 			<select name="coordinador" class="formularioLaterial coordinador">
 				<option value=''>Seleccionar Coordinador</option>
@@ -49,7 +50,17 @@
 					}
 				?>
 			</select>
-			
+			<div class="tutorial" style="border: 1px solid black;">
+				<h3 class="tutorial" >Tutorial</h3>
+				<ul>
+					<li>Seleccione el docente en el horario deseado.</li>
+					<li>Presione el botón "+" y el docente aparecerá debajo.</li>
+					<li>Si desea cambiar al docente seleccionado, presione la "X" a la derecha de su nombre.</li>
+					<li>Una vez seleccionados los docentes, indique con un tilde si utilizará Aula Virtual.</li>
+				</ul>
+				<img src="images/seldocentes.gif" style="width:80%;"/>
+			</div>
+			<br>
 			<div class="comisiones">
 			</div>
 		</div>
@@ -72,6 +83,11 @@
 						
 						$.get("fuentes/AJAX.php?act=agregarAsignacionComisionCalendario", values, function(data) {
 							actualizarTabla();
+							data = JSON.parse(data);
+							if (data.error) {
+								$('p.error').text(data.error);
+							}
+							
 						});
 					});
 					
@@ -81,7 +97,21 @@
 						$.get("fuentes/AJAX.php?act=eliminarAsignacionComisionCalendario", {'id': id}, function(data) {
 							actualizarTabla();
 						});
-					});		
+					});	
+					
+					$('.aulavirtual').change(function() {
+						var comision = $(this).data('comision');
+						var materia = $(this).data('materia');
+						var check = 0;
+						if (this.checked) {
+							check = 1;
+						}
+						$.get("./fuentes/AJAX.php?act=asignarAulaVirtualCalendario", {"comision": comision, "check": check, "materia": materia }, function(data1) {
+							//console.log(id);
+							
+							
+						});
+					});	
 				});
 			} 
 			actualizarTabla();

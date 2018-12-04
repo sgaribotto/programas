@@ -8,6 +8,13 @@
 		<h2 class="navLateral hidder">Navegación Administrador</h2>
 		
 		<ol class="navLateral navAdm" >
+			<li class="navLateral">Proyectos TFPP</li>
+			
+			<ul class="navLateral">
+				<li class="navLateral"><a href="proyectosfinales.php" class="navLateral">Proyectos Finales</a></li>
+				
+				
+			</ul>
 			<li class="navLateral">Carga y edición</li>
 			
 			<ul class="navLateral">
@@ -334,8 +341,8 @@
 				<ul class="navLateral">
 					
 					<li class="navLateral"><a href="equipodocente.php" class="navLateral">Equipo docente</a></li>
-					<li class="navLateral"><a href="asignarcomisiones.php" class="navLateral">Asignar comisiones</a></li>
-					<li class="navLateral"><a href="asignarcomisionescalendario.php" class="navLateral">Asignar comisiones calendario</a></li>
+					<!--<li class="navLateral"><a href="asignarcomisiones.php" class="navLateral">Asignar comisiones</a></li>-->
+					<li class="navLateral"><a href="asignarcomisionescalendario.php" class="navLateral">Asignar comisiones</a></li>
 					<li class="navLateral"><a href="objetivos.php" class="navLateral">Objetivos</a></li>
 					<li class="navLateral"><a href="fundamentacion.php" class="navLateral">Enfoque metodológico</a></li>
 					<li class="navLateral"><a href="unidadestematicas.php" class="navLateral">Unidades temáticas</a></li>

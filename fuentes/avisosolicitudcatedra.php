@@ -118,8 +118,8 @@
 	
 	//CONSULTA CON LOS RESPONSABLES DE MATERIAS CON COMISIONES ABIERTAS
 	
-	$anio = 2018;
-	$cuatrimestre = 2;
+	$anio = 2019;
+	$cuatrimestre = 1;
 	$query = "SELECT DISTINCT CONCAT(p.apellido, ', ', p.nombres) AS nombre_docente, d.id AS docente, p.id, dd.valor AS mail,
 				GROUP_CONCAT(DISTINCT ca.materia) AS materias
 			FROM responsable AS r
@@ -133,10 +133,10 @@
 			HAVING NOT ISNULL(materias);";
 	
 	//TEMPLATE Y ASUNTO
-	$template = "<p 'style=text-align:justify;'>Estimado Responsable de Cátedra <b>%s</b>:
+	$template = "<p 'style=text-align:justify;'>Estimado Responsable de Asignatura <b>%s</b>:
 <br />
 <br />
-A efectos de poder realizar las designaciones de docentes para el segundo cuatrimestre del ciclo lectivo 2018​ y 
+A efectos de poder realizar las designaciones de docentes para el primer cuatrimestre del ciclo lectivo 2019​ y 
 con el fin de lograr una adecuada coordinación de cursos y​ alumnos le solicitamos realice la asignación 
 de docentes a través de la aplicación web de Solicitud de Cátedra. En la misma pantalla, deberá indicar 
 qué docentes utilizarán el aula virtual de MásCampus. <br />
@@ -144,7 +144,7 @@ qué docentes utilizarán el aula virtual de MásCampus. <br />
 La distribución  de comisiones de la materia que usted tiene a cargo estará disponible ingresando a la 
 dirección: <a href='http://planeseeyn.unsam.edu.ar/programas'>http://planeseeyn.unsam.edu.ar/programas</a> 
 con el usuario y contraseña habituales y accediendo a la opción
-asignar comisiones. El sistema estará habilitado para ello desde el martes 19 de junio de 2018 hasta el domingo 1 de julio de 2018.
+asignar comisiones. El sistema estará habilitado para ello desde el viernes 26 de octubre de 2018 hasta el lunes 5 de noviembre de 2018.
 Una vez terminada la inscripción por parte de los alumnos, de acuerdo a la cantidad de inscriptos, haremos los ajustes necesarios. 
 <br />
 
@@ -157,11 +157,11 @@ Dirección de Asuntos Académicos.<br />
 Secretaría Académica<br />
 EEYN - UNSAM </p>";
 	
-	$asunto = "Solicitud de cátedra {$cuatrimestre}do cuatrimestre {$anio}";
+	$asunto = "Solicitud de Cátedra {$cuatrimestre}º cuatrimestre {$anio}";
 	
 	// ARMADO DE LA BASE DE DATOS PARA EL ENVÏO DE MAILS
 	
-	/*$result = $mysqli->query($query);
+	$result = $mysqli->query($query);
 	while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 		
 		//$materia = $row['nombre_materia'];
@@ -188,18 +188,19 @@ EEYN - UNSAM </p>";
 		
 		
 		
-	}*/
+	}
 	
 	//TEST MAIL A planes.eeyn@unsam.edu.ar
-	//$mensaje = sprintf($template, 'Santiago Garibotto');
-	//mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
+	/*$mensaje = sprintf($template, 'Santiago Garibotto');
+	mailAvisoMasCampus('Santiago Garibotto', 'planes.eeyn@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
+	echo $mensaje;*/
 	//mailAvisoMasCampus('Matías López', 'matias.lopez@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Lorena Penna', 'lpenna@unsam.edu.ar', 'TEST' . $asunto, $mensaje);
 	//mailAvisoMasCampus('Marcelo Estayno', 'mestayno@gmail.com', 'TEST' . $asunto, $mensaje);*/
 	
 	
 	//ENVIO DE MAILS GUARDADOS EN LA BASE
-	$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
+	/*$query = "SELECT id, id_destinatario, tipo_destinatario, destinatario, mail, asunto, mensaje 
 			FROM envios_por_mail
 			WHERE NOT ISNULL(mail) AND mail != '' AND enviado = 0
 			LIMIT 30;";
@@ -215,7 +216,7 @@ EEYN - UNSAM </p>";
 							SET enviado = 1 
 							WHERE id = $row[id];";
 		$mysqli->query($updateQuery);
-	}
+	}*/
 	
 	$result->free();
 	$mysqli->close();

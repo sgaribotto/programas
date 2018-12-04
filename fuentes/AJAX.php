@@ -1554,6 +1554,29 @@
 					$mysqli->close();
 					break;
 					
+				case "asignarAulaVirtualCalendario":
+					require 'conexion.php';
+					$comision = $_REQUEST['comision'];
+					$materia = $_REQUEST['materia'];
+					$check = $_REQUEST['check'];
+					$usuario = $_SESSION['usuario'];
+					//$usuario = 'test';
+					
+					$query = "UPDATE asignacion_comisiones_calendario
+								SET aula_virtual = {$check},
+								usuario_ultima_modificacion = '{$usuario}'
+								WHERE materia = '{$materia}' 
+									AND comision = '{$comision}'
+									AND anio = {$ANIO}
+									AND cuatrimestre = {$CUATRIMESTRE}";
+					$result = $mysqli->query($query);
+					echo $query;
+					//echo $mysqli->error;
+					echo 'ok';
+					
+					$mysqli->close();
+					break;
+					
 				case "asignarCargaCVAR":
 					require 'conexion.php';
 					$id = $_REQUEST['id'];
@@ -1624,7 +1647,7 @@
 						
 						
 						foreach ([1, 2] as $cuatrimestre) {
-							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+							/*$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
 										IF(nro_documento IN (SELECT DISTINCT nro_documento
 																FROM analiticos_convenios
 																WHERE carrera = 'CCCCP'), 'CCCCP', carrera) AS carrera,
@@ -1637,7 +1660,21 @@
 									WHERE anio_academico = {$anio}
 										AND periodo_lectivo = {$cuatrimestre}
 										AND materia = {$materia}
-									GROUP BY resultado, calidad";
+									GROUP BY resultado, calidad";*/
+							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+											'EYN-6' AS carrera,
+											IF(nro_documento IN (SELECT DISTINCT nro_documento + 0
+													FROM actas_convenios
+													WHERE (anio_academico < {$anio} OR 
+														(anio_academico = {$anio} AND periodo_lectivo < {$cuatrimestre}))
+														AND materia = {$materia}), 'Recursante', 'Cursante') AS calidad
+										FROM actas_convenios
+										WHERE anio_academico = {$anio}
+											#AND periodo_lectivo = {$cuatrimestre}
+											AND materia = {$materia}
+											AND nro_documento +0 IN (SELECT nro_documento
+												FROM alumnos_contador)
+										GROUP BY resultado, calidad";
 							
 							//echo $query;
 							//echo "<hr>";	
@@ -2350,9 +2387,10 @@
 					$resultadosConCarrera = array();
 					$query = "SELECT COUNT(DISTINCT CONCAT(fecha_examen, materia)) AS cantidad,
 								RIGHT(fecha_examen, 4) AS anio, resultado,
-								carrera
-								FROM analiticos
+								'EYN-6' AS carrera
+								FROM analiticos_contador
 								WHERE tipo = 'Final'
+									AND acta_final != ''
 									AND materia = {$materia}
 									AND RIGHT(fecha_examen, 4) BETWEEN {$inicio} AND {$fin}
 								GROUP BY anio, resultado, carrera
@@ -2360,13 +2398,40 @@
 							
 					$result = $mysqli->query($query);
 					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-						if (!isset($resultados[$row['carrera']][$row['anio']][$row['resultado']])) {
+						if (!isset($resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']])) {
 							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] = $row['cantidad'];
 						} else {
 							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] += $row['cantidad'];
 						}
 						
-						if (!isset($resultados['Total'][$row['anio']][$row['resultado']])) {
+						if (!isset($resultadosConCarrera['Total'][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+					}
+					
+					$query = "SELECT COUNT(DISTINCT CONCAT(fecha_examen, materia)) AS cantidad,
+								RIGHT(fecha_examen, 4) AS anio, resultado,
+								carrera
+								FROM analiticos_no_contador
+								WHERE tipo = 'Final'
+									AND acta_final != ''
+									AND materia = {$materia}
+									AND RIGHT(fecha_examen, 4) BETWEEN {$inicio} AND {$fin}
+									AND carrera IN ('EYN-3', 'EYN-4')
+								GROUP BY anio, resultado, carrera
+								ORDER BY carrera, anio, resultado";
+							
+					$result = $mysqli->query($query);
+					while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+						if (!isset($resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']])) {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] = $row['cantidad'];
+						} else {
+							$resultadosConCarrera[$row['carrera']][$row['anio']][$row['resultado']] += $row['cantidad'];
+						}
+						
+						if (!isset($resultadosConCarrera['Total'][$row['anio']][$row['resultado']])) {
 							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] = $row['cantidad'];
 						} else {
 							$resultadosConCarrera['Total'][$row['anio']][$row['resultado']] += $row['cantidad'];
@@ -2381,7 +2446,7 @@
 					foreach ($resultadosConCarrera as $carrera => $anios) {
 						
 						echo "<h2>{$carrera}</h2>";
-					
+						echo date('m/d/Y h:i:s a', time());
 						echo "<table border='1'>";
 						echo "<tr>";
 						echo "<th>Año</th>";
@@ -2511,7 +2576,7 @@
 						
 						
 						foreach ([1, 2] as $cuatrimestre) {
-							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+							/*$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
 										IF(nro_documento IN (SELECT DISTINCT nro_documento
 																FROM analiticos
 																WHERE carrera = 'CCCCP'), 'CCCCP', carrera) AS carrera,
@@ -2524,15 +2589,24 @@
 									WHERE anio_academico = {$anio}
 										AND periodo_lectivo = {$cuatrimestre}
 										AND materia = {$materia}
-									GROUP BY resultado, calidad";
-							
+									GROUP BY resultado, calidad";*/
+							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+											'EYN-6' AS carrera,
+											IF(rectificado > 1, 'Recursante', 'Cursante') AS calidad
+										FROM actas_contador
+										WHERE anio_academico = {$anio}
+											AND periodo_lectivo = {$cuatrimestre}
+											AND materia = {$materia}
+											#AND carrera IN ('EYN-3', 'EYN-4')
+											
+										GROUP BY resultado, calidad";
 							//echo $query;
 							//echo "<hr>";	
 							$result = $mysqli->query($query);
 							
 							
 							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-								if (!isset($resultados[$row['carrera']][$anio][$row['resultado']][$row['calidad']])) {
+								if (!isset($resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']])) {
 									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
 								} else {
 									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
@@ -2544,7 +2618,7 @@
 									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
 								}
 								
-								if (!isset($resultados['Total'][$anio][$row['resultado']][$row['calidad']])) {
+								if (!isset($resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']])) {
 									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
 								} else {
 									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
@@ -2556,16 +2630,59 @@
 									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
 								}
 							}
+							
+							$query = "SELECT COUNT(DISTINCT nro_documento + 0) AS cantidad, TRIM(resultado) AS resultado,
+											carrera,
+											IF(rectificado > 1, 'Recursante', 'Cursante') AS calidad
+										FROM actas_no_contador
+										WHERE anio_academico = {$anio}
+											AND periodo_lectivo = {$cuatrimestre}
+											AND materia = {$materia}
+											AND carrera IN ('EYN-3', 'EYN-4')
+										GROUP BY resultado, calidad, carrera";
+							//echo $query;
+							//echo "<hr>";
+							
+							$result = $mysqli->query($query);
+							
+							
+							while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+								if (!isset($resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera[$row['carrera']][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio][$row['resultado']][$row['calidad']] += $row['cantidad'];
+								}
+								
+								if (!isset($resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']])) {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] = $row['cantidad'];
+								} else {
+									$resultadosConCarrera['Total'][$anio]['inscriptos'][$row['calidad']] += $row['cantidad'];
+								}
+							}
+							
 						}
 						
 					}
 				
 					
-					
-					//print_r($resultados);
+					echo "<pre>";
+					//print_r($resultadosConCarrera['EYN-4']);
+					echo "</pre>";
 					
 					foreach ($resultadosConCarrera as $carrera => $resultados) {
-						
+						echo date('m/d/Y h:i:s a', time());
 						echo "<h2>{$carrera}</h2>";
 					
 						echo "<table border='1'>";
@@ -5194,29 +5311,45 @@
 							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '1'][$detalle['dia']][] = $detalle;
 							$comisiones[$detalle['materia'] . $detalle['nombre_comision']][$detalle['turno'] . '2'][$detalle['dia']][] = $detalle;
 						}
+						if (!isset($comisiones[$detalle['materia'] . $detalle['nombre_comision']]['aula_virtual'])) {
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']]['aula_virtual'] = 0;
+						}
+						if ($detalle['aula_virtual'] == 1) {
+							$comisiones[$detalle['materia'] . $detalle['nombre_comision']]['aula_virtual'] = $detalle['aula_virtual'];
+						}
 					}
-					//print_r($comisiones);
+					/*echo "<pre>";
+					print_r($comisiones);
+					echo "</pre>";*/
 					foreach ($comisiones as $nombre => $turnos) {
 						$comision = str_replace($conjunto, '', $nombre);
+						//echo "comision " . $comisiones[$nombre]['aula_virtual'];
+						$checked = "";
+						if ($comisiones[$nombre]['aula_virtual'] == 1) {
+							$checked = "checked";
+						}
 						echo "<div class='comision calendario'>";
 						echo "<h3 class='comision'>Comisión {$nombre}</h3>";
+						echo "<input type='checkbox' {$checked} name='aulavirtual' class='aulavirtual' data-comision='{$comision}' data-materia='{$conjunto}' />";
+						echo "<label for='aulavirtual'>Aula Virtual</label>";
 						echo "<table class='comision' border='1'>";
 						echo "<thead class='comision'>
 							<tr class='comision'>
 								
-								<th class='calendario' style='width:10%;'>Horario</th>
-								<th class='calendario' style='width:15%;'>Lunes</th>
-								<th class='calendario' style='width:15%;'>Martes</th>
-								<th class='calendario' style='width:15%;'>Miércoles</th>
-								<th class='calendario' style='width:15%;'>Jueves</th>
-								<th class='calendario' style='width:15%;'>Viernes</th>
-								<th class='calendario' style='width:15%;'>Sábado</th>
+								<th class='calendario' style='width:10%; text-align:center;'>Horario</th>
+								<th class='calendario' style='width:15%;text-align:center'>Lunes</th>
+								<th class='calendario' style='width:15%;text-align:center'>Martes</th>
+								<th class='calendario' style='width:15%;text-align:center'>Miércoles</th>
+								<th class='calendario' style='width:15%;text-align:center'>Jueves</th>
+								<th class='calendario' style='width:15%;text-align:center'>Viernes</th>
+								<th class='calendario' style='width:15%;text-align:center'>Sábado</th>
 								
 							</tr>
 							</thead>
 							<tbody class='calendario' id='comisionesAsignadas'>";
 							
 							foreach ($turnos as $turno => $dias) {
+								if ($turno != 'aula_virtual') {
 								echo "<tr class='calendario turno{$turno}'>";
 								echo "<td class='calendario horario'>{$horasTurno[$turno]}</td>";
 								
@@ -5258,7 +5391,7 @@
 									}
 									
 									echo "</table></form></td>";
-									
+								}
 								}
 							}
 

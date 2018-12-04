@@ -34,11 +34,12 @@
 								require 'fuentes/conexion.php';
 								
 								$query = "SELECT DISTINCT CONCAT(anio, ' - ', cuatrimestre) AS periodo
-											FROM asignacion_comisiones_calendario;";
+											FROM asignacion_comisiones_calendario
+											ORDER BY anio, cuatrimestre;";
 								$result = $mysqli->query($query);
 								
 								while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-									echo "<option value='{$row['periodo']}'>{$row['periodo']}</option>";
+									echo "<option value='{$row['periodo']}' selected>{$row['periodo']}</option>";
 								}
 							?>
 								
@@ -53,7 +54,8 @@
 												CONCAT(d.apellido, ', ', d.nombres) AS nombre
 											FROM asignacion_comisiones_calendario AS acc
 											LEFT JOIN docente AS d
-												ON d.id = acc.docente;";
+												ON d.id = acc.docente
+											ORDER BY d.apellido, d.nombres;";
 								$result = $mysqli->query($query);
 								
 								while ($row = $result->fetch_array(MYSQLI_ASSOC)) {

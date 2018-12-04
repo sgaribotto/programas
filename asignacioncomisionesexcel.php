@@ -9,7 +9,9 @@
 		
 		$periodo = $_REQUEST['periodo'];
 		
-		$query = "SELECT DISTINCT ca.materia,
+		
+		
+		/*$query = "SELECT DISTINCT ca.materia,
 					ca.nombres,
 					ca.nombre_comision,
 					ca.horario,
@@ -41,8 +43,46 @@
 					ON au.materia LIKE CONCAT(ca.materia, '%') AND au.comision_real = ca.nombre_comision
 						AND au.anio = ca.anio AND au.cuatrimestre = ca.cuatrimestre
 				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
-				GROUP BY ca.materia, ca.nombre_comision, docentes";
-				
+				GROUP BY ca.materia, ca.nombre_comision, docentes";*/
+		
+		$query = "SELECT DISTINCT ca.materia, m.nombres, c.cod, ca.turno, 
+					ca.nombre_comision, t.dia, tpn.descripcion,
+					CONCAT(d.apellido, ', ', d.nombres) AS docente,
+					IF(acc.aula_virtual = 1, 'Sí', 'No') AS aula_virtual,
+					GROUP_CONCAT(DISTINCT CONCAT(p.apellido, ', ', p.nombres) SEPARATOR ' / ') AS responsables
+				FROM comisiones_abiertas AS ca
+				LEFT JOIN vista_materias_por_conjunto AS m
+					ON ca.materia = m.conjunto
+
+				LEFT JOIN turnos_con_conjunto AS t
+					ON t.anio = ca.anio
+						AND t.cuatrimestre = ca.cuatrimestre
+						AND t.materia = CONCAT(ca.materia, IFNULL(ca.observaciones, ''))
+						AND LEFT(t.turno, 1) = ca.turno
+				LEFT JOIN asignacion_comisiones_calendario AS acc
+					ON acc.anio = ca.anio
+						AND acc.cuatrimestre = ca.cuatrimestre
+						AND acc.materia = ca.materia
+						AND acc.comision = ca.nombre_comision
+						AND acc.dia = t.dia
+						AND acc.horario = t.turno
+				LEFT JOIN turnos_por_nombre AS tpn
+					ON tpn.nombre = t.turno
+				LEFT JOIN docente AS d ON d.id = acc.docente
+				LEFT JOIN carrera AS c ON m.carrera = c.id
+				LEFT JOIN (SELECT DISTINCT r.usuario, m.conjunto
+							FROM responsable AS r
+							LEFT JOIN materia AS m
+								ON m.cod = r.materia
+							WHERE r.activo = 1) AS r
+					ON r.conjunto = ca.materia
+				LEFT JOIN personal AS p
+					ON r.usuario = p.id
+				WHERE CONCAT(ca.anio, ' - ', ca.cuatrimestre) = '{$periodo}'
+				GROUP BY ca.materia, ca.nombre_comision, t.dia, t.turno, acc.docente 
+				ORDER BY ca.materia, ca.nombre_comision, 
+					FIELD(t.dia, 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'),
+					t.turno";		
 		$result = $mysqli->query($query);
 		
 		if ($mysqli->errno) {
@@ -64,12 +104,12 @@
 			<tr>
 				<th>Materia</th>
 				<th>Nombre Materia</th>
+				<th>Carrera</th>
+				<th>Turno</th>
 				<th>Comision</th>
+				<th>Día</th>
 				<th>Horario</th>
-				<th>Aula</th>
-				<th>Inscriptos</th>
 				<th>Docentes</th>
-				<th>Cargo</th>
 				<th>Aula Virtual</th>
 				<th>Responsable</th>
 			</tr>
