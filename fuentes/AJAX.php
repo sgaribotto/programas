@@ -149,6 +149,53 @@
 					}
 					$mysqli->close();
 					break;
+					
+				case "agregarDesignacion":
+					require "./conexion.php";
+					
+					//$query = "SELECT dni FROM docente WHERE dni = '$_POST[dni]' ";
+					$result = $mysqli->query($query);
+					$docente = $mysqli->real_escape_string($_POST['docente']);
+					$categoria = $mysqli->real_escape_string($_POST['categoria']);
+					$caracter = $mysqli->real_escape_string($_POST['caracter']);
+					$dedicacion = $mysqli->real_escape_string($_POST['dedicacion']);
+					$fechaAlta = $mysqli->real_escape_string($_POST['fechaalta']);
+					$fechaBaja = $mysqli->real_escape_string($_POST['fechabaja']);
+					$motivacion = $mysqli->real_escape_string($_POST['motivacion']);
+					$observaciones = $mysqli->real_escape_string($_POST['observaciones']);
+					
+					$query = "INSERT INTO designacion SET docente = {$docente}, categoria = '{$categoria}', 
+									caracter = '{$caracter}',
+									dedicacion = '{$dedicacion}',
+									fecha_alta = '{$fechaAlta}', 
+									fecha_baja = '{$fechaBaja}',
+									motivacion = '{$motivacion}',
+									observaciones = '{$observaciones}';";
+						
+					$mysqli->query($query);
+					
+					if ($mysqli->errno) {
+						echo "ERROR: " . $mysqli->error;
+					} else {
+						echo "Se ha cargado la designación.";
+					}
+					$mysqli->close();
+					break;
+					
+				case "renovarDesignacion":
+					require "./conexion.php";
+					
+					$query = "INSERT INTO designacion 
+						(docente, categoria, caracter, dedicacion, fecha_alta, fecha_baja, motivacion, observaciones)
+						SELECT docente, categoria, caracter, dedicacion, DATE_ADD(fecha_alta, INTERVAL 1 YEAR),
+							DATE_ADD(fecha_baja, INTERVAL 1 YEAR), motivacion, observaciones
+						FROM designacion
+						WHERE id = {$_REQUEST['id']}";
+					$mysqli->query($query);
+					echo $mysqli->error;
+					
+					$mysqli->close();
+					break;
 				
 				case "agregarConstante":
 					require "./conexion.php";
@@ -207,6 +254,16 @@
 					$mysqli->query($query);
 					$mysqli->close();
 					break;
+				
+				case "eliminarDesignacion":
+					require "./conexion.php";
+					$id = $_REQUEST['id'];
+					
+					$query = "DELETE FROM designacion WHERE id = {$id}";
+					$mysqli->query($query);
+					$mysqli->close();
+					break;
+				
 				
 				case "eliminarConstante":
 					require "./conexion.php";
@@ -3620,6 +3677,64 @@
 						echo "</table>";
 					} else {
 						echo "<p>No se encontraron docentes</p>";
+					}
+					break;
+				
+				
+				case "tablaDesignaciones":
+					require 'conexion.php';
+					
+					$docente = $mysqli->real_escape_string($_REQUEST['docente']);
+					
+					$query = "SELECT id, categoria, caracter, dedicacion, fecha_alta, fecha_baja
+								FROM designacion
+								WHERE docente = {$docente}
+								ORDER BY fecha_alta DESC";
+					//echo $query;
+					$result = $mysqli->query($query);
+					echo $mysqli->error;
+					$docentes = array();
+					
+					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
+						$docentes[] = $row;
+					}
+					
+					if (sizeof($docentes)) {
+						
+						echo "<table class='docentes' style='width:98%;'>";
+						echo "<tr class='subtitulo'>
+								<th class='subtitulo'style='width:21%;'>Categoría</th>
+								<th class='subtitulo'style='width:21%;'>Caracter</th>
+								<th class='subtitulo'style='width:21%;'>Dedicación</th>
+								<th class='subtitulo' style='width:10%;'>Alta</th>
+								<th class='subtitulo' style='width:10%;'>Baja</th>
+								<th class='subtitulo' style='width:8%;'>Renovar</th>
+								<th class='subtitulo' style='width:8%;'>Eliminar</th>
+							</tr>";
+						foreach ($docentes AS $valores) {
+							echo "<tr class='info'>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[categoria]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[caracter]</td>
+									<td class='info masInfo' data-id='$valores[id]'>$valores[dedicacion]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[fecha_alta]</td>";
+							echo "<td class='materia' style='text-align:left;'>$valores[fecha_baja]</td>";
+							
+							if (strpos(strtolower($valores['caracter']), 'rdi') != false) {
+								echo "<td class='materia'></td>";
+							} else {
+								echo "<td class='materia renovar'>
+										<button class='materia botonRenovar' data-id='{$valores['id']}'>R</button>
+									</td>";
+							}
+							
+							echo "<td class='formularioLaterial eliminarEnTabla'><button type='button' 
+									class='formularioLateral botonEliminar' id='eliminarDesignacion' data-id='$valores[id]'>
+								X</button>";
+							echo "</tr>";
+						}
+						echo "</table>";
+					} else {
+						echo "<p>No se encontraron designaciones</p>";
 					}
 					break;
 					

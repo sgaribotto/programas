@@ -26,6 +26,7 @@
 				<li class="navLateral"><a href="carreras.php" class="navLateral">Carreras</a></li>
 				<li class="navLateral"><a href="personal.php" class="navLateral">Personal</a></li>
 				<li class="navLateral"><a href="permisos.php" class="navLateral">Permisos</a></li>
+				<li class="navLateral"><a href="ABMdesignaciones.php" class="navLateral">Designaciones</a></li>
 				
 			</ul>
 			
