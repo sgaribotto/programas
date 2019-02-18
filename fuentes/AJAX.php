@@ -4380,7 +4380,9 @@
 						$docente = $_REQUEST['docente'];
 					
 					
-					$query = "SELECT acc.dia, acc.horario, CONCAT(acc.materia, acc.comision, '<br />Aula: ', IFNULL(aa.aula, '')) AS materia
+					$query = "SELECT acc.dia, acc.horario, CONCAT(acc.materia, acc.comision, '<br />Aula: ', IFNULL(aa.aula, '')) AS materia,
+								acc.materia AS conjunto
+									
 									FROM asignacion_comisiones_calendario AS acc
 									LEFT JOIN asignacion_aulas AS aa
 										ON aa.dia = acc.dia
@@ -4398,9 +4400,11 @@
 					$result = $mysqli->query($query);
 					echo $mysqli->error;
 					$horariosDocente = array();
+					$materias = array();
 					
 					while ($row = $result->fetch_array(MYSQLI_ASSOC) ) {
 						$horariosDocente[$row['horario']][$row['dia']] = $row['materia'];
+						$materias[$row['conjunto']]['conjunto'] = $row['conjunto'];
 					}
 					
 					if (sizeof($horariosDocente)) {
@@ -4427,7 +4431,27 @@
 						}
 						
 						
-						echo "</table>";
+						
+						
+						echo "</table><ul>";
+						
+						foreach ($materias as $materia) {
+							$conjunto = $materia['conjunto'];
+							//echo $conjunto;
+							$query = "SELECT nombres
+										FROM vista_materias_por_conjunto
+										WHERE conjunto = '{$conjunto}'";
+							
+							//echo $query;
+							$result = $mysqli->query($query);
+							echo "<li>";
+							echo $materia['conjunto'];
+							echo ": ";
+							echo $result->fetch_array(MYSQLI_ASSOC)['nombres'];
+							echo "</li>";
+							
+						}
+						echo "</li>";
 					} else {
 						echo "<p>No se encontraron horarios para el docente</p>";
 					}
