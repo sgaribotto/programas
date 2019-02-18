@@ -2,7 +2,7 @@
 <html>
 	<head>
 		
-		<title>Evaluación y criterios de aprobación</title>
+		<title>Metodología de evaluación</title>
 		<?php 
 			require_once('./fuentes/meta.html');
 			require_once 'programas.autoloader.php';
@@ -20,7 +20,7 @@
 		?>
 		
 		<div class="formularioLateral">
-			<h2 class="formularioLateral">Evaluación y criterios de aprobación</h2>
+			<h2 class="formularioLateral">Metodología de evaluación</h2>
 			<a href="http://guarani.unsam.edu.ar/eyn_alumnos/acceso/descargar_archivo?archivo=PROM.pdf">Normativa de promoción</a>
 			<div id="formulario">
 				<fieldset class="formularioLateral">

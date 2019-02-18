@@ -121,7 +121,7 @@
 			});
 			
 			$("#botonContinuar").click(function() {
-				location.assign("./evaluacion.php");
+				location.assign("./campusvirtual.php");
 			});
 		});
 	</script>

@@ -1,5 +1,5 @@
 ﻿
-<div class="navLateral">
+<div class="navLateral" style="overflow-y: scroll; min-height:83%; height:83%;">
 			
 	<?php 
 	//print_r($_SESSION);
@@ -300,7 +300,7 @@
 	</div>
 	
 	<?php } else { ?>
-	<div class="navUsuario">
+	<div class="navUsuario" >
 			<h2 class="navLateral hidder">Docente - Carga de programas</h2>
 			
 			<?php echo (isset($_SESSION['nombreMateria'])) ? "<h3 class='nvaLateral'>" . $_SESSION['nombreMateria'] . "</h3>" : ""; ?>
@@ -345,9 +345,11 @@
 					<!--<li class="navLateral"><a href="asignarcomisiones.php" class="navLateral">Asignar comisiones</a></li>-->
 					<li class="navLateral"><a href="asignarcomisionescalendario.php" class="navLateral">Asignar comisiones</a></li>
 					<li class="navLateral"><a href="objetivos.php" class="navLateral">Objetivos</a></li>
-					<li class="navLateral"><a href="fundamentacion.php" class="navLateral">Enfoque metodológico</a></li>
+					<li class="navLateral"><a href="actividadestyp.php" class="navLateral">Descripción de actividades teóricas y prácticas</a></li>
+					<li class="navLateral"><a href="fundamentacion.php" class="navLateral">Metodología de enseñanza</a></li>
 					<li class="navLateral"><a href="unidadestematicas.php" class="navLateral">Unidades temáticas</a></li>
-					<li class="navLateral"><a href="evaluacion.php" class="navLateral">Evaluación y criterios de aprobación</a></li>
+					<li class="navLateral"><a href="campusvirtual.php" class="navLateral">Uso del campus virtual</a></li>
+					<li class="navLateral"><a href="evaluacion.php" class="navLateral">Metodología de evaluación</a></li>
 					<li class="navLateral"><a href="bibliografia.php" class="navLateral">Bibliografía</a></li>
 				</ul>
 				

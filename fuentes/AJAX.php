@@ -78,7 +78,7 @@
 				case "agregarBibliografia":
 					
 					$materia = new clases\Materia($_SESSION['materia']);
-					$materia->agregarBibliografia($_POST['titulo'], $_POST['autor'], $_POST['editorial'], $_POST['paginas'], $ANIO, $CUATRIMESTRE);
+					$materia->agregarBibliografia($_POST['titulo'], $_POST['autor'], $_POST['editorial'], $_POST['edicion'], $_POST['paginas'], $ANIO, $CUATRIMESTRE);
 					echo "<script>location.assign('../bibliografia.php')</script>";
 					break;
 					

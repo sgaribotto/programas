@@ -41,10 +41,26 @@
 				
 				$programa = new clases\Programa($_SESSION['materia'], $_SESSION['id']);
 				$programa->ingresarCampo(["objetivos" => $_POST['objetivos']], $ANIO, $CUATRIMESTRE);
+				header('location:actividadestyp.php');
+				break;
+				
+			case "actividadestyp":
+				
+				$programa = new clases\Programa($_SESSION['materia'], $_SESSION['id']);
+				$programa->ingresarCampo(["actividadestyp" => $_POST['actividadestyp']], $ANIO, $CUATRIMESTRE);
 				header('location:fundamentacion.php');
 				break;
 				
+			
+				
 			case "unidadestematicas":
+				header('location:campusvirtual.php');
+				break;
+				
+			case "campusvirtual":
+				
+				$programa = new clases\Programa($_SESSION['materia'], $_SESSION['id']);
+				$programa->ingresarCampo(["campusvirtual" => $_POST['campusvirtual']], $ANIO, $CUATRIMESTRE);
 				header('location:evaluacion.php');
 				break;
 				

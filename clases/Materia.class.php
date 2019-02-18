@@ -136,7 +136,7 @@ namespace clases {
 				$conjuntoClause = "OR materia IN $conjunto";
 			}
 			
-			$query = "SELECT titulo, autor, editorial, paginas, id FROM bibliografia 
+			$query = "SELECT titulo, autor, editorial, edicion, paginas, id FROM bibliografia 
 				WHERE (materia = {$this->cod} {$conjuntoClause}) 
 					AND activo = '1' 
 					AND anio = {$anio} 
@@ -154,15 +154,17 @@ namespace clases {
 			
 		}
 		
-		public function agregarBibliografia($titulo, $autor, $editorial, $paginas, $anio, $cuatrimestre) { //Agregar bibliografía de la materia
+		public function agregarBibliografia($titulo, $autor, $editorial, $edicion, $paginas, $anio, $cuatrimestre) { //Agregar bibliografía de la materia
 			require('./conexion.php');
 			
 			$titulo = $mysqli->real_escape_string($titulo);
 			$editorial = $mysqli->real_escape_string($editorial);
+			$edicion = $mysqli->real_escape_string($edicion);
 			$paginas = $mysqli->real_escape_string($paginas);
 			$autor = $mysqli->real_escape_string($autor);
 			
-			$query = "INSERT INTO bibliografia (materia, titulo, autor, editorial, paginas, anio, cuatrimestre) VALUES ('{$this->cod}', '$titulo', '$autor', '$editorial', '$paginas', $anio, $cuatrimestre) ";
+			$query = "INSERT INTO bibliografia (materia, titulo, autor, editorial, edicion, paginas, anio, cuatrimestre) 
+				VALUES ('{$this->cod}', '$titulo', '$autor', '$editorial', '$edicion', '$paginas', $anio, $cuatrimestre) ";
 			$mysqli->query($query);
 			
 			$mysqli->close();

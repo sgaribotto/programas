@@ -27,6 +27,7 @@
 						<th class="plantelActual" style="width:40%;">Título</th>
 						<th class="plantelActual" style="width:30%;">Autor</th>
 						<th class="plantelActual" style="width:20%;">Editorial</th>
+						<th class="plantelActual" style="width:20%;">Edición</th>
 						<th class="plantelActual" style="width:10%;">Páginas</th>
 						<!--<th class="plantelActual" style="width:20%;">Estado</th>-->
 					</tr>
@@ -46,6 +47,7 @@
 											<td class='formularioLateral plantelActual'>$value[titulo]</td>
 											<td class='formularioLateral plantelActual'>$value[autor]</td>
 											<td class='formularioLateral plantelActual'>$value[editorial]</td>
+											<td class='formularioLateral plantelActual'>$value[edicion]</td>
 											<td class='formularioLateral plantelActual'>$value[paginas]</td>
 											<td class='formularioLateral correlatividadesTable'><button type='button' class='botonEliminar' data-id='$value[id]' >X</button></td>
 											</tr>";
@@ -68,6 +70,9 @@
 						<br />
 						<label class="formularioLateral" for="editorial">Editorial: </label>
 						<input name="editorial" class="formularioLateral iconEditorial"  required="required" id="editorial" type="text">
+						<br />
+						<label class="formularioLateral" for="edicion">Edición: </label>
+						<input name="edicion" class="formularioLateral iconEditorial"  id="editorial" type="text" placeholder="Número y año de edición. Por ej: 2da edición (2017).">
 						<br />
 						<label class="formularioLateral" for="paginas">Cantidad de páginas: </label>
 						<input name="paginas" class="formularioLateral iconPaginas"  required="required" id="paginas" type="number" min="1">
