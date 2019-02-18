@@ -4387,7 +4387,7 @@
 									LEFT JOIN asignacion_aulas AS aa
 										ON aa.dia = acc.dia
 											AND aa.turno = acc.horario
-											AND acc.materia = aa.materia
+											AND aa.materia LIKE CONCAT(acc.materia, '%')
 											AND acc.comision = aa.comision_real
 											AND acc.anio = aa.anio
 											AND acc.cuatrimestre = aa.cuatrimestre
