@@ -36,7 +36,7 @@
 								require 'fuentes/conexion.php';
 								
 								$query = "SELECT DISTINCT CONCAT(anio, ' - ', cuatrimestre) AS periodo
-											FROM asignacion_comisiones
+											FROM comisiones_abiertas
 											ORDER BY anio, cuatrimestre";
 								$result = $mysqli->query($query);
 								
